@@ -316,17 +316,159 @@
             opacity: 1;
             visibility: visible;
         }
-        .who-we-are .section-heading,
-        .who-we-are .section-copy,
-        .who-we-are .eyebrow {
+        .who-we-are {
+            margin-top: -2rem;
+            margin-bottom: 10rem;
+        }
+
+        .who-we-are-layout {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: minmax(320px, 1fr) minmax(0, 1.2fr);
+            grid-template-areas:
+                "header header"
+                "card content";
+            column-gap: clamp(1.5rem, 4vw, 3rem);
+            row-gap: 2rem;
+            align-items: start;
+        }
+
+        .who-we-are-header {
+            grid-area: header;
+            position: relative;
+            z-index: 2;
+            margin-bottom: -1.25rem;
+        }
+
+        .who-we-are-header .eyebrow,
+        .who-we-are-header .section-heading {
             text-align: center;
             margin-left: auto;
             margin-right: auto;
         }
 
-        .who-we-are {
-            margin-top: -2rem;
-            margin-bottom: 10rem;
+        .who-we-are-card {
+            grid-area: card;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .who-we-are-content {
+            grid-area: content;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .who-we-are .section-copy {
+            text-align: left;
+            margin: 0;
+        }
+
+        .who-we-are .stat-grid {
+            margin-top: 0;
+        }
+
+        .who-we-are-points {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 0.75rem;
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 520px;
+            padding-left: 1.5rem;
+            flex: 1;
+            position: relative;
+        }
+
+        .who-we-are-points::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 8px;
+            border-radius: 999px;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.245),
+                rgba(255, 255, 255, 0.126)
+            );
+            border: 1px solid rgba(255, 255, 255, 0.196);
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 0.315),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.245),
+                0 6px 18px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            opacity: var(--margin-opacity, 1);
+            transform: scaleY(var(--margin-reveal, 1));
+            transform-origin: top;
+        }
+
+        html.js-anim .who-we-are-points {
+            --margin-reveal: 0;
+            --margin-opacity: 0;
+        }
+
+        .who-we-are-points li {
+            display: grid;
+            grid-template-columns: 10px 1fr;
+            gap: 0.75rem;
+            align-items: start;
+        }
+
+        .who-we-are-points li::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            margin-top: 0.4rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.45);
+        }
+
+        .who-we-are .team-stack {
+            margin: 0;
+            width: min(520px, 100%);
+        }
+
+        @media (max-width: 980px) {
+            .who-we-are-layout {
+                grid-template-columns: minmax(280px, 1fr) minmax(0, 1fr);
+                column-gap: clamp(1.25rem, 3vw, 2rem);
+            }
+
+            .who-we-are-header {
+                margin-bottom: -0.75rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .who-we-are-layout {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "header"
+                    "card"
+                    "content";
+                row-gap: 2rem;
+            }
+
+            .who-we-are-header {
+                margin-bottom: 0;
+            }
+
+            .who-we-are-card {
+                justify-content: center;
+            }
+
+            .who-we-are .team-stack {
+                width: min(420px, 92vw);
+            }
         }
 
         #team,
@@ -699,9 +841,9 @@
         .team-stack .team-card {
             position: absolute;
             width: min(360px, 82vw);
-            transform: translate3d(0, var(--stack-y, 0px), 0) scale(var(--stack-scale, 1));
+            transform: translate3d(var(--stack-x, 0px), var(--stack-y, 0px), 0) scale(var(--stack-scale, 1));
             opacity: var(--stack-opacity, 1);
-            filter: blur(var(--stack-blur, 0px));
+            filter: blur(var(--stack-blur, 0px)) brightness(var(--stack-brightness, 1)) saturate(var(--stack-saturate, 1));
             z-index: var(--stack-z, 1);
             pointer-events: var(--pointer, none);
             will-change: transform, opacity, filter;
@@ -733,6 +875,31 @@
             margin-top: 1rem;
         }
 
+        .team-card.is-active .team-info {
+            position: relative;
+        }
+
+        .team-card.is-active .team-info::before {
+            content: "";
+            position: absolute;
+            inset: -6px -10px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 0.25),
+                inset 0 -1px 2px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .team-card.is-active .team-info > * {
+            position: relative;
+            z-index: 1;
+        }
+
         .team-info a {
             width: 42px;
             height: 42px;
@@ -749,12 +916,14 @@
             font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 0.25rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
         }
 
         .team-role {
             color: rgba(255, 255, 255, 0.78);
             font-size: 0.9rem;
             font-weight: 500;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
         }
 
         footer {
@@ -1782,85 +1951,53 @@
         </section>
 
         <section id="who-we-are" class="section who-we-are">
-            <div class="eyebrow" data-animate="text" data-anim-group="about-flow">Who We Are</div>
-            <h2 class="section-heading" data-animate="text" data-anim-group="about-flow">Who We Are</h2>
-            <p class="section-copy" data-animate="text" data-anim-group="about-flow">We're a tight-knit team of strategists, designers, and developers who are passionate about building things that matter. Our collaborative process ensures that we not only meet but exceed your expectations, delivering a product that is both beautiful and functional.</p>
-            <div class="stat-grid">
-                <article class="stat-card" data-animate="fade-slow" data-anim-group="about-flow">
-                    <div class="stat-icon-wrap">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 3h7v7H3z"/>
-                            <path d="M14 3h7v7h-7z"/>
-                            <path d="M14 14h7v7h-7z"/>
-                            <path d="M3 14h7v7H3z"/>
-                        </svg>
+            <div class="who-we-are-layout">
+                <div class="who-we-are-header">
+                    <div class="eyebrow" data-animate="text" data-anim-group="about-flow">Who We Are</div>
+                    <h2 class="section-heading" data-animate="text" data-anim-group="about-flow">Who We Are</h2>
+                </div>
+                <div class="who-we-are-card">
+                    <div class="team-stack" role="button" tabindex="0" aria-label="Team card stack" data-animate="card" data-anim-group="about-flow">
+                        <article class="team-card">
+                            <img class="team-photo" src="images/zenpfp.png" alt="Zendyn Reddy">
+                            <div class="team-info">
+                                <div>
+                                    <div class="team-name">Zendyn Reddy</div>
+                                    <div class="team-role">Co-Founder & CEO</div>
+                                </div>
+                                <a href="https://www.linkedin.com/in/zendyn-reddy-507aa4365/" aria-label="Zendyn Reddy on LinkedIn">in</a>
+                            </div>
+                        </article>
+                        <article class="team-card">
+                            <img class="team-photo" src="images/cjpfp.jpg" alt="Cornelis de Heus">
+                            <div class="team-info">
+                                <div>
+                                    <div class="team-name">Cornelis de Heus</div>
+                                    <div class="team-role">Co-Founder & Lead Designer</div>
+                                </div>
+                                <a href="https://www.linkedin.com/in/cornelis-de-heus-4ba938372/" aria-label="Cornelis de Heus on LinkedIn">in</a>
+                            </div>
+                        </article>
+                        <article class="team-card">
+                            <img class="team-photo" src="images/khanyipfp.jpg" alt="Khanyiso Mkulise">
+                            <div class="team-info">
+                                <div>
+                                    <div class="team-name">Khanyiso Mkulise</div>
+                                    <div class="team-role">Co-Founder & CTO</div>
+                                </div>
+                                <a href="https://za.linkedin.com/in/khanyiso-mkulise-b59938372" aria-label="Khanyiso Mkulise on LinkedIn">in</a>
+                            </div>
+                        </article>
                     </div>
-                    <div>
-                        <h3>Building Quality Digital Products</h3>
-                        <p>Designing and developing modern apps and web applications with clean, scalable foundations.</p>
-                    </div>
-                </article>
-                <article class="stat-card" data-animate="fade-slow" data-anim-group="about-flow">
-                    <div class="stat-icon-wrap">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="9"/>
-                            <path d="M12 7v5l3 2"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3>10,000+ Hours of Development</h3>
-                        <p>Time spent building, refining, and improving our apps and internal projects.</p>
-                    </div>
-                </article>
-                <article class="stat-card" data-animate="fade-slow" data-anim-group="about-flow">
-                    <div class="stat-icon-wrap">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 12h6l-2 8 8-16h-6l2-8z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3>95% Faster</h3>
-                        <p>We leverage leading AI tools to speed up development, improve design quality, and stay ahead.</p>
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <section id="team" class="section">
-            <div class="eyebrow" data-animate="text" data-anim-group="about-flow">Our Team</div>
-            <h2 class="section-heading" data-animate="text" data-anim-group="about-flow">Meet the Minds Behind ZoneBroz Studios</h2>
-            <p class="section-copy" data-animate="text" data-anim-group="about-flow">We bring together technology and strategy to create smarter automation solutions.</p>
-            <div class="team-stack" role="button" tabindex="0" aria-label="Team card stack" data-animate="card" data-anim-group="about-flow">
-                <article class="team-card">
-                    <img class="team-photo" src="images/zenpfp.png" alt="Zendyn Reddy">
-                    <div class="team-info">
-                        <div>
-                            <div class="team-name">Zendyn Reddy</div>
-                            <div class="team-role">Co-Founder & CEO</div>
-                        </div>
-                        <a href="https://www.linkedin.com/in/zendyn-reddy-507aa4365/" aria-label="Zendyn Reddy on LinkedIn">in</a>
-                    </div>
-                </article>
-                <article class="team-card">
-                    <img class="team-photo" src="images/cjpfp.jpg" alt="Cornelis de Heus">
-                    <div class="team-info">
-                        <div>
-                            <div class="team-name">Cornelis de Heus</div>
-                            <div class="team-role">Co-Founder & Lead Designer</div>
-                        </div>
-                        <a href="https://www.linkedin.com/in/cornelis-de-heus-4ba938372/" aria-label="Cornelis de Heus on LinkedIn">in</a>
-                    </div>
-                </article>
-                <article class="team-card">
-                    <img class="team-photo" src="images/khanyipfp.jpg" alt="Khanyiso Mkulise">
-                    <div class="team-info">
-                        <div>
-                            <div class="team-name">Khanyiso Mkulise</div>
-                            <div class="team-role">Co-Founder & CTO</div>
-                        </div>
-                        <a href="https://za.linkedin.com/in/khanyiso-mkulise-b59938372" aria-label="Khanyiso Mkulise on LinkedIn">in</a>
-                    </div>
-                </article>
+                </div>
+                <div class="who-we-are-content">
+                    <p class="section-copy" data-animate="text" data-anim-group="about-flow">We're a tight-knit team of strategists, designers, and developers who are passionate about building things that matter. Our collaborative process ensures that we not only meet but exceed your expectations, delivering a product that is both beautiful and functional.</p>
+                    <ul class="who-we-are-points" data-animate="text" data-anim-group="about-flow">
+                        <li>Building quality digital products with clean, scalable foundations.</li>
+                        <li>10,000+ hours spent refining and improving our apps and internal projects.</li>
+                        <li>95% faster delivery by leveraging leading AI tools and modern workflows.</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
@@ -2713,16 +2850,87 @@
             const cards = Array.from(stack.querySelectorAll('.team-card'));
             if (cards.length < 2) return;
 
+            const aboutSection = document.querySelector('#who-we-are');
+            const aboutCopy = aboutSection?.querySelector('.who-we-are-content .section-copy');
+            const aboutItems = aboutSection?.querySelectorAll('.who-we-are-content .who-we-are-points li') || [];
+            let hasInitializedAboutContent = false;
+
             let order = cards.map((_, index) => index);
             let isAnimating = false;
             let idleTimer = null;
             let autoTimer = null;
 
             const stackOffsets = {
-                y: [0, 26, 52],
+                x: [0, 28, 56],
+                y: [0, 0, 0],
                 scale: [1, 0.965, 0.93],
-                blur: [0, 1, 2],
-                opacity: [1, 0.78, 0.6]
+                blur: [0, 3, 6],
+                opacity: [1, 0.78, 0.6],
+                brightness: [1, 0.61, 0.51],
+                saturate: [1, 0.85, 0.75]
+            };
+
+            const getAboutAnimConfig = () => {
+                if (window.matchMedia && window.matchMedia('(max-width: 640px)').matches) {
+                    return { copyDuration: 0.45, itemDuration: 0.4, itemX: 10, itemStagger: 0.07 };
+                }
+
+                if (window.matchMedia && window.matchMedia('(max-width: 1024px)').matches) {
+                    return { copyDuration: 0.5, itemDuration: 0.42, itemX: 12, itemStagger: 0.08 };
+                }
+
+                return { copyDuration: 0.55, itemDuration: 0.45, itemX: 14, itemStagger: 0.08 };
+            };
+
+            const isAboutVisible = () => {
+                if (!aboutSection) return false;
+                const rect = aboutSection.getBoundingClientRect();
+                const vh = window.innerHeight || 0;
+                return rect.top < vh * 0.9 && rect.bottom > 0;
+            };
+
+            const updateAboutContent = (shouldAnimate = false) => {
+                if (!aboutCopy || !aboutItems.length) return;
+                const activeCard = cards[order[0]];
+                if (!activeCard) return;
+
+                const name = activeCard.querySelector('.team-name')?.textContent?.trim() || 'Founder';
+                const role = activeCard.querySelector('.team-role')?.textContent?.trim() || 'Leader';
+
+                aboutCopy.textContent = `${name} serves as ${role}, guiding the studio's direction and ensuring every build meets our standard.`;
+
+                const bulletCopy = [
+                    `Role focus: ${role} ownership across strategy, delivery, and quality.`,
+                    `Leads key decisions while collaborating closely with design and development.`,
+                    `Keeps the team aligned on execution, polish, and client outcomes.`
+                ];
+
+                aboutItems.forEach((item, index) => {
+                    if (bulletCopy[index]) {
+                        item.textContent = bulletCopy[index];
+                    }
+                });
+
+                if (!shouldAnimate || !window.gsap) return;
+                const config = getAboutAnimConfig();
+                const slideSlowdown = 1.3;
+                gsap.killTweensOf([aboutCopy, ...aboutItems]);
+                gsap.set(aboutCopy, { opacity: 0 });
+                gsap.set(aboutItems, { opacity: 0, x: -config.itemX });
+
+                gsap.to(aboutCopy, {
+                    opacity: 1,
+                    duration: config.copyDuration,
+                    ease: 'power2.out'
+                });
+
+                gsap.to(aboutItems, {
+                    opacity: 1,
+                    x: 0,
+                    duration: config.itemDuration * slideSlowdown,
+                    ease: 'power2.out',
+                    stagger: config.itemStagger * slideSlowdown
+                });
             };
 
             const applyStackStyles = () => {
@@ -2730,15 +2938,21 @@
                     const card = cards[cardIndex];
                     const depthIndex = Math.min(position, stackOffsets.y.length - 1);
 
+                    card.style.setProperty('--stack-x', `${stackOffsets.x[depthIndex]}px`);
                     card.style.setProperty('--stack-y', `${stackOffsets.y[depthIndex]}px`);
                     card.style.setProperty('--stack-scale', stackOffsets.scale[depthIndex].toString());
                     card.style.setProperty('--stack-blur', `${stackOffsets.blur[depthIndex]}px`);
                     card.style.setProperty('--stack-opacity', stackOffsets.opacity[depthIndex].toString());
+                    card.style.setProperty('--stack-brightness', stackOffsets.brightness[depthIndex].toString());
+                    card.style.setProperty('--stack-saturate', stackOffsets.saturate[depthIndex].toString());
                     card.style.setProperty('--stack-z', `${cards.length - position}`);
                     card.style.setProperty('--pointer', position === 0 ? 'auto' : 'none');
                     card.style.setProperty('--blur-transition', position === 0 ? '0s' : '0.35s');
                     card.classList.toggle('is-active', position === 0);
                 });
+                const shouldAnimate = hasInitializedAboutContent && isAboutVisible();
+                updateAboutContent(shouldAnimate);
+                hasInitializedAboutContent = true;
             };
 
             const setStackHeight = () => {
@@ -2772,14 +2986,12 @@
 
             const startAuto = () => {
                 stopAuto();
-                autoTimer = setInterval(() => rotateStack(1), 4500);
             };
 
             const resetIdle = () => {
                 if (idleTimer) {
                     clearTimeout(idleTimer);
                 }
-                idleTimer = setTimeout(() => startAuto(), 1500);
             };
 
             const handleUserInteraction = (event) => {
@@ -2805,7 +3017,7 @@
 
             setStackHeight();
             applyStackStyles();
-            resetIdle();
+            stopAuto();
         });
 
         // Modal functionality
@@ -2992,6 +3204,10 @@
                 return Boolean(el.closest('#who-we-are'));
             };
 
+            const isAboutCustomItem = (el) => {
+                return Boolean(el.closest('#who-we-are') && el.closest('.who-we-are-content'));
+            };
+
             const isInCenterZone = (el) => {
                 const rect = el.getBoundingClientRect();
                 const vh = window.innerHeight || 0;
@@ -3047,18 +3263,103 @@
                 el.dataset.animState = 'shown';
             };
 
+            const initAboutReveal = () => {
+                const section = document.querySelector('#who-we-are');
+                if (!section) return;
+
+                const content = section.querySelector('.who-we-are-content');
+                if (!content) return;
+
+                const copy = content.querySelector('.section-copy');
+                const points = content.querySelector('.who-we-are-points');
+                if (!copy || !points) return;
+
+                const items = Array.from(points.querySelectorAll('li'));
+                const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                if (prefersReduced) {
+                    gsap.set(points, { '--margin-reveal': 1, opacity: 1, clearProps: 'transform,clipPath' });
+                    gsap.set(copy, { opacity: 1, clearProps: 'transform,clipPath' });
+                    gsap.set(items, { opacity: 1, clearProps: 'transform' });
+                    return;
+                }
+
+                let config = {
+                    lineDuration: 0.6,
+                    copyDuration: 0.55,
+                    itemDuration: 0.45,
+                    copyX: 0,
+                    itemX: 14,
+                    itemStagger: 0.08
+                };
+
+                if (window.matchMedia && window.matchMedia('(max-width: 640px)').matches) {
+                    config = {
+                        lineDuration: 0.35,
+                        copyDuration: 0.45,
+                        itemDuration: 0.4,
+                        copyX: 0,
+                        itemX: 10,
+                        itemStagger: 0.07
+                    };
+                } else if (window.matchMedia && window.matchMedia('(max-width: 1024px)').matches) {
+                    config = {
+                        lineDuration: 0.5,
+                        copyDuration: 0.5,
+                        itemDuration: 0.42,
+                        copyX: 0,
+                        itemX: 12,
+                        itemStagger: 0.08
+                    };
+                }
+
+                gsap.set(points, { '--margin-reveal': 0, '--margin-opacity': 0, opacity: 1 });
+                gsap.set(copy, { opacity: 0, x: -config.copyX });
+                gsap.set(items, { opacity: 0, x: -config.itemX });
+
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: section,
+                        start: 'top 70%',
+                        once: true
+                    }
+                });
+
+                tl.to(points, {
+                    '--margin-reveal': 1,
+                    '--margin-opacity': 1,
+                    duration: config.lineDuration,
+                    ease: 'power2.out'
+                })
+                    .to(copy, {
+                        opacity: 1,
+                        x: 0,
+                        duration: config.copyDuration,
+                        ease: 'power2.out'
+                    }, '<+0.15')
+                    .to(items, {
+                        opacity: 1,
+                        x: 0,
+                        duration: config.itemDuration,
+                        ease: 'power2.out',
+                        stagger: config.itemStagger
+                    }, '<+0.1');
+            };
+
             const initAnimations = () => {
                 const items = gsap.utils.toArray(SELECTOR);
                 if (!items.length) return;
 
-                items.forEach(setHidden);
+                const defaultItems = items.filter((el) => !isAboutCustomItem(el));
+                defaultItems.forEach(setHidden);
 
                 if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                    items.forEach(setVisible);
+                    defaultItems.forEach(setVisible);
+                    initAboutReveal();
                     return;
                 }
 
-                const heroItems = items.filter((el) => el.getAttribute('data-animate') === 'hero');
+                const heroItems = defaultItems.filter((el) => el.getAttribute('data-animate') === 'hero');
                 if (heroItems.length) {
                     gsap.timeline({ defaults: { duration: 0.9, ease: 'power3.out' } })
                         .fromTo(heroItems, { opacity: 0, y: 18 }, { opacity: 1, y: 0, stagger: 0.12, clearProps: 'transform' })
@@ -3069,7 +3370,7 @@
                         });
                 }
 
-                const scrollItems = items.filter((el) => el.getAttribute('data-animate') !== 'hero');
+                const scrollItems = defaultItems.filter((el) => el.getAttribute('data-animate') !== 'hero');
                 scrollItems.forEach((el) => {
                     if (isAboveCenterZone(el)) {
                         setVisible(el);
@@ -3150,6 +3451,7 @@
                     });
                 });
 
+                initAboutReveal();
                 ScrollTrigger.refresh();
             };
 
