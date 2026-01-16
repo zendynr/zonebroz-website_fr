@@ -463,6 +463,85 @@
             color: inherit;
         }
 
+        .project-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Project State Badge Styles */
+        .project-state-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: none;
+            line-height: 1;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        /* State-specific colors - muted, matching website color scheme */
+        .project-state-badge[data-state="BUILDING"] {
+            background: rgba(160, 160, 165, 0.08);
+            border-color: rgba(160, 160, 165, 0.25);
+            color: #c5c5ca;
+        }
+
+        .project-state-badge[data-state="TESTING"] {
+            background: rgba(160, 160, 165, 0.08);
+            border-color: rgba(160, 160, 165, 0.25);
+            color: #c5c5ca;
+        }
+
+        .project-state-badge[data-state="LIVE"] {
+            background: rgba(200, 200, 205, 0.1);
+            border-color: rgba(200, 200, 205, 0.3);
+            color: #d5d5da;
+        }
+
+        .project-state-badge[data-state="NEEDS_FUNDING"] {
+            background: rgba(180, 175, 170, 0.08);
+            border-color: rgba(180, 175, 170, 0.25);
+            color: #d0cdc8;
+        }
+
+        .project-state-badge[data-state="NEEDS_COLLABORATORS"] {
+            background: rgba(170, 170, 175, 0.08);
+            border-color: rgba(170, 170, 175, 0.25);
+            color: #c8c8cd;
+        }
+
+        .project-state-badge[data-state="NEEDS_VALIDATION"] {
+            background: rgba(175, 165, 165, 0.08);
+            border-color: rgba(175, 165, 165, 0.25);
+            color: #d0c8c8;
+        }
+
+        .project-state-badge[data-state="ON_HOLD"] {
+            background: rgba(130, 130, 135, 0.08);
+            border-color: rgba(130, 130, 135, 0.25);
+            color: #b0b0b5;
+        }
+
+        .project-state-badge[data-state="ARCHIVED"] {
+            background: rgba(100, 100, 105, 0.08);
+            border-color: rgba(100, 100, 105, 0.25);
+            color: #8a8a8f;
+        }
+
+        @media (max-width: 640px) {
+            .project-card h3 {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
         .featured-slider {
             margin-top: 2.5rem;
             display: grid;
@@ -1851,7 +1930,10 @@
                                 <img src="images/app mobile.jpg" alt="FurlyFuzz App preview">
                             </div>
                             <div>
-                                <h3>FurlyFuzz.</h3>
+                                <h3>
+                                    FurlyFuzz.
+                                    <span class="project-state-badge" data-state="LIVE">Live</span>
+                                </h3>
                                 <p>Smart pet care web app that helps pet owners track, manage, and optimize their pets' daily routines.</p>
                             </div>
                         </a>
@@ -1860,7 +1942,10 @@
                                 <img src="images/dreamdlogo.png" alt="Dream Delusion preview">
                             </div>
                             <div>
-                                <h3>Dream Delusion.</h3>
+                                <h3>
+                                    Dream Delusion.
+                                    <span class="project-state-badge" data-state="LIVE">Live</span>
+                                </h3>
                                 <p>A minimal space. No distractions, just you and your mind. Capture your thoughts, explore your mind.</p>
                             </div>
                         </a>
@@ -3092,6 +3177,24 @@
                 initAnimations();
             });
         })();
+
+        // Project State Utility
+        // Maps state enum values to human-readable labels
+        const PROJECT_STATES = {
+            BUILDING: 'Building',
+            TESTING: 'Testing',
+            LIVE: 'Live',
+            NEEDS_FUNDING: 'Needs Funding',
+            NEEDS_COLLABORATORS: 'Needs Collaborators',
+            NEEDS_VALIDATION: 'Needs Validation',
+            ON_HOLD: 'On Hold',
+            ARCHIVED: 'Archived'
+        };
+
+        // Helper function to get human-readable label from state enum
+        function getProjectStateLabel(state) {
+            return PROJECT_STATES[state] || state;
+        }
     </script>
     </div>
 </body>
