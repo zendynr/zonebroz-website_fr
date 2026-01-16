@@ -1,0 +1,3099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZoneBroz Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script>
+        (function() {
+            document.documentElement.classList.add('js-anim');
+            try {
+                if (sessionStorage.getItem('navExpanding')) {
+                    document.documentElement.classList.add('nav-precollapsed');
+                }
+            } catch (e) {
+                // Ignore storage access errors (e.g. private mode).
+            }
+        })();
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+        }
+
+        /* Chromium / WebKit */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        html, body, * {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        :root {
+            --bg: #030303;
+            --panel: #101010;
+            --muted: #a0a0a5;
+            --white: #ffffff;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html.js-anim [data-animate] {
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        #app-root {
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 24px;
+            padding-right: 24px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        .full-bleed {
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+        }
+
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 64px 24px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            line-height: 1.65;
+            padding-top: 0;
+            min-height: 100vh;
+        }
+
+        .vignette-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 117.6vmax;
+            height: 117.6vmax;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(ellipse 70% 88% at 50% 50%, rgba(35, 35, 35, 1) 0%, rgba(20, 20, 20, 1) 30%, rgba(10, 10, 10, 1) 45%, rgba(3, 3, 3, 1) 60%, rgba(1, 1, 1, 1) 75%, #000000 100%);
+        }
+
+        img, video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 6rem;
+            padding-bottom: 4rem;
+        }
+
+        main,
+        section,
+        footer,
+        .section,
+        .values-section-wrapper,
+        .project-view-wrapper,
+        .featured-slider,
+        .featured-slider-viewport,
+        .featured-track,
+        .project-view-content {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .section {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 5rem 1.5rem 3rem;
+        }
+
+        .hero-logo-img {
+            width: 140px;
+            height: auto;
+            display: block;
+            margin: 0 auto 2rem;
+        }
+
+        .hero h1 {
+            margin-top: 3rem;
+            font-size: clamp(2.75rem, 8vw, 4.75rem);
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: clamp(1.05rem, 3vw, 1.3rem);
+            max-width: 650px;
+            margin: 1.5rem auto 1.75rem;
+        }
+
+        .primary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.95rem 2.75rem;
+            border-radius: 999px;
+            background: #ffffff;
+            color: #000;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 60px rgba(255, 255, 255, 0.12);
+        }
+
+        .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.95rem 2.75rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            color: var(--white);
+            font-weight: 600;
+            font-size: 1rem;
+            background: transparent;
+            transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .secondary-btn:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        .button-row {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .eyebrow {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.35em;
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+
+        .section-heading {
+            font-size: clamp(2.25rem, 5vw, 3.1rem);
+            font-weight: 800;
+            margin-bottom: 0.85rem;
+        }
+
+        .section-copy {
+            color: var(--muted);
+            max-width: 680px;
+            font-size: 1.05rem;
+        }
+
+        .stat-grid, .value-grid, .project-grid, .team-grid {
+            margin-top: 2.5rem;
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .stat-grid {
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        }
+
+        .value-grid {
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        .values-section-wrapper {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto 10rem;
+            padding: 0;
+        }
+
+        .values-section-wrapper .section-heading,
+        .values-section-wrapper .section-copy,
+        .values-section-wrapper .eyebrow {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .featured-work-heading,
+        .featured-work-copy {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #projects {
+            margin-bottom: 8rem;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #projects.is-ready {
+            opacity: 1;
+            visibility: visible;
+        }
+        .who-we-are .section-heading,
+        .who-we-are .section-copy,
+        .who-we-are .eyebrow {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .who-we-are {
+            margin-top: -2rem;
+            margin-bottom: 10rem;
+        }
+
+        #team,
+        #values,
+        #projects,
+        footer {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        body.about-scroll-fade #team,
+        body.about-scroll-fade #values,
+        body.about-scroll-fade #projects,
+        body.about-scroll-fade footer {
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+        }
+
+        .team-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            margin-top: 3rem;
+        }
+
+        #team .eyebrow,
+        #team .section-heading,
+        #team .section-copy {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #team {
+            margin-bottom: 10rem;
+        }
+
+        .value-card, .project-card, .team-card {
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1.75rem;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card {
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1.75rem;
+            display: flex;
+            gap: 1.1rem;
+            align-items: flex-start;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon-wrap {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.08);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon-wrap svg {
+            width: 24px;
+            height: 24px;
+            color: #fff;
+        }
+
+        .stat-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .stat-card:hover,
+        .value-card:hover,
+        .project-card:hover,
+        .team-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.35),
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .value-card {
+            padding: 2.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            border-radius: 24px;
+        }
+
+        .value-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: grid;
+            place-items: center;
+        }
+
+        .value-icon-wrap svg {
+            width: 26px;
+            height: 26px;
+            color: #fff;
+        }
+
+        .project-card {
+            padding: 2rem;
+            display: grid;
+            gap: 1.5rem;
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .featured-slider {
+            margin-top: 2.5rem;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .featured-slider-viewport {
+            position: relative;
+            height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            --card-gap: 300px;
+        }
+
+        .featured-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .featured-card {
+            position: absolute;
+            width: min(340px, 78vw);
+            max-width: 360px;
+            opacity: var(--opacity, 0);
+            transform: translateX(calc(var(--offset, 0) * var(--card-gap))) scale(var(--scale, 0.9));
+            transition: none;
+            z-index: calc(5 - var(--abs-offset, 0));
+            pointer-events: var(--pointer, none);
+            will-change: transform, opacity;
+            transform-origin: center center;
+        }
+
+        .featured-slider.is-ready .featured-card {
+            transition: transform 0.68s cubic-bezier(0.28, 1.56, 0.64, 1), opacity 0.6s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .featured-slider.is-stacked .featured-card {
+            transform: translateX(0) translateY(var(--stack-y, 0px)) scale(var(--stack-scale, 0.92)) scaleY(0.94);
+            opacity: var(--stack-opacity, 0);
+        }
+
+        .featured-slider.is-revealed .featured-card {
+            transition-delay: var(--stack-delay, 0ms);
+        }
+
+        .featured-card:hover {
+            transform: translateX(calc(var(--offset, 0) * var(--card-gap))) scale(var(--scale, 0.9));
+        }
+
+        .featured-card .project-media {
+            height: 200px;
+        }
+
+        .featured-card .project-media img {
+            height: 100%;
+        }
+
+        .placeholder-media {
+            display: grid;
+            place-items: center;
+            height: 200px;
+            background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), rgba(12, 12, 12, 0.9));
+        }
+
+        .placeholder-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+        }
+
+        .slider-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slider-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--white);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider-btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        @media (max-width: 980px) {
+            .featured-slider-viewport {
+                height: 400px;
+                --card-gap: 250px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .featured-slider-viewport {
+                height: 380px;
+                --card-gap: 220px;
+            }
+
+            .featured-card {
+                width: min(300px, 84vw);
+            }
+        }
+
+        .project-media {
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #101010;
+        }
+
+        .project-media img, .team-photo {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .team-card {
+            padding: 1.5rem;
+        }
+
+        .team-stack {
+            position: relative;
+            width: min(900px, 92vw);
+            margin: 3rem auto 0;
+            height: 520px;
+            display: grid;
+            place-items: center;
+            perspective: 1200px;
+            cursor: pointer;
+        }
+
+        .team-stack .team-card {
+            position: absolute;
+            width: min(360px, 82vw);
+            transform: translate3d(0, var(--stack-y, 0px), 0) scale(var(--stack-scale, 1));
+            opacity: var(--stack-opacity, 1);
+            filter: blur(var(--stack-blur, 0px));
+            z-index: var(--stack-z, 1);
+            pointer-events: var(--pointer, none);
+            will-change: transform, opacity, filter;
+            transition:
+                transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.6s ease,
+                filter var(--blur-transition, 0.35s) ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+        .team-stack .team-card:hover {
+            transform: translate3d(0, var(--stack-y, 0px), 0) scale(var(--stack-scale, 1));
+        }
+
+        .team-stack .team-card.is-active {
+            filter: blur(0px);
+        }
+
+        .team-photo {
+            border-radius: 24px;
+            height: 360px;
+        }
+
+        .team-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .team-info a {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .team-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .team-role {
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        footer {
+            padding: 2rem 0 3rem;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        footer a:hover {
+            color: var(--white);
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 100%;
+            z-index: 1000;
+            background: transparent;
+            backdrop-filter: none;
+            border-bottom: none;
+            padding: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .top-nav-container {
+            display: none;
+        }
+
+        .nav-island {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            width: fit-content;
+            max-width: calc(100% - 2rem);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .nav-island::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .nav-island > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-island a,
+        .nav-island button {
+            padding: 0.5rem 1rem;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 999px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .nav-island a:hover,
+        .nav-island button:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-island .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 0.25rem;
+        }
+
+        .nav-island .nav-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 999px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .nav-island .nav-icon-btn:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-island .nav-icon-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Navigation collapse animation */
+        .nav-island .nav-extra {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            overflow: hidden;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 500px;
+            opacity: 1;
+        }
+
+        html.nav-precollapsed .nav-island .nav-extra {
+            max-width: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            gap: 0;
+        }
+
+        .nav-island.collapsed .nav-extra {
+            max-width: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            gap: 0;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island .nav-divider {
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 1px;
+            opacity: 1;
+        }
+
+        html.nav-precollapsed .nav-island .nav-divider {
+            width: 0;
+            opacity: 0;
+            margin: 0;
+        }
+
+        .nav-island.collapsed .nav-divider {
+            width: 0;
+            opacity: 0;
+            margin: 0;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island .nav-icon-btn {
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        html.nav-precollapsed .nav-island .nav-icon-btn {
+            opacity: 0;
+            transform: scale(0.8);
+            width: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-island.collapsed .nav-icon-btn {
+            opacity: 0;
+            transform: scale(0.8);
+            width: 0;
+            padding: 0;
+            margin: 0;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Bounce animation keyframes */
+        @keyframes navBounceCollapse {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+            30% {
+                transform: translateX(-50%) scale(0.99);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.005);
+            }
+            65% {
+                transform: translateX(-50%) scale(0.998);
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        @keyframes navBounceExpand {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.004);
+            }
+            65% {
+                transform: translateX(-50%) scale(0.998);
+            }
+            75% {
+                transform: translateX(-50%) scale(1.0005);
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        /* Apply bounce animation to nav island */
+        .nav-island {
+            transform: translateX(-50%);
+        }
+
+        .nav-island.collapsing {
+            animation: navBounceCollapse 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island.expanding {
+            animation: navBounceExpand 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Apple-like bounce animation */
+        @keyframes appleBounce {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+            35% {
+                transform: translateX(-50%) scale(0.995);
+            }
+            60% {
+                transform: translateX(-50%) scale(1.005);
+            }
+            80% {
+                transform: translateX(-50%) scale(0.998);
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        .nav-island.bouncing {
+            animation: appleBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+
+
+        .project-view-wrapper {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 8rem 0 4rem;
+        }
+
+        .project-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 3rem;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .project-back-link:hover {
+            color: var(--white);
+        }
+
+        .project-back-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .project-view-header {
+            margin-bottom: 4rem;
+        }
+
+        .project-view-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .project-view-tagline {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+
+        .project-view-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .project-view-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .project-view-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--white);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.1),
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-view-link:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        .project-view-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .project-view-hero-image {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 4rem;
+            background: var(--panel);
+        }
+
+        .project-view-hero-image img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .project-view-content {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .project-view-main {
+            min-width: 0;
+        }
+
+        .project-view-sidebar {
+            position: sticky;
+            top: 6rem;
+            height: fit-content;
+        }
+
+        .project-view-section {
+            margin-bottom: 3rem;
+        }
+
+        .project-view-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .project-view-section h2::before {
+            content: '|';
+            color: var(--muted);
+            font-weight: 400;
+            pointer-events: none;
+        }
+
+        .project-view-section p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.75;
+            margin-bottom: 1.25rem;
+        }
+
+        .project-view-section ul {
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.75;
+            margin-left: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .project-view-section li {
+            margin-bottom: 0.75rem;
+        }
+
+        .project-view-tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .project-view-tool-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--white);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 
+                0 2px 6px rgba(0, 0, 0, 0.1),
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-view-toc {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-view-toc h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .project-view-toc ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .project-view-toc li {
+            margin-bottom: 0.75rem;
+        }
+
+        .project-view-toc a {
+            color: var(--muted);
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+            display: block;
+            text-decoration: none;
+        }
+
+        .project-view-toc a:hover {
+            color: var(--white);
+        }
+
+        @media (max-width: 968px) {
+            .project-view-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .project-view-sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .project-view-wrapper {
+                padding: 6rem 0 3rem;
+            }
+
+            .project-view-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-island {
+                flex-wrap: wrap;
+                max-width: calc(100% - 2rem);
+                padding: 0.75rem 1rem;
+                gap: 0.5rem;
+            }
+
+            .nav-island a,
+            .nav-island button {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+
+        .hamburger-btn {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.25s ease;
+            gap: 5px;
+        }
+
+        .hamburger-btn:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--muted);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn:hover span {
+            background: var(--white);
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        .nav-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 1.5rem;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 0.75rem;
+            min-width: 220px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .nav-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        @media (max-width: 640px) {
+            .nav-menu {
+                right: 1rem;
+                left: 1rem;
+                min-width: auto;
+            }
+        }
+
+        @media (min-width: 820px) {
+            .project-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .value-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .logo-badge {
+                font-size: 0.55rem;
+                letter-spacing: 0.25em;
+            }
+
+            .team-photo {
+                height: 300px;
+            }
+
+            .team-stack {
+                height: 480px;
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            pointer-events: none;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: transparent;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            padding: 3rem;
+            padding-right: 2.75rem;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .modal-content > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--white);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-close svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-content h1 {
+            font-size: clamp(2.2rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--white);
+        }
+
+        .modal-content .last-updated {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .modal-content h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+
+        .modal-content h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--white);
+        }
+
+        .modal-content p {
+            color: var(--muted);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            line-height: 1.75;
+        }
+
+        .modal-content ul,
+        .modal-content ol {
+            color: var(--muted);
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-content strong {
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .modal-content a {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+        .modal-content .contact-info {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content .contact-info h3 {
+            margin-top: 0;
+        }
+
+        /* Contact Form Styles */
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .modal-content .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .modal-content label {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--white);
+            padding: 0.85rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content input:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        .modal-content .select-wrapper {
+            position: relative;
+        }
+
+        .modal-content .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            border-left: 2px solid var(--white);
+            border-bottom: 2px solid var(--white);
+            transform: translateY(-60%) rotate(-45deg);
+            opacity: 0.7;
+        }
+
+        .modal-content select {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(20, 20, 20, 0.95);
+            color: var(--white);
+            padding: 0.85rem 1rem;
+            padding-right: 2.5rem;
+            font-size: 1rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(20, 20, 20, 0.8);
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        .modal-content select option {
+            background: #0c0c0c;
+            color: var(--white);
+            padding: 0.75rem 1rem;
+        }
+
+        .modal-content select option:hover,
+        .modal-content select option:focus,
+        .modal-content select option:checked {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+        }
+
+
+        .modal-content textarea {
+            resize: none;
+            min-height: 140px;
+        }
+
+        .modal-content button[type="submit"] {
+            margin-top: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 999px;
+            background: var(--white);
+            color: #000;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.9rem 2.75rem;
+            align-self: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content button[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 20px 50px rgba(255, 255, 255, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.4),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        @media (max-width: 640px) {
+            .modal-content {
+                padding: 2rem 1.5rem;
+                padding-right: 1.25rem;
+            }
+
+            .modal-close {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .modal-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .modal-content h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="vignette-overlay" aria-hidden="true"></div>
+    <div id="app-root">
+    <nav class="top-nav">
+        <div class="top-nav-container">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-menu" id="navMenu">
+                <a href="terms.html">Terms & Conditions</a>
+                <a href="privacy.html">Privacy Policy</a>
+            </div>
+        </div>
+    </nav>
+    <nav class="nav-island">
+        <a href="#who-we-are">About Us</a>
+        <a href="#projects">Projects</a>
+        <button data-modal="contact">Contact Us</button>
+        <div class="nav-extra">
+            <span class="nav-divider"></span>
+            <button class="nav-icon-btn" data-modal="terms" aria-label="Terms & Conditions" title="Terms & Conditions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                </svg>
+            </button>
+            <button class="nav-icon-btn" data-modal="privacy" aria-label="Privacy Policy" title="Privacy Policy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+    <main>
+        <section class="hero section" id="home">
+            <div>
+                <img src="images/zonebroz-logo.png" alt="ZoneBroz Studios logo" class="hero-logo-img" data-animate="hero">
+                <h1 data-animate="hero">We Build Digital Products for the Modern World.</h1>
+                <p data-animate="hero">ZoneBrozStudios is a design and development agency focused on creating high-impact websites and applications that people love to use.</p>
+            </div>
+        </section>
+
+        <section id="who-we-are" class="section who-we-are">
+            <div class="eyebrow" data-animate="text" data-anim-group="about-flow">Who We Are</div>
+            <h2 class="section-heading" data-animate="text" data-anim-group="about-flow">Who We Are</h2>
+            <p class="section-copy" data-animate="text" data-anim-group="about-flow">We're a tight-knit team of strategists, designers, and developers who are passionate about building things that matter. Our collaborative process ensures that we not only meet but exceed your expectations, delivering a product that is both beautiful and functional.</p>
+            <div class="stat-grid">
+                <article class="stat-card" data-animate="fade-slow" data-anim-group="about-flow">
+                    <div class="stat-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3h7v7H3z"/>
+                            <path d="M14 3h7v7h-7z"/>
+                            <path d="M14 14h7v7h-7z"/>
+                            <path d="M3 14h7v7H3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>Building Quality Digital Products</h3>
+                        <p>Designing and developing modern apps and web applications with clean, scalable foundations.</p>
+                    </div>
+                </article>
+                <article class="stat-card" data-animate="fade-slow" data-anim-group="about-flow">
+                    <div class="stat-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M12 7v5l3 2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>10,000+ Hours of Development</h3>
+                        <p>Time spent building, refining, and improving our apps and internal projects.</p>
+                    </div>
+                </article>
+                <article class="stat-card" data-animate="fade-slow" data-anim-group="about-flow">
+                    <div class="stat-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12h6l-2 8 8-16h-6l2-8z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>95% Faster</h3>
+                        <p>We leverage leading AI tools to speed up development, improve design quality, and stay ahead.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="team" class="section">
+            <div class="eyebrow" data-animate="text" data-anim-group="about-flow">Our Team</div>
+            <h2 class="section-heading" data-animate="text" data-anim-group="about-flow">Meet the Minds Behind ZoneBroz Studios</h2>
+            <p class="section-copy" data-animate="text" data-anim-group="about-flow">We bring together technology and strategy to create smarter automation solutions.</p>
+            <div class="team-stack" role="button" tabindex="0" aria-label="Team card stack" data-animate="card" data-anim-group="about-flow">
+                <article class="team-card">
+                    <img class="team-photo" src="images/zenpfp.png" alt="Zendyn Reddy">
+                    <div class="team-info">
+                        <div>
+                            <div class="team-name">Zendyn Reddy</div>
+                            <div class="team-role">Co-Founder & CEO</div>
+                        </div>
+                        <a href="https://www.linkedin.com/in/zendyn-reddy-507aa4365/" aria-label="Zendyn Reddy on LinkedIn">in</a>
+                    </div>
+                </article>
+                <article class="team-card">
+                    <img class="team-photo" src="images/cjpfp.jpg" alt="Cornelis de Heus">
+                    <div class="team-info">
+                        <div>
+                            <div class="team-name">Cornelis de Heus</div>
+                            <div class="team-role">Co-Founder & Lead Designer</div>
+                        </div>
+                        <a href="https://www.linkedin.com/in/cornelis-de-heus-4ba938372/" aria-label="Cornelis de Heus on LinkedIn">in</a>
+                    </div>
+                </article>
+                <article class="team-card">
+                    <img class="team-photo" src="images/khanyipfp.jpg" alt="Khanyiso Mkulise">
+                    <div class="team-info">
+                        <div>
+                            <div class="team-name">Khanyiso Mkulise</div>
+                            <div class="team-role">Co-Founder & CTO</div>
+                        </div>
+                        <a href="https://za.linkedin.com/in/khanyiso-mkulise-b59938372" aria-label="Khanyiso Mkulise on LinkedIn">in</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section id="values" class="section">
+            <div class="values-section-wrapper">
+                <div class="eyebrow" data-animate="text" data-anim-group="values-flow">Our Values</div>
+                <h2 class="section-heading" data-animate="text" data-anim-group="values-flow">The Values Behind ZoneBroz Studios</h2>
+                <p class="section-copy" data-animate="text" data-anim-group="values-flow">Our values guide everything we create at ZoneBroz Studios. From creativity to precision, we're committed to building high-quality digital products that are meaningful, reliable, and built with care.</p>
+                <div class="value-grid">
+                    <article class="value-card" data-animate="fade" data-anim-group="values-flow">
+                        <div class="value-icon-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3c3.31 0 6 2.61 6 5.83 0 2.17-1.2 3.51-2.39 4.7-.55.55-.86 1.29-.86 2.06v.41a1 1 0 0 1-1 1h-2.5a1 1 0 0 1-1-1v-.41c0-.78-.31-1.51-.86-2.06C7.2 12.34 6 11 6 8.83 6 5.61 8.69 3 12 3z"/>
+                                <path d="M10 18h4"/>
+                                <path d="M11 21h2"/>
+                            </svg>
+                        </div>
+                        <h3>Pushing Digital Innovation</h3>
+                        <p>We challenge convention and build future-focused digital products that set new standards in design, performance, and user experience.</p>
+                    </article>
+                    <article class="value-card" data-animate="fade" data-anim-group="values-flow">
+                        <div class="value-icon-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m6 12 3 3 9-9"/>
+                                <path d="M21 12v6a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h7"/>
+                            </svg>
+                        </div>
+                        <h3>Built on Trust & Transparency</h3>
+                        <p>Every project is guided by honesty, open communication, and a commitment to delivering exactly what we promise — no shortcuts, no empty buzzwords.</p>
+                    </article>
+                    <article class="value-card" data-animate="fade" data-anim-group="values-flow">
+                        <div class="value-icon-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3v18"/>
+                                <path d="M4 9h16"/>
+                                <path d="M4 15h10"/>
+                            </svg>
+                        </div>
+                        <h3>Simple Solutions, Smart Design</h3>
+                        <p>We believe the best products are easy to understand, easy to use, and beautifully designed — without unnecessary complexity.</p>
+                    </article>
+                    <article class="value-card" data-animate="fade" data-anim-group="values-flow">
+                        <div class="value-icon-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 7h16"/>
+                                <path d="M6 5v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5"/>
+                                <path d="M10 11h4"/>
+                                <path d="M10 15h4"/>
+                            </svg>
+                        </div>
+                        <h3>Reliable Development, Every Time</h3>
+                        <p>We value consistency and discipline. When we build, we build properly — clean structure, scalable foundations, and long-term stability.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section">
+            <div class="eyebrow featured-work-heading" data-animate="text" data-anim-group="projects-flow">Featured Work</div>
+            <h2 class="section-heading featured-work-heading" data-animate="text" data-anim-group="projects-flow">Featured Work</h2>
+            <p class="section-copy featured-work-copy" data-animate="text" data-anim-group="projects-flow">Take a look at some of the projects we're proud to have been a part of.</p>
+            <div class="featured-slider" aria-label="Featured projects slider" data-animate="slider" data-anim-group="projects-flow">
+                <div class="featured-slider-viewport">
+                    <div class="featured-track">
+                        <a href="projects/furlyfuzz.html" class="project-card featured-card">
+                            <div class="project-media">
+                                <img src="images/app mobile.jpg" alt="FurlyFuzz App preview">
+                            </div>
+                            <div>
+                                <h3>FurlyFuzz.</h3>
+                                <p>Smart pet care web app that helps pet owners track, manage, and optimize their pets' daily routines.</p>
+                            </div>
+                        </a>
+                        <a href="projects/dream-delusion.html" class="project-card featured-card">
+                            <div class="project-media">
+                                <img src="images/dreamdlogo.png" alt="Dream Delusion preview">
+                            </div>
+                            <div>
+                                <h3>Dream Delusion.</h3>
+                                <p>A minimal space. No distractions, just you and your mind. Capture your thoughts, explore your mind.</p>
+                            </div>
+                        </a>
+                        <article class="project-card featured-card">
+                            <div class="project-media placeholder-media">
+                                <span class="placeholder-label">Placeholder Image</span>
+                            </div>
+                            <div>
+                                <h3>Project Placeholder 03</h3>
+                                <p>Another placeholder card representing a future featured build.</p>
+                            </div>
+                        </article>
+                        <article class="project-card featured-card">
+                            <div class="project-media placeholder-media">
+                                <span class="placeholder-label">Placeholder Image</span>
+                            </div>
+                            <div>
+                                <h3>Project Placeholder 04</h3>
+                                <p>Use this space for a short headline about a product or service.</p>
+                            </div>
+                        </article>
+                        <article class="project-card featured-card">
+                            <div class="project-media placeholder-media">
+                                <span class="placeholder-label">Placeholder Image</span>
+                            </div>
+                            <div>
+                                <h3>Project Placeholder 05</h3>
+                                <p>Final sample card to keep the slider looping smoothly.</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="slider-controls">
+                    <button class="slider-btn" type="button" data-direction="prev">Prev</button>
+                    <button class="slider-btn" type="button" data-direction="next">Next</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
+            <button data-modal="terms" style="color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s ease; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0;">Terms & Conditions</button>
+            <span style="color: var(--muted);">•</span>
+            <button data-modal="privacy" style="color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s ease; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0;">Privacy Policy</button>
+        </div>
+        <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">© 2025 ZoneBrozStudios. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Terms & Conditions Modal -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h1>Terms & Conditions</h1>
+            <p class="last-updated">Last Updated: January 2025</p>
+
+            <h2>1. Introduction</h2>
+            <p>Welcome to ZoneBroz Studios ("we," "our," or "us"). These Terms and Conditions ("Terms") govern your access to and use of our website, services, and digital products. By accessing or using our services, you agree to be bound by these Terms.</p>
+            <p>ZoneBroz Studios is a design and development agency focused on creating high-impact websites and applications. We provide web design, web development, UI/UX design, brand strategy, and related digital services.</p>
+
+            <h2>2. Services</h2>
+            <p>ZoneBroz Studios offers the following services:</p>
+            <ul>
+                <li><strong>Web Development:</strong> Custom website and web application development</li>
+                <li><strong>UI/UX Design:</strong> User interface and user experience design services</li>
+                <li><strong>Brand Strategy:</strong> Branding and strategic design consultation</li>
+                <li><strong>Full Package Services:</strong> Comprehensive design and development solutions</li>
+            </ul>
+            <p>All services are provided subject to separate service agreements and project-specific terms that will be agreed upon before commencement of work.</p>
+
+            <h2>3. Payment Terms</h2>
+            <h3>3.1 Payment Processing</h3>
+            <p>We accept payments through various methods, including but not limited to payment processors such as Ozow. All payments are processed securely in accordance with applicable payment processing regulations.</p>
+            <h3>3.2 Pricing</h3>
+            <p>Project pricing is determined on a case-by-case basis and will be clearly outlined in project proposals and service agreements. Prices are subject to change, but any changes will not affect projects already under contract.</p>
+            <h3>3.3 Payment Schedule</h3>
+            <p>Payment terms, including deposit requirements and milestone payments, will be specified in individual service agreements. Failure to make payments as agreed may result in suspension or termination of services.</p>
+            <h3>3.4 Refunds</h3>
+            <p>Refund policies are determined on a project-by-project basis and will be detailed in service agreements. Generally, work completed and delivered is non-refundable unless otherwise specified.</p>
+
+            <h2>4. Intellectual Property</h2>
+            <h3>4.1 Client Ownership</h3>
+            <p>Upon full payment, clients own the final deliverables created specifically for their project. This includes custom code, designs, and other project-specific materials.</p>
+            <h3>4.2 Our Rights</h3>
+            <p>ZoneBroz Studios retains the right to use completed projects in our portfolio and for marketing purposes, unless otherwise agreed in writing. We also retain rights to any pre-existing tools, frameworks, or methodologies used in project delivery.</p>
+            <h3>4.3 Third-Party Materials</h3>
+            <p>Any third-party materials, including fonts, images, or software, used in projects are subject to their respective licenses. Clients are responsible for ensuring compliance with third-party license terms.</p>
+
+            <h2>5. Client Responsibilities</h2>
+            <p>Clients agree to:</p>
+            <ul>
+                <li>Provide accurate and complete information necessary for project completion</li>
+                <li>Respond to requests for feedback and approvals in a timely manner</li>
+                <li>Ensure they have the legal right to use any content, images, or materials provided to us</li>
+                <li>Comply with all applicable laws and regulations</li>
+                <li>Make payments according to agreed schedules</li>
+            </ul>
+
+            <h2>6. Our Responsibilities</h2>
+            <p>ZoneBroz Studios agrees to:</p>
+            <ul>
+                <li>Deliver services with professional care and skill</li>
+                <li>Meet agreed-upon deadlines, subject to client cooperation</li>
+                <li>Maintain confidentiality of client information</li>
+                <li>Comply with all applicable laws and regulations</li>
+                <li>Provide reasonable support and communication throughout projects</li>
+            </ul>
+
+            <h2>7. Limitation of Liability</h2>
+            <p>To the maximum extent permitted by law, ZoneBroz Studios shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, or any loss of data, use, goodwill, or other intangible losses resulting from your use of our services.</p>
+            <p>Our total liability for any claims arising from our services shall not exceed the total amount paid by the client for the specific project in question.</p>
+
+            <h2>8. Warranties</h2>
+            <p>We warrant that our services will be performed in a professional and workmanlike manner. However, we do not guarantee specific results or outcomes. All deliverables are provided "as is" without warranties of any kind, either express or implied, except as required by law.</p>
+
+            <h2>9. Termination</h2>
+            <p>Either party may terminate a service agreement with written notice. Upon termination:</p>
+            <ul>
+                <li>Clients are responsible for payment of all work completed up to the termination date</li>
+                <li>We will deliver all completed work to the client</li>
+                <li>Any unused deposits or prepayments may be refunded at our discretion, minus work completed</li>
+            </ul>
+
+            <h2>10. Confidentiality</h2>
+            <p>We respect the confidentiality of client information and project details. We will not disclose confidential information to third parties without consent, except as required by law or as necessary to provide our services.</p>
+
+            <h2>11. Data Protection</h2>
+            <p>We handle personal data in accordance with applicable data protection laws. For detailed information about how we collect, use, and protect your data, please refer to our <button data-modal="privacy" style="color: var(--white); text-decoration: underline; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0;">Privacy Policy</button>.</p>
+
+            <h2>12. Modifications to Terms</h2>
+            <p>We reserve the right to modify these Terms at any time. Changes will be effective immediately upon posting to our website. Continued use of our services after changes constitutes acceptance of the modified Terms.</p>
+
+            <h2>13. Governing Law</h2>
+            <p>These Terms shall be governed by and construed in accordance with the laws of South Africa, without regard to its conflict of law provisions. Any disputes arising from these Terms or our services shall be subject to the exclusive jurisdiction of the courts of South Africa.</p>
+
+            <h2>14. Severability</h2>
+            <p>If any provision of these Terms is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force and effect.</p>
+
+            <h2>15. Entire Agreement</h2>
+            <p>These Terms, together with any service agreements or project-specific terms, constitute the entire agreement between you and ZoneBroz Studios regarding the use of our services.</p>
+
+            <div class="contact-info">
+                <h3>Contact Information</h3>
+                <p>If you have any questions about these Terms & Conditions, please contact us:</p>
+                <p><strong>ZoneBroz Studios</strong><br>
+                Email: <a href="contact.html">Contact Us</a><br>
+                Website: <a href="index.html">www.zonebrozstudios.com</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h1>Privacy Policy</h1>
+            <p class="last-updated">Last Updated: January 2025</p>
+
+            <h2>1. Introduction</h2>
+            <p>ZoneBroz Studios ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our services, or interact with us.</p>
+            <p>By using our website and services, you consent to the data practices described in this policy. If you do not agree with the practices described, please do not use our services.</p>
+
+            <h2>2. Information We Collect</h2>
+            <h3>2.1 Information You Provide</h3>
+            <p>We collect information that you voluntarily provide to us, including:</p>
+            <ul>
+                <li><strong>Contact Information:</strong> Name, email address, phone number, company name, and role</li>
+                <li><strong>Business Information:</strong> Company size, annual revenue, website URL, and project requirements</li>
+                <li><strong>Project Details:</strong> Budget information, service interests, and project descriptions</li>
+                <li><strong>Communication Data:</strong> Messages, inquiries, and feedback you send to us</li>
+                <li><strong>Payment Information:</strong> Billing details processed through secure payment processors (we do not store full payment card details)</li>
+            </ul>
+
+            <h3>2.2 Automatically Collected Information</h3>
+            <p>When you visit our website, we may automatically collect certain information, including:</p>
+            <ul>
+                <li><strong>Usage Data:</strong> Pages visited, time spent on pages, click patterns, and navigation paths</li>
+                <li><strong>Device Information:</strong> IP address, browser type, operating system, device type, and screen resolution</li>
+                <li><strong>Location Data:</strong> General geographic location based on IP address</li>
+                <li><strong>Cookies and Tracking Technologies:</strong> Information collected through cookies, web beacons, and similar technologies</li>
+            </ul>
+
+            <h3>2.3 Information from Third Parties</h3>
+            <p>We may receive information about you from third-party services, such as:</p>
+            <ul>
+                <li>Payment processors (e.g., Ozow) for transaction verification</li>
+                <li>Analytics services (e.g., Google Analytics) for website usage statistics</li>
+                <li>Social media platforms if you interact with us through social media</li>
+            </ul>
+
+            <h2>3. How We Use Your Information</h2>
+            <p>We use the information we collect for the following purposes:</p>
+            <ul>
+                <li><strong>Service Delivery:</strong> To provide, maintain, and improve our design and development services</li>
+                <li><strong>Communication:</strong> To respond to inquiries, send project updates, and provide customer support</li>
+                <li><strong>Business Operations:</strong> To process payments, manage projects, and fulfill contractual obligations</li>
+                <li><strong>Marketing:</strong> To send promotional materials, newsletters, and updates about our services (with your consent)</li>
+                <li><strong>Legal Compliance:</strong> To comply with legal obligations, including KYC (Know Your Customer) requirements for payment processing</li>
+                <li><strong>Analytics:</strong> To analyze website usage, improve user experience, and optimize our services</li>
+                <li><strong>Security:</strong> To detect, prevent, and address security issues and fraudulent activity</li>
+            </ul>
+
+            <h2>4. Legal Basis for Processing</h2>
+            <p>We process your personal information based on the following legal grounds:</p>
+            <ul>
+                <li><strong>Contractual Necessity:</strong> To fulfill our contractual obligations and provide requested services</li>
+                <li><strong>Legitimate Interests:</strong> To operate our business, improve services, and ensure security</li>
+                <li><strong>Consent:</strong> When you have provided explicit consent for specific processing activities</li>
+                <li><strong>Legal Obligation:</strong> To comply with applicable laws, including KYC and anti-money laundering regulations</li>
+            </ul>
+
+            <h2>5. Information Sharing and Disclosure</h2>
+            <p>We may share your information in the following circumstances:</p>
+            <h3>5.1 Service Providers</h3>
+            <p>We may share information with third-party service providers who assist us in:</p>
+            <ul>
+                <li>Payment processing (e.g., Ozow)</li>
+                <li>Website hosting and maintenance</li>
+                <li>Email delivery and communication services</li>
+                <li>Analytics and performance monitoring</li>
+                <li>Customer relationship management</li>
+            </ul>
+            <p>These service providers are contractually obligated to protect your information and use it only for specified purposes.</p>
+
+            <h3>5.2 Legal Requirements</h3>
+            <p>We may disclose your information if required by law, court order, or governmental authority, including:</p>
+            <ul>
+                <li>Compliance with KYC and anti-money laundering regulations</li>
+                <li>Response to legal process or requests from law enforcement</li>
+                <li>Protection of our rights, property, or safety, or that of others</li>
+            </ul>
+
+            <h3>5.3 Business Transfers</h3>
+            <p>In the event of a merger, acquisition, or sale of assets, your information may be transferred to the acquiring entity.</p>
+
+            <h3>5.4 With Your Consent</h3>
+            <p>We may share your information with third parties when you have provided explicit consent to do so.</p>
+
+            <h2>6. Data Security</h2>
+            <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include:</p>
+            <ul>
+                <li>Encryption of data in transit and at rest</li>
+                <li>Secure payment processing through certified payment providers</li>
+                <li>Regular security assessments and updates</li>
+                <li>Access controls and authentication mechanisms</li>
+                <li>Employee training on data protection practices</li>
+            </ul>
+            <p>However, no method of transmission over the internet or electronic storage is 100% secure. While we strive to protect your information, we cannot guarantee absolute security.</p>
+
+            <h2>7. Data Retention</h2>
+            <p>We retain your personal information for as long as necessary to:</p>
+            <ul>
+                <li>Fulfill the purposes for which it was collected</li>
+                <li>Comply with legal obligations (including KYC record-keeping requirements)</li>
+                <li>Resolve disputes and enforce agreements</li>
+                <li>Maintain business records as required by law</li>
+            </ul>
+            <p>When information is no longer needed, we will securely delete or anonymize it in accordance with our data retention policies and applicable laws.</p>
+
+            <h2>8. Your Rights</h2>
+            <p>Depending on your location, you may have the following rights regarding your personal information:</p>
+            <ul>
+                <li><strong>Access:</strong> Request access to your personal information</li>
+                <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
+                <li><strong>Deletion:</strong> Request deletion of your personal information (subject to legal retention requirements)</li>
+                <li><strong>Objection:</strong> Object to processing of your information for certain purposes</li>
+                <li><strong>Restriction:</strong> Request restriction of processing in certain circumstances</li>
+                <li><strong>Portability:</strong> Request transfer of your information to another service provider</li>
+                <li><strong>Withdraw Consent:</strong> Withdraw consent where processing is based on consent</li>
+            </ul>
+            <p>To exercise these rights, please contact us using the information provided in the "Contact Us" section below. We will respond to your request within a reasonable timeframe and in accordance with applicable law.</p>
+
+            <h2>9. Cookies and Tracking Technologies</h2>
+            <p>We use cookies and similar tracking technologies to collect and store information about your preferences and website usage. Cookies are small text files placed on your device when you visit our website.</p>
+            <h3>9.1 Types of Cookies</h3>
+            <ul>
+                <li><strong>Essential Cookies:</strong> Required for website functionality and cannot be disabled</li>
+                <li><strong>Analytics Cookies:</strong> Help us understand how visitors use our website</li>
+                <li><strong>Functional Cookies:</strong> Remember your preferences and settings</li>
+            </ul>
+            <h3>9.2 Cookie Management</h3>
+            <p>You can control cookies through your browser settings. However, disabling certain cookies may affect website functionality.</p>
+
+            <h2>10. Third-Party Links</h2>
+            <p>Our website may contain links to third-party websites or services. We are not responsible for the privacy practices of these third parties. We encourage you to review the privacy policies of any third-party sites you visit.</p>
+
+            <h2>11. Children's Privacy</h2>
+            <p>Our services are not intended for individuals under the age of 18. We do not knowingly collect personal information from children. If we become aware that we have collected information from a child, we will take steps to delete such information promptly.</p>
+
+            <h2>12. International Data Transfers</h2>
+            <p>Your information may be transferred to and processed in countries other than your country of residence. These countries may have different data protection laws. We take appropriate measures to ensure your information receives adequate protection in accordance with this Privacy Policy.</p>
+
+            <h2>13. KYC and Compliance</h2>
+            <p>As part of our compliance with Know Your Customer (KYC) requirements for payment processing services, we may collect and verify:</p>
+            <ul>
+                <li>Business registration and incorporation documents</li>
+                <li>Identity verification documents for business owners and authorized representatives</li>
+                <li>Business address and contact information</li>
+                <li>Financial information necessary for payment processing</li>
+            </ul>
+            <p>This information is collected and retained in accordance with applicable financial regulations and anti-money laundering laws.</p>
+
+            <h2>14. Changes to This Privacy Policy</h2>
+            <p>We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. We will notify you of any material changes by:</p>
+            <ul>
+                <li>Posting the updated policy on our website with a new "Last Updated" date</li>
+                <li>Sending an email notification to registered users (if applicable)</li>
+            </ul>
+            <p>Your continued use of our services after changes become effective constitutes acceptance of the updated Privacy Policy.</p>
+
+            <h2>15. Contact Us</h2>
+            <p>If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
+
+            <div class="contact-info">
+                <h3>ZoneBroz Studios</h3>
+                <p><strong>Email:</strong> <a href="contact.html">Contact Us</a><br>
+                <strong>Website:</strong> <a href="index.html">www.zonebrozstudios.com</a></p>
+                <p>We will respond to your inquiry within a reasonable timeframe and in accordance with applicable data protection laws.</p>
+            </div>
+
+            <h2>16. Governing Law</h2>
+            <p>This Privacy Policy is governed by the laws of South Africa. Any disputes arising from this policy or our data practices shall be subject to the exclusive jurisdiction of the courts of South Africa.</p>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h1>Tell us where you're at</h1>
+            <form action="https://formspree.io/f/mvgrynvw" method="POST">
+                <div class="form-row">
+                    <div>
+                        <label for="name">What is your name?</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div>
+                        <label for="email">What is your email?</label>
+                        <input type="email" id="email" name="_replyto" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="role">What is your role in the company?</label>
+                    <input type="text" id="role" name="role">
+                </div>
+
+                <div class="form-row">
+                    <div>
+                        <label for="company_name">Company Name</label>
+                        <input type="text" id="company_name" name="company_name">
+                    </div>
+                    <div>
+                        <label for="company_website">Company Website</label>
+                        <input type="url" id="company_website" name="company_website">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="select-wrapper">
+                        <label for="company_size">Company Size</label>
+                        <select id="company_size" name="company_size">
+                            <option value="">Select company size</option>
+                            <option>1-10 employees</option>
+                            <option>11-50 employees</option>
+                            <option>51-200 employees</option>
+                            <option>201-1000 employees</option>
+                            <option>1000+ employees</option>
+                        </select>
+                    </div>
+                    <div class="select-wrapper">
+                        <label for="revenue">Company's Annual Revenue</label>
+                        <select id="revenue" name="revenue">
+                            <option value="">Select revenue range</option>
+                            <option>Under $1M</option>
+                            <option>$1M - $10M</option>
+                            <option>$10M - $50M</option>
+                            <option>$50M+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="select-wrapper">
+                        <label for="budget">Project budget</label>
+                        <select id="budget" name="budget">
+                            <option value="">Select budget range</option>
+                            <option>$5,000 - $10,000</option>
+                            <option>$10,000 - $25,000</option>
+                            <option>$25,000 - $50,000</option>
+                            <option>$50,000+</option>
+                        </select>
+                    </div>
+                    <div class="select-wrapper">
+                        <label for="services-interest">What services are you interested in?</label>
+                        <select id="services-interest" name="services_interest">
+                            <option value="">Select service</option>
+                            <option>UI/UX Design</option>
+                            <option>Web Development</option>
+                            <option>Brand Strategy</option>
+                            <option>Full Package</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+
+                <button type="submit">Send Inquiry</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                const target = document.querySelector(href);
+                if (!target) return;
+                e.preventDefault();
+                if (href === '#who-we-are') {
+                    scrollToAboutCentered(true);
+                    scheduleAboutFadeReset();
+                } else {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                // Trigger bounce animation on navbar
+                bounceNavbar();
+            });
+        });
+
+        // Apple-like bounce animation for navbar
+        function bounceNavbar() {
+            const navIsland = document.querySelector('.nav-island');
+            if (navIsland) {
+                // Remove any existing bounce class
+                navIsland.classList.remove('bouncing');
+                // Force reflow to restart animation
+                void navIsland.offsetWidth;
+                // Add bounce class
+                navIsland.classList.add('bouncing');
+                // Remove bounce class after animation completes
+                setTimeout(() => {
+                    navIsland.classList.remove('bouncing');
+                }, 600);
+            }
+        }
+
+        function disableSmoothScroll() {
+            document.documentElement.style.scrollBehavior = 'auto';
+            document.body.style.scrollBehavior = 'auto';
+        }
+
+        function restoreSmoothScroll() {
+            document.documentElement.style.scrollBehavior = '';
+            document.body.style.scrollBehavior = '';
+        }
+
+        function scrollToAboutCentered(useSmooth = false) {
+            const aboutSection = document.querySelector('#who-we-are');
+            if (!aboutSection) return;
+            const sectionTop = aboutSection.getBoundingClientRect().top + window.scrollY;
+            const sectionHeight = aboutSection.offsetHeight || 0;
+            const viewportHeight = window.innerHeight || 0;
+            const centeredScroll = sectionTop - Math.max((viewportHeight - sectionHeight) / 2, 0);
+            const targetTop = Math.max(0, Math.round(centeredScroll));
+            if (useSmooth) {
+                window.scrollTo({ top: targetTop, behavior: 'smooth' });
+            } else {
+                window.scrollTo(0, targetTop);
+            }
+        }
+
+        function scheduleAboutFadeReset() {
+            if (!window.zonebrozScrollAnim || typeof window.zonebrozScrollAnim.reset !== 'function') return;
+            const aboutSection = document.querySelector('#who-we-are');
+            if (!aboutSection) return;
+            const sectionTop = aboutSection.getBoundingClientRect().top + window.scrollY;
+            const sectionHeight = aboutSection.offsetHeight || 0;
+            const viewportHeight = window.innerHeight || 0;
+            const centeredScroll = sectionTop - Math.max((viewportHeight - sectionHeight) / 2, 0);
+            const targetTop = Math.max(0, Math.round(centeredScroll));
+            let resolved = false;
+            document.body.classList.add('about-scroll-fade');
+            document.body.classList.add('about-skip-reveal');
+
+            const maybeReset = () => {
+                if (resolved) return;
+                if (Math.abs(window.scrollY - targetTop) <= 2) {
+                    resolved = true;
+                    window.zonebrozScrollAnim.reset();
+                    setTimeout(() => {
+                        document.body.classList.remove('about-skip-reveal');
+                    }, 50);
+                }
+            };
+
+            const checkScroll = () => {
+                if (resolved) return;
+                maybeReset();
+                if (!resolved) {
+                    requestAnimationFrame(checkScroll);
+                }
+            };
+
+            requestAnimationFrame(checkScroll);
+            setTimeout(() => {
+                if (!resolved) {
+                    resolved = true;
+                    window.zonebrozScrollAnim.reset();
+                    setTimeout(() => {
+                        document.body.classList.remove('about-skip-reveal');
+                    }, 50);
+                }
+            }, 1200);
+
+            let lastY = window.scrollY;
+            const handleScroll = () => {
+                const currentY = window.scrollY;
+                if (currentY > lastY && currentY > targetTop + 12) {
+                    document.body.classList.remove('about-scroll-fade');
+                    document.body.classList.remove('about-skip-reveal');
+                    window.removeEventListener('scroll', handleScroll);
+                }
+                lastY = currentY;
+            };
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        }
+
+        function restoreScrollPosition() {
+            const targetSection = sessionStorage.getItem('scrollRestoreTarget');
+
+            if (!targetSection && !sessionStorage.getItem('scrollRestoreY')) {
+                return;
+            }
+
+            disableSmoothScroll();
+            requestAnimationFrame(() => {
+                if (targetSection === 'projects') {
+                    const projectsSection = document.querySelector('#projects');
+                    if (projectsSection) {
+                        projectsSection.scrollIntoView({ behavior: 'auto', block: 'start' });
+                    }
+                } else if (targetSection === 'about') {
+                    scrollToAboutCentered();
+                } else {
+                    const storedScrollY = sessionStorage.getItem('scrollRestoreY');
+                    if (storedScrollY) {
+                        const scrollY = Number.parseInt(storedScrollY, 10);
+                        window.scrollTo(0, Number.isNaN(scrollY) ? 0 : scrollY);
+                    }
+                }
+
+                sessionStorage.removeItem('scrollRestoreY');
+                sessionStorage.removeItem('scrollRestoreTarget');
+                restoreSmoothScroll();
+            });
+        }
+
+        // Add bounce animation when main page buttons are clicked
+        document.querySelectorAll('.primary-btn, .secondary-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Only trigger if we're on the main page (not navigating away)
+                if (this.href && !this.href.includes('contact.html') && !this.href.includes('projects/')) {
+                    bounceNavbar();
+                } else if (this.href && this.href.includes('contact.html')) {
+                    // For external links, trigger bounce before navigation
+                    e.preventDefault();
+                    bounceNavbar();
+                    // Navigate after a short delay
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 300);
+                }
+            });
+        });
+
+        // Add bounce animation when nav-island links are clicked (only on main page)
+        document.querySelectorAll('.nav-island a[href^="#"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Only on main page (index.html or root)
+                if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
+                    bounceNavbar();
+                }
+            });
+        });
+
+        // Add bounce animation when nav-island buttons (like Contact Us modal) are clicked (only on main page)
+        document.querySelectorAll('.nav-island button[data-modal]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // Only on main page (index.html or root)
+                if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
+                    bounceNavbar();
+                }
+            });
+        });
+
+        // Featured work infinite slider
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.querySelector('.featured-slider');
+            if (!slider) return;
+
+            const projectsSection = document.querySelector('#projects');
+            if (projectsSection) {
+                projectsSection.classList.remove('is-ready');
+            }
+            slider.classList.remove('is-ready');
+            slider.classList.add('is-stacked');
+
+            const cards = Array.from(slider.querySelectorAll('.featured-card'));
+            if (!cards.length) {
+                slider.classList.add('is-ready');
+                if (projectsSection) {
+                    projectsSection.classList.add('is-ready');
+                }
+                return;
+            }
+
+            const total = cards.length;
+            let currentIndex = 0;
+            let isAnimating = false;
+            const visibleRange = 1;
+            let hasEnteredView = false;
+
+            const wrapIndex = (index) => (index + total) % total;
+
+            const updateCards = () => {
+                cards.forEach((card, index) => {
+                    let offset = index - currentIndex;
+                    if (offset > total / 2) offset -= total;
+                    if (offset < -total / 2) offset += total;
+
+                    const absOffset = Math.abs(offset);
+                    const isVisible = absOffset <= visibleRange;
+                    const opacity = isVisible ? (1 - absOffset * 0.45) : 0;
+                    const scale = 1 - absOffset * 0.08;
+                    const stackDepth = Math.min(absOffset, 3);
+                    const stackY = stackDepth * 14;
+                    const stackScale = 0.92 - stackDepth * 0.025;
+                    const stackOpacity = 0.55 + (3 - stackDepth) * 0.12;
+                    const stackDelay = stackDepth * 70;
+
+                    card.style.setProperty('--offset', offset);
+                    card.style.setProperty('--abs-offset', absOffset);
+                    card.style.setProperty('--opacity', opacity.toString());
+                    card.style.setProperty('--scale', scale.toString());
+                    card.style.setProperty('--pointer', absOffset === 0 ? 'auto' : 'none');
+                    card.style.setProperty('--stack-y', `${stackY}px`);
+                    card.style.setProperty('--stack-scale', stackScale.toString());
+                    card.style.setProperty('--stack-opacity', stackOpacity.toString());
+                    card.style.setProperty('--stack-delay', `${stackDelay}ms`);
+                });
+            };
+
+            slider.dataset.sliderVisible = 'false';
+
+            const revealFeatured = () => {
+                if (slider.classList.contains('is-revealed')) return;
+                if (slider.dataset.sliderVisible !== 'true') return;
+                slider.classList.add('is-revealed');
+                slider.classList.remove('is-stacked');
+            };
+
+            slider.revealFromScroll = () => {
+                slider.dataset.sliderVisible = 'true';
+                if (hasEnteredView && slider.classList.contains('is-ready')) {
+                    revealFeatured();
+                }
+            };
+
+            const markFeaturedReady = () => {
+                updateCards();
+                slider.classList.add('is-ready');
+                if (projectsSection) {
+                    projectsSection.classList.add('is-ready');
+                }
+                if (hasEnteredView) {
+                    revealFeatured();
+                }
+            };
+
+            const move = (direction) => {
+                if (isAnimating) return;
+                isAnimating = true;
+                currentIndex = wrapIndex(currentIndex + direction);
+                updateCards();
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 520);
+            };
+
+            const prevBtn = slider.querySelector('[data-direction="prev"]');
+            const nextBtn = slider.querySelector('[data-direction="next"]');
+            if (prevBtn) prevBtn.addEventListener('click', () => move(-1));
+            if (nextBtn) nextBtn.addEventListener('click', () => move(1));
+
+            const viewport = slider.querySelector('.featured-slider-viewport');
+            if (viewport) {
+                viewport.addEventListener('wheel', (event) => {
+                    event.preventDefault();
+                    const delta = Math.sign(event.deltaY || event.deltaX);
+                    if (delta !== 0) {
+                        move(delta > 0 ? 1 : -1);
+                    }
+                }, { passive: false });
+            }
+
+            const images = Array.from(slider.querySelectorAll('img'));
+            const imagePromises = images.map((img) => {
+                if (img.complete) return Promise.resolve();
+                return new Promise((resolve) => {
+                    const done = () => resolve();
+                    img.addEventListener('load', done, { once: true });
+                    img.addEventListener('error', done, { once: true });
+                });
+            });
+
+            const fontPromise = document.fonts && document.fonts.ready
+                ? document.fonts.ready.catch(() => undefined)
+                : Promise.resolve();
+
+            Promise.all([fontPromise, ...imagePromises]).then(markFeaturedReady);
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        hasEnteredView = true;
+                        if (slider.classList.contains('is-ready')) {
+                            revealFeatured();
+                        }
+                        observer.disconnect();
+                    }
+                });
+            }, { threshold: 0.35 });
+
+            revealObserver.observe(slider);
+        });
+
+        // Team card stack interaction
+        document.addEventListener('DOMContentLoaded', () => {
+            const stack = document.querySelector('.team-stack');
+            if (!stack) return;
+
+            const cards = Array.from(stack.querySelectorAll('.team-card'));
+            if (cards.length < 2) return;
+
+            let order = cards.map((_, index) => index);
+            let isAnimating = false;
+            let idleTimer = null;
+            let autoTimer = null;
+
+            const stackOffsets = {
+                y: [0, 26, 52],
+                scale: [1, 0.965, 0.93],
+                blur: [0, 1, 2],
+                opacity: [1, 0.78, 0.6]
+            };
+
+            const applyStackStyles = () => {
+                order.forEach((cardIndex, position) => {
+                    const card = cards[cardIndex];
+                    const depthIndex = Math.min(position, stackOffsets.y.length - 1);
+
+                    card.style.setProperty('--stack-y', `${stackOffsets.y[depthIndex]}px`);
+                    card.style.setProperty('--stack-scale', stackOffsets.scale[depthIndex].toString());
+                    card.style.setProperty('--stack-blur', `${stackOffsets.blur[depthIndex]}px`);
+                    card.style.setProperty('--stack-opacity', stackOffsets.opacity[depthIndex].toString());
+                    card.style.setProperty('--stack-z', `${cards.length - position}`);
+                    card.style.setProperty('--pointer', position === 0 ? 'auto' : 'none');
+                    card.style.setProperty('--blur-transition', position === 0 ? '0s' : '0.35s');
+                    card.classList.toggle('is-active', position === 0);
+                });
+            };
+
+            const setStackHeight = () => {
+                const maxHeight = cards.reduce((max, card) => Math.max(max, card.offsetHeight), 0);
+                const offset = stackOffsets.y[stackOffsets.y.length - 1] || 0;
+                stack.style.height = `${maxHeight + offset}px`;
+            };
+
+            const rotateStack = (direction = 1) => {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                if (direction > 0) {
+                    order.push(order.shift());
+                } else {
+                    order.unshift(order.pop());
+                }
+
+                applyStackStyles();
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 900);
+            };
+
+            const stopAuto = () => {
+                if (autoTimer) {
+                    clearInterval(autoTimer);
+                    autoTimer = null;
+                }
+            };
+
+            const startAuto = () => {
+                stopAuto();
+                autoTimer = setInterval(() => rotateStack(1), 4500);
+            };
+
+            const resetIdle = () => {
+                if (idleTimer) {
+                    clearTimeout(idleTimer);
+                }
+                idleTimer = setTimeout(() => startAuto(), 1500);
+            };
+
+            const handleUserInteraction = (event) => {
+                stopAuto();
+                resetIdle();
+                if (event && event.target && event.target.closest('a')) {
+                    return;
+                }
+                rotateStack(1);
+            };
+
+            stack.addEventListener('click', handleUserInteraction);
+            stack.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleUserInteraction(event);
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                setStackHeight();
+            });
+
+            setStackHeight();
+            applyStackStyles();
+            resetIdle();
+        });
+
+        // Modal functionality
+        const modals = {
+            terms: document.getElementById('termsModal'),
+            privacy: document.getElementById('privacyModal'),
+            contact: document.getElementById('contactModal')
+        };
+
+        function openModal(modalId) {
+            const modal = modals[modalId];
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = modals[modalId];
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeAllModals() {
+            Object.keys(modals).forEach(key => {
+                closeModal(key);
+            });
+        }
+
+        // Open modals when buttons are clicked
+        document.querySelectorAll('[data-modal]').forEach(button => {
+            button.addEventListener('click', () => {
+                const modalId = button.getAttribute('data-modal');
+                openModal(modalId);
+            });
+        });
+
+        // Close modals when close button is clicked
+        document.querySelectorAll('.modal-close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', () => {
+                const modal = closeBtn.closest('.modal-overlay');
+                if (modal) {
+                    const modalId = modal.id.replace('Modal', '');
+                    closeModal(modalId);
+                }
+            });
+        });
+
+        // Close modals when clicking outside the modal content
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    const modalId = overlay.id.replace('Modal', '');
+                    closeModal(modalId);
+                }
+            });
+        });
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAllModals();
+            }
+        });
+
+        // Navigation island element
+        const navIsland = document.querySelector('.nav-island');
+
+        // Function to collapse navigation with bounce
+        function collapseNavigation() {
+            if (navIsland) {
+                // Remove any existing animation classes
+                navIsland.classList.remove('expanding');
+                // Add collapsing animation class
+                navIsland.classList.add('collapsing');
+                // Add collapsed class
+                navIsland.classList.add('collapsed');
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    navIsland.classList.remove('collapsing');
+                }, 700);
+            }
+        }
+
+        // Function to expand navigation with bounce
+        function expandNavigation() {
+            if (navIsland) {
+                document.documentElement.classList.remove('nav-precollapsed');
+                // Remove collapsed class first
+                navIsland.classList.remove('collapsed');
+                // Remove any existing animation classes
+                navIsland.classList.remove('collapsing');
+                // Add expanding animation class
+                navIsland.classList.add('expanding');
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    navIsland.classList.remove('expanding');
+                }, 800);
+            }
+        }
+
+        // Store collapse state when clicking project cards
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Only store state if it's a project page link
+                if (this.href && this.href.includes('projects/')) {
+                    sessionStorage.setItem('navCollapsing', 'true');
+                    sessionStorage.setItem('scrollRestoreY', window.scrollY.toString());
+                    sessionStorage.setItem('scrollRestoreTarget', 'projects');
+                }
+            });
+        });
+
+        // Check navigation state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we're on a project page
+            if (window.location.pathname.includes('projects/')) {
+                // Check if we're coming from main page (should animate collapse)
+                const shouldCollapse = sessionStorage.getItem('navCollapsing');
+                if (shouldCollapse) {
+                    // Small delay to ensure page is rendered, then collapse with animation
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            collapseNavigation();
+                        }, 50);
+                    });
+                    sessionStorage.removeItem('navCollapsing');
+                } else {
+                    // Direct navigation or refresh - start collapsed immediately
+                    navIsland.classList.add('collapsed');
+                }
+            } else {
+                // We're on the main page
+                // Check if we're coming from a project page and need to expand
+                const shouldExpand = sessionStorage.getItem('navExpanding');
+                if (shouldExpand) {
+                    // Start collapsed, then expand with animation
+                    navIsland.classList.add('collapsed');
+                    // Small delay to ensure the collapsed state is rendered, then expand
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            expandNavigation();
+                        }, 100);
+                    });
+                    sessionStorage.removeItem('navExpanding');
+                } else {
+                    // Ensure navigation is expanded on main page
+                    navIsland.classList.remove('collapsed');
+                }
+
+                restoreScrollPosition();
+            }
+        });
+
+        // GSAP scroll animation system (layout-safe: opacity/transform only)
+        (function() {
+            if (!window.gsap || !window.ScrollTrigger) return;
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            const SELECTOR = '[data-animate]';
+            const CENTER_TOP = 0.35;
+            const CENTER_BOTTOM = 0.65;
+            const GROUP_STAGGER = 0.1;
+
+            const PRESETS = {
+                hero: { y: 18, scale: 1, duration: 0.9, ease: 'power3.out', useTransform: true },
+                text: { y: 16, scale: 1, duration: 0.8, ease: 'power3.out', useTransform: true },
+                card: { y: 34, scale: 0.965, duration: 1.275, ease: 'back.out(1.3)', useTransform: true },
+                slider: { y: 14, scale: 0.99, duration: 0.85, ease: 'power3.out', useTransform: true },
+                fade: { duration: 0.7, ease: 'power3.out', useTransform: false },
+                'fade-slow': { duration: 0.8, ease: 'power3.out', useTransform: false }
+            };
+
+            const getPreset = (el) => {
+                const key = el.getAttribute('data-animate') || 'text';
+                return PRESETS[key] || PRESETS.text;
+            };
+
+            const shouldSkipAboutReveal = (el) => {
+                if (!document.body.classList.contains('about-skip-reveal')) return false;
+                return Boolean(el.closest('#who-we-are'));
+            };
+
+            const isInCenterZone = (el) => {
+                const rect = el.getBoundingClientRect();
+                const vh = window.innerHeight || 0;
+                const zoneTop = vh * CENTER_TOP;
+                const zoneBottom = vh * CENTER_BOTTOM;
+                return rect.bottom >= zoneTop && rect.top <= zoneBottom;
+            };
+
+            const isAboveCenterZone = (el) => {
+                const rect = el.getBoundingClientRect();
+                const vh = window.innerHeight || 0;
+                return rect.bottom < vh * CENTER_TOP;
+            };
+
+            const setHidden = (el) => {
+                el.dataset.animState = 'hidden';
+                gsap.set(el, { opacity: 0, clearProps: 'transform' });
+            };
+
+            const setVisible = (el) => {
+                el.dataset.animState = 'shown';
+                gsap.set(el, { opacity: 1, clearProps: 'transform' });
+                if (el.getAttribute('data-animate') === 'slider' && typeof el.revealFromScroll === 'function') {
+                    el.revealFromScroll();
+                }
+            };
+
+            const animateIn = (el, delay = 0) => {
+                if (el.dataset.animState === 'shown') return;
+                const preset = getPreset(el);
+                const fromVars = { opacity: 0 };
+                const toVars = {
+                    opacity: 1,
+                    duration: preset.duration,
+                    ease: preset.ease,
+                    delay,
+                    overwrite: 'auto'
+                };
+
+                if (preset.useTransform) {
+                    fromVars.y = preset.y || 0;
+                    fromVars.scale = preset.scale || 1;
+                    toVars.y = 0;
+                    toVars.scale = 1;
+                    toVars.clearProps = 'transform';
+                }
+
+                if (el.getAttribute('data-animate') === 'slider' && typeof el.revealFromScroll === 'function') {
+                    toVars.onStart = () => el.revealFromScroll();
+                }
+
+                gsap.fromTo(el, fromVars, toVars);
+                el.dataset.animState = 'shown';
+            };
+
+            const initAnimations = () => {
+                const items = gsap.utils.toArray(SELECTOR);
+                if (!items.length) return;
+
+                items.forEach(setHidden);
+
+                if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    items.forEach(setVisible);
+                    return;
+                }
+
+                const heroItems = items.filter((el) => el.getAttribute('data-animate') === 'hero');
+                if (heroItems.length) {
+                    gsap.timeline({ defaults: { duration: 0.9, ease: 'power3.out' } })
+                        .fromTo(heroItems, { opacity: 0, y: 18 }, { opacity: 1, y: 0, stagger: 0.12, clearProps: 'transform' })
+                        .add(() => {
+                            heroItems.forEach((el) => {
+                                el.dataset.animState = 'shown';
+                            });
+                        });
+                }
+
+                const scrollItems = items.filter((el) => el.getAttribute('data-animate') !== 'hero');
+                scrollItems.forEach((el) => {
+                    if (isAboveCenterZone(el)) {
+                        setVisible(el);
+                    } else if (isInCenterZone(el)) {
+                        if (shouldSkipAboutReveal(el)) {
+                            setVisible(el);
+                        } else {
+                            animateIn(el);
+                        }
+                    }
+                });
+
+                const groupMap = new Map();
+                scrollItems.forEach((el) => {
+                    const group = el.getAttribute('data-anim-group');
+                    if (!group) return;
+                    if (!groupMap.has(group)) groupMap.set(group, []);
+                    groupMap.get(group).push(el);
+                });
+
+                const groupedItems = new Set();
+                groupMap.forEach((elements) => {
+                    elements.forEach((el) => groupedItems.add(el));
+                    ScrollTrigger.batch(elements, {
+                        start: `top ${CENTER_BOTTOM * 100}%`,
+                        end: `bottom ${CENTER_TOP * 100}%`,
+                        once: true,
+                        onEnter: (batch) => {
+                            batch.forEach((el, index) => {
+                                if (shouldSkipAboutReveal(el)) {
+                                    setVisible(el);
+                                } else {
+                                    animateIn(el, index * GROUP_STAGGER);
+                                }
+                            });
+                        },
+                        onEnterBack: (batch) => {
+                            batch.forEach((el, index) => {
+                                if (shouldSkipAboutReveal(el)) {
+                                    setVisible(el);
+                                } else {
+                                    animateIn(el, index * GROUP_STAGGER);
+                                }
+                            });
+                        }
+                    });
+                });
+
+                scrollItems.forEach((el) => {
+                    if (groupedItems.has(el)) return;
+                    ScrollTrigger.create({
+                        trigger: el,
+                        start: `top ${CENTER_BOTTOM * 100}%`,
+                        end: `bottom ${CENTER_TOP * 100}%`,
+                        once: true,
+                        onEnter: () => {
+                            if (shouldSkipAboutReveal(el)) {
+                                setVisible(el);
+                            } else {
+                                animateIn(el);
+                            }
+                        },
+                        onEnterBack: () => {
+                            if (shouldSkipAboutReveal(el)) {
+                                setVisible(el);
+                            } else {
+                                animateIn(el);
+                            }
+                        }
+                    });
+                });
+
+                ScrollTrigger.addEventListener('refresh', () => {
+                    scrollItems.forEach((el) => {
+                        if (isAboveCenterZone(el)) {
+                            setVisible(el);
+                        }
+                    });
+                });
+
+                ScrollTrigger.refresh();
+            };
+
+            const resetAnimations = () => {
+                const items = gsap.utils.toArray(SELECTOR);
+                items.forEach(setHidden);
+            };
+
+            window.zonebrozScrollAnim = {
+                reset: () => {
+                    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+                    resetAnimations();
+                    initAnimations();
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initAnimations();
+            });
+
+            window.addEventListener('pageshow', (event) => {
+                if (!event.persisted) return;
+                ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+                resetAnimations();
+                initAnimations();
+            });
+        })();
+    </script>
+    </div>
+</body>
+</html>
+

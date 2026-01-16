@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact ZoneBroz Studios</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        /* Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+        }
+
+        /* Chromium / WebKit */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        :root {
+            --bg: #030303;
+            --panel: #101010;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f5f5f5;
+            --muted: #a0a0a5;
+            --accent: #ffffff;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif !important;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        #app-root {
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 24px;
+            padding-right: 24px;
+            box-sizing: border-box;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 32px;
+            padding-bottom: 32px;
+        }
+
+        .full-bleed {
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+        }
+
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 64px 24px;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .page-background {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(90, 60, 255, 0.2), transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body,
+        .contact-card {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .contact-card {
+            width: 100%;
+            max-width: 100%;
+            background: var(--panel);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            padding: 3rem;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 4vw, 2.8rem);
+            margin-bottom: 2rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        label {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+
+        input, textarea {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: var(--text);
+            padding: 0.85rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.05);
+        }
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            border-left: 2px solid var(--text);
+            border-bottom: 2px solid var(--text);
+            transform: translateY(-60%) rotate(-45deg);
+            opacity: 0.7;
+        }
+
+        select {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(20, 20, 20, 0.95);
+            color: var(--text);
+            padding: 0.85rem 1rem;
+            padding-right: 2.5rem;
+            font-size: 1rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.4);
+            background: rgba(20, 20, 20, 0.8);
+        }
+
+        select option {
+            background: #0c0c0c;
+            color: var(--text);
+            padding: 0.75rem 1rem;
+        }
+
+        select option:hover,
+        select option:focus,
+        select option:checked {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text);
+        }
+
+        textarea {
+            resize: none;
+            min-height: 140px;
+        }
+
+        button {
+            margin-top: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 999px;
+            background: var(--accent);
+            color: #000;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.9rem 2.75rem;
+            align-self: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(255, 255, 255, 0.15);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--muted);
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover {
+            color: var(--text);
+        }
+
+        @media (max-width: 640px) {
+            .contact-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-background" aria-hidden="true"></div>
+    <div id="app-root">
+    <div class="contact-card">
+        <a class="back-link" href="index.html">&#8592; Back to Home</a>
+        <h1>Tell us where you're at</h1>
+        <form action="https://formspree.io/f/mvgrynvw" method="POST">
+            <div class="form-row">
+                <div>
+                    <label for="name">What is your name?</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div>
+                    <label for="email">What is your email?</label>
+                    <input type="email" id="email" name="_replyto" required>
+                </div>
+            </div>
+
+            <div>
+                <label for="role">What is your role in the company?</label>
+                <input type="text" id="role" name="role">
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="company_name">Company Name</label>
+                    <input type="text" id="company_name" name="company_name">
+                </div>
+                <div>
+                    <label for="company_website">Company Website</label>
+                    <input type="url" id="company_website" name="company_website">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="select-wrapper">
+                    <label for="company_size">Company Size</label>
+                    <select id="company_size" name="company_size">
+                        <option value="">Select company size</option>
+                        <option>1-10 employees</option>
+                        <option>11-50 employees</option>
+                        <option>51-200 employees</option>
+                        <option>201-1000 employees</option>
+                        <option>1000+ employees</option>
+                    </select>
+                </div>
+                <div class="select-wrapper">
+                    <label for="revenue">Company's Annual Revenue</label>
+                    <select id="revenue" name="revenue">
+                        <option value="">Select revenue range</option>
+                        <option>Under $1M</option>
+                        <option>$1M - $10M</option>
+                        <option>$10M - $50M</option>
+                        <option>$50M+</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="select-wrapper">
+                    <label for="budget">Project budget</label>
+                    <select id="budget" name="budget">
+                        <option value="">Select budget range</option>
+                        <option>$5,000 - $10,000</option>
+                        <option>$10,000 - $25,000</option>
+                        <option>$25,000 - $50,000</option>
+                        <option>$50,000+</option>
+                    </select>
+                </div>
+                <div class="select-wrapper">
+                    <label for="services-interest">What services are you interested in?</label>
+                    <select id="services-interest" name="services_interest">
+                        <option value="">Select service</option>
+                        <option>UI/UX Design</option>
+                        <option>Web Development</option>
+                        <option>Brand Strategy</option>
+                        <option>Full Package</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label for="message">Message</label>
+                <textarea id="message" name="message" required></textarea>
+            </div>
+
+            <button type="submit">Send Inquiry</button>
+        </form>
+    </div>
+    </div>
+</body>
+</html>
+

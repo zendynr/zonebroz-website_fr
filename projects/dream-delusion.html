@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream Delusion - ZoneBroz Studios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script>
+        document.documentElement.classList.add('js-anim');
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Firefox */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+        }
+
+        /* Chromium / WebKit */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        html, body, * {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        :root {
+            --bg: #030303;
+            --panel: #101010;
+            --muted: #a0a0a5;
+            --white: #ffffff;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html.js-anim [data-animate] {
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        #app-root {
+            width: 100%;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 24px;
+            padding-right: 24px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+
+        .full-bleed {
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            margin-right: calc(50% - 50vw);
+        }
+
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 64px 24px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            line-height: 1.65;
+            padding-top: 0;
+            min-height: 100vh;
+        }
+
+        .vignette-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 117.6vmax;
+            height: 117.6vmax;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(ellipse 70% 88% at 50% 50%, rgba(35, 35, 35, 1) 0%, rgba(20, 20, 20, 1) 30%, rgba(10, 10, 10, 1) 45%, rgba(3, 3, 3, 1) 60%, rgba(1, 1, 1, 1) 75%, #000000 100%);
+        }
+
+        body,
+        .container {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        img, video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .nav-island {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            width: fit-content;
+            max-width: calc(100% - 2rem);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .nav-island::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .nav-island > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-island.collapsed .nav-extra {
+            max-width: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            gap: 0;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island .nav-extra {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            overflow: hidden;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 500px;
+            opacity: 1;
+        }
+
+        .nav-island .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 0.25rem;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island.collapsed .nav-divider {
+            width: 0;
+            opacity: 0;
+            margin: 0;
+        }
+
+        .nav-island .nav-icon-btn {
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .nav-island.collapsed .nav-icon-btn {
+            opacity: 0;
+            transform: scale(0.8);
+            width: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Bounce animation keyframes */
+        @keyframes navBounceCollapse {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+            30% {
+                transform: translateX(-50%) scale(0.99);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.005);
+            }
+            65% {
+                transform: translateX(-50%) scale(0.998);
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        @keyframes navBounceExpand {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.008);
+            }
+            65% {
+                transform: translateX(-50%) scale(0.996);
+            }
+            75% {
+                transform: translateX(-50%) scale(1.001);
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        /* Apply bounce animation to nav island */
+        .nav-island {
+            transform: translateX(-50%);
+        }
+
+        .nav-island.collapsing {
+            animation: navBounceCollapse 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island.expanding {
+            animation: navBounceExpand 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Apple-like bounce animation */
+        @keyframes appleBounce {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+            35% {
+                transform: translateX(-50%) scale(0.995);
+            }
+            60% {
+                transform: translateX(-50%) scale(1.005);
+            }
+            80% {
+                transform: translateX(-50%) scale(0.998);
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        .nav-island.bouncing {
+            animation: appleBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island a,
+        .nav-island button {
+            padding: 0.5rem 1rem;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 999px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .nav-island a:hover,
+        .nav-island button:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-island .nav-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 999px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .nav-island .nav-icon-btn:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-island .nav-icon-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 8rem 0 4rem;
+        }
+
+        .project-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 3rem;
+            transition: color 0.2s ease;
+        }
+
+        .project-back-link:hover {
+            color: var(--white);
+        }
+
+        .project-back-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .project-view-header {
+            margin-bottom: 4rem;
+        }
+
+        .project-view-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .project-view-tagline {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+
+        .project-view-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .project-view-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .project-view-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--white);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.1),
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-view-link:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        .project-view-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .project-view-hero-image {
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 4rem;
+            background: var(--panel);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+
+        .project-view-hero-image img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .project-view-content {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .project-view-main {
+            min-width: 0;
+        }
+
+        .project-view-sidebar {
+            position: sticky;
+            top: 6rem;
+            height: fit-content;
+        }
+
+        .project-view-section {
+            margin-bottom: 3rem;
+        }
+
+        .project-view-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .project-view-section h2::before {
+            content: '|';
+            color: var(--muted);
+            font-weight: 400;
+            pointer-events: none;
+        }
+
+        .project-view-section p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.75;
+            margin-bottom: 1.25rem;
+        }
+
+        .project-view-section ul {
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.75;
+            margin-left: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .project-view-section li {
+            margin-bottom: 0.75rem;
+        }
+
+        .project-view-tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .project-view-tool-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--white);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 
+                0 2px 6px rgba(0, 0, 0, 0.1),
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-view-toc {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-view-toc h3 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .project-view-toc ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .project-view-toc li {
+            margin-bottom: 0.75rem;
+        }
+
+        .project-view-toc a {
+            color: var(--muted);
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+            display: block;
+            text-decoration: none;
+        }
+
+        .project-view-toc a:hover {
+            color: var(--white);
+        }
+
+        footer {
+            padding: 3rem 0;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        footer a:hover {
+            color: var(--white);
+        }
+
+        @media (max-width: 968px) {
+            .project-view-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .project-view-sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 6rem 0 3rem;
+            }
+
+            .project-view-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .nav-island {
+                flex-wrap: wrap;
+                max-width: calc(100% - 2rem);
+                padding: 0.75rem 1rem;
+                gap: 0.5rem;
+            }
+
+            .nav-island a,
+            .nav-island button {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            pointer-events: none;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: transparent;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            padding: 3rem;
+            padding-right: 2.75rem;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .modal-content > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--white);
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-close svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-content h1 {
+            font-size: clamp(2.2rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--white);
+        }
+
+        .modal-content p {
+            color: var(--muted);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            line-height: 1.75;
+        }
+
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .modal-content .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .modal-content label {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--white);
+            padding: 0.85rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content input:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        .modal-content .select-wrapper {
+            position: relative;
+        }
+
+        .modal-content .select-wrapper::after {
+            content: '';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            border-left: 2px solid var(--white);
+            border-bottom: 2px solid var(--white);
+            transform: translateY(-60%) rotate(-45deg);
+            opacity: 0.7;
+        }
+
+        .modal-content select {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(20, 20, 20, 0.95);
+            color: var(--white);
+            padding: 0.85rem 1rem;
+            padding-right: 2.5rem;
+            font-size: 1rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.072),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(20, 20, 20, 0.8);
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.096),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        .modal-content select option {
+            background: #0c0c0c;
+            color: var(--white);
+            padding: 0.75rem 1rem;
+        }
+
+        .modal-content select option:hover,
+        .modal-content select option:focus,
+        .modal-content select option:checked {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+        }
+
+        .modal-content textarea {
+            resize: none;
+            min-height: 140px;
+        }
+
+        .modal-content button[type="submit"] {
+            margin-top: 1rem;
+            border: none;
+            cursor: pointer;
+            border-radius: 999px;
+            background: var(--white);
+            color: #000;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.9rem 2.75rem;
+            align-self: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+            box-shadow: 
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content button[type="submit"]:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 20px 50px rgba(255, 255, 255, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.4),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.12);
+        }
+
+        @media (max-width: 640px) {
+            .modal-content {
+                padding: 2rem 1.5rem;
+                padding-right: 1.25rem;
+            }
+
+            .modal-close {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .modal-content h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="vignette-overlay" aria-hidden="true"></div>
+    <div id="app-root">
+    <nav class="nav-island">
+        <a href="../index.html" data-return="about">About Us</a>
+        <a href="../index.html" data-return="projects">Projects</a>
+        <button data-modal="contact">Contact Us</button>
+        <div class="nav-extra">
+            <span class="nav-divider"></span>
+            <a class="nav-icon-btn" href="../terms.html" aria-label="Terms & Conditions" title="Terms & Conditions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                </svg>
+            </a>
+            <a class="nav-icon-btn" href="../privacy.html" aria-label="Privacy Policy" title="Privacy Policy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="../index.html" class="project-back-link" data-return="projects" data-animate="hero">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Back to Projects
+        </a>
+
+        <div class="project-view-header">
+            <h1 class="project-view-title" data-animate="hero">Dream Delusion</h1>
+            <p class="project-view-tagline" data-animate="hero">A minimal space. No distractions, just you and your mind. Capture your thoughts, explore your mind.</p>
+            <div class="project-view-meta">
+                <div class="project-view-links">
+                    <a href="https://dreamdelusion.com" target="_blank" rel="noopener noreferrer" class="project-view-link" data-animate="hero">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        View Live Site
+                    </a>
+                    <a href="https://github.com/zendynr/DreamDelusion" target="_blank" rel="noopener noreferrer" class="project-view-link" data-animate="hero">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                        </svg>
+                        View on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="project-view-hero-image" data-animate="hero">
+            <img src="../images/dreamdlogo.png" alt="Dream Delusion logo">
+        </div>
+
+        <div class="project-view-content">
+            <div class="project-view-main">
+                <div class="project-view-section" id="overview">
+                    <h2 data-animate="text" data-anim-group="project-flow">Overview</h2>
+                    <p data-animate="text" data-anim-group="project-flow">
+                        Dream Delusion is a minimalist journaling and thought-capture application designed to provide a distraction-free environment for reflection and introspection. The platform emphasizes simplicity and focus, allowing users to document their thoughts, dreams, and ideas without the clutter of traditional note-taking applications.
+                    </p>
+                    <p data-animate="text" data-anim-group="project-flow">
+                        Built on the philosophy that clarity comes from simplicity, Dream Delusion strips away unnecessary features and presents users with a clean, intuitive interface. The application encourages mindful writing and helps users explore their inner thoughts through an uncluttered digital space.
+                    </p>
+                    <p data-animate="text" data-anim-group="project-flow">
+                        Whether used for daily journaling, dream logging, or capturing fleeting thoughts, Dream Delusion provides a serene digital environment that respects the user's need for focus and contemplation.
+                    </p>
+                </div>
+
+                <div class="project-view-section" id="features">
+                    <h2 data-animate="text" data-anim-group="project-flow">Features</h2>
+                    <ul data-animate="text" data-anim-group="project-flow">
+                        <li>Minimalist, distraction-free interface designed for focus</li>
+                        <li>Clean and intuitive writing experience</li>
+                        <li>Organized entry management and search functionality</li>
+                        <li>Privacy-focused design with secure data storage</li>
+                        <li>Responsive design that works across all devices</li>
+                        <li>Fast and lightweight performance</li>
+                        <li>Customizable writing environment</li>
+                        <li>Export capabilities for your thoughts and entries</li>
+                    </ul>
+                </div>
+
+                <div class="project-view-section" id="tools">
+                    <h2 data-animate="text" data-anim-group="project-flow">Tools</h2>
+                    <div class="project-view-tools-list">
+                        <span class="project-view-tool-badge" data-animate="card" data-anim-group="project-flow">React</span>
+                        <span class="project-view-tool-badge" data-animate="card" data-anim-group="project-flow">JavaScript</span>
+                        <span class="project-view-tool-badge" data-animate="card" data-anim-group="project-flow">CSS3</span>
+                        <span class="project-view-tool-badge" data-animate="card" data-anim-group="project-flow">HTML5</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-view-sidebar">
+                <div class="project-view-toc">
+                    <h3 data-animate="text" data-anim-group="project-flow">Table of Contents</h3>
+                    <ul data-animate="text" data-anim-group="project-flow">
+                        <li><a href="#overview">Overview</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#tools">Tools</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
+            <a href="../terms.html">Terms & Conditions</a>
+            <span>•</span>
+            <a href="../privacy.html">Privacy Policy</a>
+        </div>
+        <p>© 2025 ZoneBrozStudios. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+            <h1>Tell us where you're at</h1>
+            <form action="https://formspree.io/f/mvgrynvw" method="POST">
+                <div class="form-row">
+                    <div>
+                        <label for="name">What is your name?</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div>
+                        <label for="email">What is your email?</label>
+                        <input type="email" id="email" name="_replyto" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="role">What is your role in the company?</label>
+                    <input type="text" id="role" name="role">
+                </div>
+
+                <div class="form-row">
+                    <div>
+                        <label for="company_name">Company Name</label>
+                        <input type="text" id="company_name" name="company_name">
+                    </div>
+                    <div>
+                        <label for="company_website">Company Website</label>
+                        <input type="url" id="company_website" name="company_website">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="select-wrapper">
+                        <label for="company_size">Company Size</label>
+                        <select id="company_size" name="company_size">
+                            <option value="">Select company size</option>
+                            <option>1-10 employees</option>
+                            <option>11-50 employees</option>
+                            <option>51-200 employees</option>
+                            <option>201-1000 employees</option>
+                            <option>1000+ employees</option>
+                        </select>
+                    </div>
+                    <div class="select-wrapper">
+                        <label for="revenue">Company's Annual Revenue</label>
+                        <select id="revenue" name="revenue">
+                            <option value="">Select revenue range</option>
+                            <option>Under $1M</option>
+                            <option>$1M - $10M</option>
+                            <option>$10M - $50M</option>
+                            <option>$50M+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="select-wrapper">
+                        <label for="budget">Project budget</label>
+                        <select id="budget" name="budget">
+                            <option value="">Select budget range</option>
+                            <option>$5,000 - $10,000</option>
+                            <option>$10,000 - $25,000</option>
+                            <option>$25,000 - $50,000</option>
+                            <option>$50,000+</option>
+                        </select>
+                    </div>
+                    <div class="select-wrapper">
+                        <label for="services-interest">What services are you interested in?</label>
+                        <select id="services-interest" name="services_interest">
+                            <option value="">Select service</option>
+                            <option>UI/UX Design</option>
+                            <option>Web Development</option>
+                            <option>Brand Strategy</option>
+                            <option>Full Package</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+
+                <button type="submit">Send Inquiry</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Navigation island element
+        const navIsland = document.querySelector('.nav-island');
+
+        // Function to collapse navigation with bounce
+        function collapseNavigation() {
+            if (navIsland) {
+                // Remove any existing animation classes
+                navIsland.classList.remove('expanding');
+                // Add collapsing animation class
+                navIsland.classList.add('collapsing');
+                // Add collapsed class
+                navIsland.classList.add('collapsed');
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    navIsland.classList.remove('collapsing');
+                }, 700);
+            }
+        }
+
+        // Collapse navigation with animation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we're coming from main page (should animate collapse)
+            const shouldCollapse = sessionStorage.getItem('navCollapsing');
+            if (shouldCollapse) {
+                // Small delay to ensure page is rendered, then collapse with animation
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        collapseNavigation();
+                    }, 50);
+                });
+                sessionStorage.removeItem('navCollapsing');
+            } else {
+                // Direct navigation or refresh - start collapsed immediately
+                navIsland.classList.add('collapsed');
+            }
+        });
+
+        function triggerNavBounce() {
+            if (!navIsland) {
+                return;
+            }
+            navIsland.classList.remove('bouncing');
+            void navIsland.offsetWidth;
+            navIsland.classList.add('bouncing');
+            setTimeout(() => {
+                navIsland.classList.remove('bouncing');
+            }, 400);
+        }
+
+        // Handle navigation links that go back to main page
+        document.querySelectorAll('.nav-island a[href*="index.html"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+                    return;
+                }
+                // Store state that we're expanding
+                sessionStorage.setItem('navExpanding', 'true');
+                const targetHref = this.href;
+                triggerNavBounce();
+                e.preventDefault();
+                setTimeout(() => {
+                    window.location.href = targetHref;
+                }, 200);
+            });
+        });
+
+        document.querySelectorAll('[data-return="projects"]').forEach(link => {
+            link.addEventListener('click', function() {
+                sessionStorage.setItem('scrollRestoreTarget', 'projects');
+            });
+        });
+
+        document.querySelectorAll('[data-return="about"]').forEach(link => {
+            link.addEventListener('click', function() {
+                sessionStorage.setItem('scrollRestoreTarget', 'about');
+            });
+        });
+
+        // Handle back link
+        const backLink = document.querySelector('.project-back-link');
+        if (backLink) {
+            backLink.addEventListener('click', function(e) {
+                // Store state that we're expanding
+                sessionStorage.setItem('navExpanding', 'true');
+                sessionStorage.setItem('scrollRestoreTarget', 'projects');
+            });
+        }
+
+        const contactModal = document.getElementById('contactModal');
+
+        function openContactModal() {
+            if (contactModal) {
+                contactModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeContactModal() {
+            if (contactModal) {
+                contactModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.querySelectorAll('[data-modal="contact"]').forEach(button => {
+            button.addEventListener('click', openContactModal);
+        });
+
+        if (contactModal) {
+            const closeBtn = contactModal.querySelector('.modal-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeContactModal);
+            }
+            contactModal.addEventListener('click', (e) => {
+                if (e.target === contactModal) {
+                    closeContactModal();
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeContactModal();
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+
+        // GSAP scroll animation system (layout-safe: opacity/transform only)
+        (function() {
+            if (!window.gsap || !window.ScrollTrigger) return;
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            const SELECTOR = '[data-animate]';
+            const CENTER_TOP = 0.35;
+            const CENTER_BOTTOM = 0.65;
+            const GROUP_STAGGER = 0.1;
+
+            const PRESETS = {
+                hero: { y: 18, scale: 1, duration: 0.9, ease: 'power3.out', useTransform: true },
+                text: { y: 16, scale: 1, duration: 0.8, ease: 'power3.out', useTransform: true },
+                card: { y: 26, scale: 0.98, duration: 0.85, ease: 'back.out(1.15)', useTransform: true },
+                fade: { duration: 0.7, ease: 'power3.out', useTransform: false }
+            };
+
+            const getPreset = (el) => {
+                const key = el.getAttribute('data-animate') || 'text';
+                return PRESETS[key] || PRESETS.text;
+            };
+
+            const isInCenterZone = (el) => {
+                const rect = el.getBoundingClientRect();
+                const vh = window.innerHeight || 0;
+                const zoneTop = vh * CENTER_TOP;
+                const zoneBottom = vh * CENTER_BOTTOM;
+                return rect.bottom >= zoneTop && rect.top <= zoneBottom;
+            };
+
+            const isAboveCenterZone = (el) => {
+                const rect = el.getBoundingClientRect();
+                const vh = window.innerHeight || 0;
+                return rect.bottom < vh * CENTER_TOP;
+            };
+
+            const setHidden = (el) => {
+                el.dataset.animState = 'hidden';
+                gsap.set(el, { opacity: 0, clearProps: 'transform' });
+            };
+
+            const setVisible = (el) => {
+                el.dataset.animState = 'shown';
+                gsap.set(el, { opacity: 1, clearProps: 'transform' });
+            };
+
+            const animateIn = (el, delay = 0) => {
+                if (el.dataset.animState === 'shown') return;
+                const preset = getPreset(el);
+                const fromVars = { opacity: 0 };
+                const toVars = {
+                    opacity: 1,
+                    duration: preset.duration,
+                    ease: preset.ease,
+                    delay,
+                    overwrite: 'auto'
+                };
+
+                if (preset.useTransform) {
+                    fromVars.y = preset.y || 0;
+                    fromVars.scale = preset.scale || 1;
+                    toVars.y = 0;
+                    toVars.scale = 1;
+                    toVars.clearProps = 'transform';
+                }
+
+                gsap.fromTo(el, fromVars, toVars);
+                el.dataset.animState = 'shown';
+            };
+
+            const initAnimations = () => {
+                const items = gsap.utils.toArray(SELECTOR);
+                if (!items.length) return;
+
+                items.forEach(setHidden);
+
+                if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    items.forEach(setVisible);
+                    return;
+                }
+
+                const heroItems = items.filter((el) => el.getAttribute('data-animate') === 'hero');
+                if (heroItems.length) {
+                    gsap.timeline({ defaults: { duration: 0.9, ease: 'power3.out' } })
+                        .fromTo(heroItems, { opacity: 0, y: 18 }, { opacity: 1, y: 0, stagger: 0.12, clearProps: 'transform' })
+                        .add(() => {
+                            heroItems.forEach((el) => {
+                                el.dataset.animState = 'shown';
+                            });
+                        });
+                }
+
+                const scrollItems = items.filter((el) => el.getAttribute('data-animate') !== 'hero');
+                scrollItems.forEach((el) => {
+                    if (isAboveCenterZone(el)) {
+                        setVisible(el);
+                    } else if (isInCenterZone(el)) {
+                        animateIn(el);
+                    }
+                });
+
+                const groupMap = new Map();
+                scrollItems.forEach((el) => {
+                    const group = el.getAttribute('data-anim-group');
+                    if (!group) return;
+                    if (!groupMap.has(group)) groupMap.set(group, []);
+                    groupMap.get(group).push(el);
+                });
+
+                const groupedItems = new Set();
+                groupMap.forEach((elements) => {
+                    elements.forEach((el) => groupedItems.add(el));
+                    ScrollTrigger.batch(elements, {
+                        start: `top ${CENTER_BOTTOM * 100}%`,
+                        end: `bottom ${CENTER_TOP * 100}%`,
+                        once: true,
+                        onEnter: (batch) => {
+                            batch.forEach((el, index) => animateIn(el, index * GROUP_STAGGER));
+                        },
+                        onEnterBack: (batch) => {
+                            batch.forEach((el, index) => animateIn(el, index * GROUP_STAGGER));
+                        }
+                    });
+                });
+
+                scrollItems.forEach((el) => {
+                    if (groupedItems.has(el)) return;
+                    ScrollTrigger.create({
+                        trigger: el,
+                        start: `top ${CENTER_BOTTOM * 100}%`,
+                        end: `bottom ${CENTER_TOP * 100}%`,
+                        once: true,
+                        onEnter: () => animateIn(el),
+                        onEnterBack: () => animateIn(el)
+                    });
+                });
+
+                ScrollTrigger.addEventListener('refresh', () => {
+                    scrollItems.forEach((el) => {
+                        if (isAboveCenterZone(el)) {
+                            setVisible(el);
+                        }
+                    });
+                });
+
+                ScrollTrigger.refresh();
+            };
+
+            const resetAnimations = () => {
+                const items = gsap.utils.toArray(SELECTOR);
+                items.forEach(setHidden);
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initAnimations();
+            });
+
+            window.addEventListener('pageshow', (event) => {
+                if (!event.persisted) return;
+                ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+                resetAnimations();
+                initAnimations();
+            });
+        })();
+    </script>
+    </div>
+</body>
+</html>
