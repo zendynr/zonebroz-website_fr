@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <!-- DrawSVGPlugin (requires GreenSock Club membership) -->
+    <script src="https://assets.codepen.io/16327/DrawSVGPlugin3.min.js"></script>
+    <!-- MorphSVGPlugin (requires GreenSock Club membership) -->
+    <script src="https://assets.codepen.io/16327/MorphSVGPlugin3.min.js"></script>
     <script>
         (function() {
             document.documentElement.classList.add('js-anim');
@@ -181,6 +185,48 @@
             height: auto;
             display: block;
             margin: 0 auto 2rem;
+        }
+
+        /* Logo Animation Styles */
+        .logo-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        #logo-svg {
+            width: 240px;
+            height: auto;
+            margin-bottom: 0;
+        }
+
+        /* Optional stroke glow effect */
+        #z-path {
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+        }
+
+        #logo-text {
+            text-align: center;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            letter-spacing: 0.3em;
+            opacity: 0;
+            font-weight: 300;
+            margin-top: 1.5rem;
+        }
+
+        #logo-text span {
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 0.5em;
+        }
+
+        #logo-text small {
+            font-size: 0.7rem;
+            letter-spacing: 0.5em;
+            opacity: 0.9;
         }
 
         .hero h1 {
@@ -1944,9 +1990,38 @@
     <main>
         <section class="hero section" id="home">
             <div>
-                <img src="images/zonebroz-logo.png" alt="ZoneBroz Studios logo" class="hero-logo-img" data-animate="hero">
-                <h1 data-animate="hero">We Build Digital Products for the Modern World.</h1>
-                <p data-animate="hero">ZoneBrozStudios is a design and development agency focused on creating high-impact websites and applications that people love to use.</p>
+                <div class="logo-container">
+                    <svg id="logo-svg" viewBox="0 0 300 226.71" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- DRAW PATH - Used for the looping draw animation (thick Z shape) -->
+                        <!-- Z path: top-right → top-left → bottom-right → bottom-left (matches logo rotation) -->
+                        <path
+                            id="z-path"
+                            d="M 206.24 56.32 L 122.04 98.81 L 194.38 121.27 L 110.64 160.38"
+                            stroke="white"
+                            stroke-width="10"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            fill="none"
+                        />
+
+                        <!-- LOGO SEGMENTS - Actual logo paths (from SVG file) -->
+                        <g id="z-pieces" opacity="0">
+                            <!-- Top segment (polyline converted to path) -->
+                            <path id="z-top" d="M 122.04 98.81 L 206.24 56.32 L 205.55 82.6 L 121.38 124.21 Z" fill="white"/>
+                            <!-- Middle segment (polygon converted to path) -->
+                            <path id="z-mid" d="M 125.84 127.02 L 165.42 106.25 L 192.19 118.13 L 150.13 138.59 Z" fill="white"/>
+                            <!-- Bottom segment (polygon converted to path) -->
+                            <path id="z-bot" d="M 110.64 160.38 L 194.38 121.27 L 192.6 145.54 L 108.99 182.89 Z" fill="white"/>
+                        </g>
+                    </svg>
+
+                    <div id="logo-text">
+                        <span>ZONEBROZ</span><br />
+                        <small>STUDIOS</small>
+                    </div>
+                </div>
+                <h1>We Build Digital Products for the Modern World.</h1>
+                <p>ZoneBrozStudios is a design and development agency focused on creating high-impact websites and applications that people love to use.</p>
             </div>
         </section>
 
@@ -3509,6 +3584,127 @@
         function getProjectStateLabel(state) {
             return PROJECT_STATES[state] || state;
         }
+
+        // ============================================
+        // LOGO ANIMATION - Z Path Drawing and Morph
+        // ============================================
+        (function() {
+            // Wait for DOM and GSAP plugins to be ready
+            function initLogoAnimation() {
+                if (typeof gsap === 'undefined' || typeof DrawSVGPlugin === 'undefined' || typeof MorphSVGPlugin === 'undefined') {
+                    setTimeout(initLogoAnimation, 100);
+                    return;
+                }
+
+                // Register plugins
+                gsap.registerPlugin(DrawSVGPlugin, MorphSVGPlugin);
+
+                // Check if animation elements exist
+                const zPath = document.getElementById('z-path');
+                const zPieces = document.getElementById('z-pieces');
+                const logoText = document.getElementById('logo-text');
+
+                if (!zPath || !zPieces || !logoText) {
+                    return; // Elements not found, skip animation
+                }
+
+                // Get hero text elements (the h1 and p that come after the logo)
+                const heroSection = document.querySelector('.hero');
+                const heroH1 = heroSection ? heroSection.querySelector('h1:not(#logo-text)') : null;
+                const heroP = heroSection ? heroSection.querySelector('p') : null;
+
+                // Initial state setup
+                gsap.set("#z-path", { drawSVG: "0% 0%" });
+                gsap.set("#z-pieces", { opacity: 0 });
+                gsap.set("#logo-text", { y: 20, opacity: 0 });
+                
+                // Hide hero text initially - will appear after logo segments
+                if (heroH1) gsap.set(heroH1, { y: 20, opacity: 0 });
+                if (heroP) gsap.set(heroP, { y: 20, opacity: 0 });
+
+                // ============================================
+                // COMPLETE ANIMATION - Stroke then morph to logo segments
+                // ============================================
+                const mainAnimation = gsap.timeline({ 
+                    defaults: { ease: "power2.inOut" }
+                });
+
+                // 1. Initial stroke - plays once with faster easing
+                mainAnimation.to("#z-path", {
+                    duration: 1.5,
+                    drawSVG: "100% 0%",
+                    ease: "power2.out"
+                })
+                    
+                    // 2. Fade out the drawn path
+                    .to("#z-path", {
+                        duration: 0.3,
+                        opacity: 0,
+                        ease: "power2.in"
+                    })
+                    
+                    // 3. Reveal logo segments (morph transition)
+                    .to("#z-pieces", {
+                        duration: 0.5,
+                        opacity: 1,
+                        ease: "power2.out"
+                    }, "-=0.2")
+                    
+                    // 4. Split animation - animate the three pieces
+                    .to("#z-top", {
+                        duration: 0.6,
+                        y: -8,
+                        ease: "power2.out"
+                    }, "-=0.2")
+                    .to("#z-mid", {
+                        duration: 0.6,
+                        scale: 1.05,
+                        ease: "power2.out"
+                    }, "<")
+                    .to("#z-bot", {
+                        duration: 0.6,
+                        y: 8,
+                        ease: "power2.out"
+                    }, "<")
+                    
+                    // 5. Logo text reveal
+                    .to("#logo-text", {
+                        duration: 0.8,
+                        opacity: 1,
+                        y: 0,
+                        ease: "power3.out"
+                    }, "-=0.2");
+                
+                // 6. Hero h1 and p reveal (after logo segments appear)
+                if (heroH1) {
+                    mainAnimation.to(heroH1, {
+                        duration: 0.8,
+                        opacity: 1,
+                        y: 0,
+                        ease: "power3.out"
+                    }, "-=0.4");
+                }
+                
+                if (heroP) {
+                    mainAnimation.to(heroP, {
+                        duration: 0.8,
+                        opacity: 1,
+                        y: 0,
+                        ease: "power3.out"
+                    }, "-=0.6");
+                }
+
+                // Start animation automatically
+                mainAnimation.play();
+            }
+
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initLogoAnimation);
+            } else {
+                initLogoAnimation();
+            }
+        })();
     </script>
     </div>
 </body>
