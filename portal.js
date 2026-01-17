@@ -18,6 +18,24 @@ const mockCustomers = [
     name: 'Sarah Johnson',
     company: 'Digital Solutions',
     email: 'sarah@digitalsolutions.com'
+  },
+  {
+    id: 'cust-4',
+    name: 'Michael Chen',
+    company: 'Cloud Innovations',
+    email: 'michael@cloudinnovations.com'
+  },
+  {
+    id: 'cust-5',
+    name: 'Emily Rodriguez',
+    company: 'Creative Agency',
+    email: 'emily@creativeagency.com'
+  },
+  {
+    id: 'cust-6',
+    name: 'David Williams',
+    company: 'StartupHub',
+    email: 'david@startuphub.com'
   }
 ];
 
@@ -51,6 +69,20 @@ const mockProjects = [
     scopeSummary: 'Real-time analytics dashboard with custom reporting and data visualization.'
   }
 ];
+
+// Helper function to get date string N days ago
+function getDateDaysAgo(days) {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString().split('T')[0];
+}
+
+// Helper function to get date string N months ago
+function getDateMonthsAgo(months) {
+  const date = new Date();
+  date.setMonth(date.getMonth() - months);
+  return date.toISOString().split('T')[0];
+}
 
 const mockInvoices = [
   {
@@ -92,8 +124,162 @@ const mockInvoices = [
     pdfUrl: '#',
     issuedAt: '2024-01-01',
     dueAt: '2024-02-01'
+  },
+  // Recent paid invoices for Revenue Performance testing
+  {
+    id: 'inv-5',
+    customerId: 'cust-1',
+    projectId: 'proj-1',
+    amount: 3200.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateDaysAgo(1), // Yesterday
+    dueAt: getDateDaysAgo(-29)
+  },
+  {
+    id: 'inv-6',
+    customerId: 'cust-2',
+    projectId: 'proj-3',
+    amount: 4500.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateDaysAgo(3), // 3 days ago
+    dueAt: getDateDaysAgo(-27)
+  },
+  {
+    id: 'inv-7',
+    customerId: 'cust-1',
+    projectId: 'proj-2',
+    amount: 6800.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateDaysAgo(5), // 5 days ago
+    dueAt: getDateDaysAgo(-25)
+  },
+  {
+    id: 'inv-8',
+    customerId: 'cust-3',
+    projectId: 'proj-4',
+    amount: 9200.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateDaysAgo(7), // 7 days ago
+    dueAt: getDateDaysAgo(-23)
+  },
+  {
+    id: 'inv-9',
+    customerId: 'cust-2',
+    projectId: 'proj-3',
+    amount: 5500.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateDaysAgo(10), // 10 days ago
+    dueAt: getDateDaysAgo(-20)
+  },
+  {
+    id: 'inv-10',
+    customerId: 'cust-1',
+    projectId: 'proj-1',
+    amount: 7800.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateDaysAgo(15), // 15 days ago
+    dueAt: getDateDaysAgo(-15)
+  },
+  {
+    id: 'inv-11',
+    customerId: 'cust-3',
+    projectId: 'proj-4',
+    amount: 11200.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateDaysAgo(20), // 20 days ago
+    dueAt: getDateDaysAgo(-10)
+  },
+  {
+    id: 'inv-12',
+    customerId: 'cust-2',
+    projectId: 'proj-3',
+    amount: 3400.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateDaysAgo(25), // 25 days ago
+    dueAt: getDateDaysAgo(-5)
+  },
+  {
+    id: 'inv-13',
+    customerId: 'cust-1',
+    projectId: 'proj-2',
+    amount: 8900.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateMonthsAgo(2), // 2 months ago
+    dueAt: getDateMonthsAgo(1)
+  },
+  {
+    id: 'inv-14',
+    customerId: 'cust-3',
+    projectId: 'proj-4',
+    amount: 15600.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateMonthsAgo(3), // 3 months ago
+    dueAt: getDateMonthsAgo(2)
+  },
+  {
+    id: 'inv-15',
+    customerId: 'cust-2',
+    projectId: 'proj-3',
+    amount: 7200.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateMonthsAgo(5), // 5 months ago
+    dueAt: getDateMonthsAgo(4)
+  },
+  {
+    id: 'inv-16',
+    customerId: 'cust-1',
+    projectId: 'proj-1',
+    amount: 10300.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateMonthsAgo(8), // 8 months ago
+    dueAt: getDateMonthsAgo(7)
+  },
+  {
+    id: 'inv-17',
+    customerId: 'cust-3',
+    projectId: 'proj-4',
+    amount: 6400.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateMonthsAgo(10), // 10 months ago
+    dueAt: getDateMonthsAgo(9)
+  },
+  {
+    id: 'inv-18',
+    customerId: 'cust-2',
+    projectId: 'proj-3',
+    amount: 12800.00,
+    status: 'Paid',
+    pdfUrl: '#',
+    issuedAt: getDateMonthsAgo(11), // 11 months ago
+    dueAt: getDateMonthsAgo(10)
   }
 ];
+
+// Helper function to get timestamp N hours/minutes ago
+function getTimestampHoursAgo(hours) {
+  const date = new Date();
+  date.setHours(date.getHours() - hours);
+  return date.toISOString();
+}
+
+function getTimestampMinutesAgo(minutes) {
+  const date = new Date();
+  date.setMinutes(date.getMinutes() - minutes);
+  return date.toISOString();
+}
 
 const mockThreads = [
   {
@@ -119,51 +305,244 @@ const mockThreads = [
     customerId: 'cust-3',
     subject: 'Dashboard feature request',
     projectId: 'proj-4'
+  },
+  {
+    id: 'thread-5',
+    customerId: 'cust-4',
+    subject: 'Cloud migration consultation',
+    projectId: null
+  },
+  {
+    id: 'thread-6',
+    customerId: 'cust-5',
+    subject: 'Website redesign proposal',
+    projectId: null
+  },
+  {
+    id: 'thread-7',
+    customerId: 'cust-6',
+    subject: 'Mobile app development inquiry',
+    projectId: null
+  },
+  {
+    id: 'thread-8',
+    customerId: 'cust-2',
+    subject: 'Payment integration support',
+    projectId: 'proj-3'
+  },
+  {
+    id: 'thread-9',
+    customerId: 'cust-4',
+    subject: 'API documentation questions',
+    projectId: null
   }
 ];
 
 const mockMessages = [
+  // Thread 1 - Recent conversation (Jane Smith)
   {
     id: 'msg-1',
     threadId: 'thread-1',
     senderRole: 'customer',
     body: 'Hi, I wanted to check on the timeline for the e-commerce redesign. When can we expect the first prototype?',
-    createdAt: '2024-02-15T10:30:00Z'
+    createdAt: getTimestampHoursAgo(5)
   },
   {
     id: 'msg-2',
     threadId: 'thread-1',
     senderRole: 'admin',
     body: 'Thanks for reaching out! We\'re on track and should have the first prototype ready by next Friday. I\'ll send it over as soon as it\'s ready.',
-    createdAt: '2024-02-15T14:20:00Z'
+    createdAt: getTimestampHoursAgo(4)
   },
   {
     id: 'msg-3',
     threadId: 'thread-1',
     senderRole: 'customer',
     body: 'Perfect, looking forward to it!',
-    createdAt: '2024-02-15T15:00:00Z'
+    createdAt: getTimestampHoursAgo(3)
   },
   {
     id: 'msg-4',
+    threadId: 'thread-1',
+    senderRole: 'admin',
+    body: 'Great! I\'ll keep you updated as we progress.',
+    createdAt: getTimestampHoursAgo(2)
+  },
+  // Thread 2 - Very recent (Jane Smith)
+  {
+    id: 'msg-5',
     threadId: 'thread-2',
     senderRole: 'customer',
     body: 'The mobile app designs look great! Can we adjust the color scheme to match our brand guidelines a bit more closely?',
-    createdAt: '2024-02-18T09:15:00Z'
-  },
-  {
-    id: 'msg-5',
-    threadId: 'thread-3',
-    senderRole: 'admin',
-    body: 'The brand guidelines document has been finalized and is ready for download. You should receive an email with the link shortly.',
-    createdAt: '2024-02-20T11:00:00Z'
+    createdAt: getTimestampMinutesAgo(30)
   },
   {
     id: 'msg-6',
+    threadId: 'thread-2',
+    senderRole: 'admin',
+    body: 'Absolutely! I can make those adjustments. Which specific colors from your brand guidelines would you like me to use?',
+    createdAt: getTimestampMinutesAgo(15)
+  },
+  // Thread 3 - Yesterday (John Doe)
+  {
+    id: 'msg-7',
+    threadId: 'thread-3',
+    senderRole: 'admin',
+    body: 'The brand guidelines document has been finalized and is ready for download. You should receive an email with the link shortly.',
+    createdAt: getTimestampHoursAgo(24)
+  },
+  {
+    id: 'msg-8',
+    threadId: 'thread-3',
+    senderRole: 'customer',
+    body: 'Perfect, thank you so much! The guidelines look excellent.',
+    createdAt: getTimestampHoursAgo(23)
+  },
+  // Thread 4 - 2 days ago (Sarah Johnson)
+  {
+    id: 'msg-9',
     threadId: 'thread-4',
     senderRole: 'customer',
     body: 'Is it possible to add real-time notifications to the dashboard? This would be a huge value-add for our team.',
-    createdAt: '2024-02-22T13:45:00Z'
+    createdAt: getTimestampHoursAgo(48)
+  },
+  {
+    id: 'msg-10',
+    threadId: 'thread-4',
+    senderRole: 'admin',
+    body: 'Yes, that\'s definitely possible! I can add real-time notifications using WebSockets. Let me create a proposal for you.',
+    createdAt: getTimestampHoursAgo(47)
+  },
+  {
+    id: 'msg-11',
+    threadId: 'thread-4',
+    senderRole: 'customer',
+    body: 'That sounds perfect! Looking forward to seeing the proposal.',
+    createdAt: getTimestampHoursAgo(46)
+  },
+  // Thread 5 - Recent (Michael Chen)
+  {
+    id: 'msg-12',
+    threadId: 'thread-5',
+    senderRole: 'customer',
+    body: 'Hi! I\'m interested in migrating our infrastructure to the cloud. Can we schedule a consultation?',
+    createdAt: getTimestampHoursAgo(12)
+  },
+  {
+    id: 'msg-13',
+    threadId: 'thread-5',
+    senderRole: 'admin',
+    body: 'Hi Michael! Absolutely, I\'d be happy to help with your cloud migration. What\'s your availability this week?',
+    createdAt: getTimestampHoursAgo(11)
+  },
+  {
+    id: 'msg-14',
+    threadId: 'thread-5',
+    senderRole: 'customer',
+    body: 'I\'m free Tuesday or Wednesday afternoon. Does either work for you?',
+    createdAt: getTimestampHoursAgo(10)
+  },
+  {
+    id: 'msg-15',
+    threadId: 'thread-5',
+    senderRole: 'admin',
+    body: 'Wednesday afternoon works perfectly! I\'ll send you a calendar invite.',
+    createdAt: getTimestampHoursAgo(9)
+  },
+  // Thread 6 - Very recent (Emily Rodriguez)
+  {
+    id: 'msg-16',
+    threadId: 'thread-6',
+    senderRole: 'customer',
+    body: 'Hey! I saw your portfolio and I\'m really impressed. We\'re looking to redesign our website. Are you available for new projects?',
+    createdAt: getTimestampMinutesAgo(45)
+  },
+  {
+    id: 'msg-17',
+    threadId: 'thread-6',
+    senderRole: 'admin',
+    body: 'Hi Emily! Thank you so much! Yes, we\'re currently taking on new projects. I\'d love to learn more about what you have in mind.',
+    createdAt: getTimestampMinutesAgo(30)
+  },
+  {
+    id: 'msg-18',
+    threadId: 'thread-6',
+    senderRole: 'customer',
+    body: 'Great! We\'re a creative agency and need a modern, portfolio-style website. Can we set up a call to discuss?',
+    createdAt: getTimestampMinutesAgo(20)
+  },
+  // Thread 7 - 3 days ago (David Williams)
+  {
+    id: 'msg-19',
+    threadId: 'thread-7',
+    senderRole: 'customer',
+    body: 'Hi there! I\'m interested in developing a mobile app for my startup. What\'s your typical timeline for app development?',
+    createdAt: getTimestampHoursAgo(72)
+  },
+  {
+    id: 'msg-20',
+    threadId: 'thread-7',
+    senderRole: 'admin',
+    body: 'Hi David! Great question. The timeline depends on the complexity, but typically 3-6 months for a full mobile app. What kind of app are you looking to build?',
+    createdAt: getTimestampHoursAgo(71)
+  },
+  {
+    id: 'msg-21',
+    threadId: 'thread-7',
+    senderRole: 'customer',
+    body: 'It\'s a social networking app with real-time messaging. I can share more details if you\'re interested.',
+    createdAt: getTimestampHoursAgo(70)
+  },
+  // Thread 8 - Recent (John Doe - second thread)
+  {
+    id: 'msg-22',
+    threadId: 'thread-8',
+    senderRole: 'customer',
+    body: 'I\'m having some issues with the payment integration. The transactions aren\'t processing correctly.',
+    createdAt: getTimestampHoursAgo(6)
+  },
+  {
+    id: 'msg-23',
+    threadId: 'thread-8',
+    senderRole: 'admin',
+    body: 'I\'m sorry to hear that! Let me investigate this right away. Can you share any error messages you\'re seeing?',
+    createdAt: getTimestampHoursAgo(5)
+  },
+  {
+    id: 'msg-24',
+    threadId: 'thread-8',
+    senderRole: 'customer',
+    body: 'The error says "Payment gateway timeout". It happens randomly, not every time.',
+    createdAt: getTimestampHoursAgo(4)
+  },
+  {
+    id: 'msg-25',
+    threadId: 'thread-8',
+    senderRole: 'admin',
+    body: 'Thanks for the details. This sounds like a connection issue with the payment gateway. I\'ll check our API logs and get back to you within the hour.',
+    createdAt: getTimestampHoursAgo(3)
+  },
+  // Thread 9 - 1 week ago (Michael Chen - second thread)
+  {
+    id: 'msg-26',
+    threadId: 'thread-9',
+    senderRole: 'customer',
+    body: 'I have a few questions about the API documentation. Is there a way to filter results by date range?',
+    createdAt: getTimestampHoursAgo(168)
+  },
+  {
+    id: 'msg-27',
+    threadId: 'thread-9',
+    senderRole: 'admin',
+    body: 'Yes! You can use the `startDate` and `endDate` query parameters. I\'ll send you an example in the updated docs.',
+    createdAt: getTimestampHoursAgo(167)
+  },
+  {
+    id: 'msg-28',
+    threadId: 'thread-9',
+    senderRole: 'customer',
+    body: 'Perfect, that\'s exactly what I needed. Thanks!',
+    createdAt: getTimestampHoursAgo(166)
   }
 ];
 
@@ -519,6 +898,7 @@ function getStatusBadge(status) {
     'New': 'badge-info',
     'In Review': 'badge-warning',
     'Done': 'badge-success',
+    'Abandoned': 'badge-danger',
     'In Progress': 'badge-info',
     'Completed': 'badge-success',
     'Paused': 'badge-warning',
@@ -887,31 +1267,49 @@ function renderCustomerMessages() {
       );
       
       const content = `
-        <a href="#/portal/messages" class="back-link">← Back to Messages</a>
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">${thread.subject}</div>
-          </div>
-          <div class="message-thread" id="message-thread">
-            ${threadMessages.map(msg => `
-              <div class="message ${msg.senderRole}">
-                <div class="message-header">
-                  <span>${msg.senderRole === 'customer' ? 'You' : 'ZoneBroz'}</span>
-                  <span>${formatDate(msg.createdAt)}</span>
+        <div class="dm-container" style="height: calc(100vh - 200px); min-height: 500px;">
+          <div class="dm-chat-container" style="width: 100%;">
+            <div class="dm-chat-header">
+              <div class="dm-chat-header-info">
+                <div class="dm-avatar dm-avatar-small">
+                  <div class="dm-avatar-initial">Z</div>
                 </div>
-                <div class="message-body">${msg.body}</div>
+                <div>
+                  <div class="dm-chat-header-name">ZoneBroz Studios</div>
+                  <div class="dm-chat-header-meta">${thread.subject}</div>
+                </div>
               </div>
-            `).join('')}
-          </div>
-          <div class="message-compose">
-            <textarea id="new-message" placeholder="Type your message..."></textarea>
-            <button class="btn btn-primary" onclick="sendMessage('${selectedThreadId}')">Send</button>
+            </div>
+            <div class="dm-chat-messages" id="message-thread">
+              ${threadMessages.map(msg => {
+                const isCustomer = msg.senderRole === 'customer';
+                return `
+                  <div class="dm-message ${isCustomer ? 'dm-message-sent' : 'dm-message-received'}">
+                    <div class="dm-message-bubble">
+                      ${msg.body}
+                    </div>
+                    <div class="dm-message-time">${formatTime(new Date(msg.createdAt))}</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+            <div class="dm-chat-input-container">
+              <div class="dm-chat-input-wrapper">
+                <textarea id="new-message" class="dm-chat-input" placeholder="Type your message..." rows="1"></textarea>
+                <button class="dm-send-btn" onclick="sendMessage('${selectedThreadId}')">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       `;
       
       renderCustomerLayout(content, 'messages');
-      document.getElementById('page-title').textContent = thread.subject;
+      document.getElementById('page-title').textContent = 'Messages';
       
       // Scroll to bottom
       setTimeout(() => {
@@ -919,23 +1317,59 @@ function renderCustomerMessages() {
         if (threadEl) threadEl.scrollTop = threadEl.scrollHeight;
       }, 100);
       
+      // Auto-resize textarea
+      const textarea = document.getElementById('new-message');
+      if (textarea) {
+        textarea.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        
+        textarea.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage(selectedThreadId);
+          }
+        });
+      }
+      
+      window.sendMessage = function(threadId) {
+        const textarea = document.getElementById('new-message');
+        const body = textarea.value.trim();
+        if (!body) return;
+        
+        store.addMessage({
+          threadId,
+          senderRole: 'customer',
+          body
+        });
+        
+        textarea.value = '';
+        textarea.style.height = 'auto';
+        router.handleRoute();
+      };
+      
       return;
     }
   }
   
+  // Thread list view
   const threadsList = customerThreads.length > 0
     ? customerThreads.map(thread => {
         const lastMessage = store.messages
           .filter(m => m.threadId === thread.id)
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+        const timeAgo = lastMessage ? getTimeAgo(new Date(lastMessage.createdAt)) : '';
         return `
-          <div class="list-item" onclick="window.location.hash = '#/portal/messages?thread=${thread.id}'">
-            <div class="list-item-header">
-              <div>
-                <div class="list-item-title">${thread.subject}</div>
-                ${lastMessage ? `<div class="list-item-meta">${lastMessage.body.substring(0, 60)}...</div>` : ''}
-              </div>
+          <div class="dm-contact-item" onclick="window.location.hash = '#/portal/messages?thread=${thread.id}'">
+            <div class="dm-avatar">
+              <div class="dm-avatar-initial">Z</div>
             </div>
+            <div class="dm-contact-info">
+              <div class="dm-contact-name">${thread.subject}</div>
+              <div class="dm-contact-preview">${lastMessage ? lastMessage.body.substring(0, 50) + (lastMessage.body.length > 50 ? '...' : '') : 'No messages yet'}</div>
+            </div>
+            ${timeAgo ? `<div class="dm-time">${timeAgo}</div>` : ''}
           </div>
         `;
       }).join('')
@@ -943,28 +1377,13 @@ function renderCustomerMessages() {
   
   const content = `
     <h2 style="margin-bottom: 2rem;">Messages</h2>
-    <div class="list">
+    <div class="dm-contacts-list" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 0.5rem;">
       ${threadsList}
     </div>
   `;
   
   renderCustomerLayout(content, 'messages');
   document.getElementById('page-title').textContent = 'Messages';
-  
-  window.sendMessage = function(threadId) {
-    const textarea = document.getElementById('new-message');
-    const body = textarea.value.trim();
-    if (!body) return;
-    
-    store.addMessage({
-      threadId,
-      senderRole: 'customer',
-      body
-    });
-    
-    textarea.value = '';
-    router.handleRoute(); // Re-render
-  };
 }
 
 function renderCustomerRequests() {
@@ -1128,6 +1547,289 @@ function renderCustomerRequests() {
   document.getElementById('page-title').textContent = 'Requests';
 }
 
+// ==================== REVENUE PERFORMANCE FUNCTIONS ====================
+
+function calculateRevenueData(range = 'month') {
+  const paidInvoices = store.invoices.filter(inv => inv.status === 'Paid');
+  const now = new Date();
+  let startDate, endDate, labels = [], data = [];
+  
+  if (range === 'week') {
+    // Last 7 days
+    endDate = new Date(now);
+    startDate = new Date(now);
+    startDate.setDate(startDate.getDate() - 6);
+    
+    // Create labels for each day
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      data.push(0);
+    }
+    
+    // Aggregate revenue by day
+    paidInvoices.forEach(inv => {
+      const invDate = new Date(inv.issuedAt);
+      if (invDate >= startDate && invDate <= endDate) {
+        const dayIndex = Math.floor((invDate - startDate) / (1000 * 60 * 60 * 24));
+        if (dayIndex >= 0 && dayIndex < data.length) {
+          data[dayIndex] += inv.amount;
+        }
+      }
+    });
+    
+  } else if (range === 'month') {
+    // Last 30 days, aggregated by day
+    endDate = new Date(now);
+    startDate = new Date(now);
+    startDate.setDate(startDate.getDate() - 29);
+    
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      data.push(0);
+    }
+    
+    paidInvoices.forEach(inv => {
+      const invDate = new Date(inv.issuedAt);
+      if (invDate >= startDate && invDate <= endDate) {
+        const dayIndex = Math.floor((invDate - startDate) / (1000 * 60 * 60 * 24));
+        if (dayIndex >= 0 && dayIndex < data.length) {
+          data[dayIndex] += inv.amount;
+        }
+      }
+    });
+    
+  } else if (range === 'year') {
+    // Last 12 months
+    endDate = new Date(now);
+    startDate = new Date(now);
+    startDate.setMonth(startDate.getMonth() - 11);
+    startDate.setDate(1); // Start of month
+    startDate.setHours(0, 0, 0, 0);
+    
+    // Create labels for each month
+    const currentMonth = new Date(startDate);
+    while (currentMonth <= endDate) {
+      labels.push(currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+      data.push(0);
+      currentMonth.setMonth(currentMonth.getMonth() + 1);
+    }
+    
+    // Aggregate revenue by month
+    paidInvoices.forEach(inv => {
+      const invDate = new Date(inv.issuedAt);
+      invDate.setDate(1);
+      invDate.setHours(0, 0, 0, 0);
+      
+      if (invDate >= startDate && invDate <= endDate) {
+        const monthIndex = (invDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                          (invDate.getMonth() - startDate.getMonth());
+        if (monthIndex >= 0 && monthIndex < data.length) {
+          data[monthIndex] += inv.amount;
+        }
+      }
+    });
+  }
+  
+  return { labels, data, startDate, endDate };
+}
+
+function calculateRevenueMetrics(range = 'month') {
+  const { data, labels, startDate, endDate } = calculateRevenueData(range);
+  const totalRevenue = data.reduce((sum, val) => sum + val, 0);
+  
+  let daysInRange;
+  if (range === 'year') {
+    // For year, calculate based on number of months
+    daysInRange = labels.length * 30; // Approximate 30 days per month
+  } else {
+    daysInRange = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+  }
+  
+  const avgRevenuePerDay = daysInRange > 0 ? totalRevenue / daysInRange : 0;
+  
+  const maxRevenue = data.length > 0 ? Math.max(...data, 0) : 0;
+  const bestDayIndex = data.indexOf(maxRevenue);
+  const bestDayLabel = bestDayIndex >= 0 ? labels[bestDayIndex] : 'N/A';
+  
+  const paidInvoices = store.invoices.filter(inv => inv.status === 'Paid');
+  const invoicesInRange = paidInvoices.filter(inv => {
+    const invDate = new Date(inv.issuedAt);
+    return invDate >= startDate && invDate <= endDate;
+  }).length;
+  
+  return {
+    totalRevenue,
+    avgRevenuePerDay,
+    bestDay: bestDayLabel,
+    bestDayRevenue: maxRevenue,
+    invoicesPaid: invoicesInRange,
+    daysInRange
+  };
+}
+
+let revenueChartInstance = null;
+
+function renderRevenueChart(range = 'month') {
+  const { labels, data } = calculateRevenueData(range);
+  const hasData = data.some(val => val > 0);
+  
+  const container = document.getElementById('revenue-chart-container');
+  if (!container) return;
+  
+  // Destroy existing chart if it exists
+  if (revenueChartInstance) {
+    revenueChartInstance.destroy();
+    revenueChartInstance = null;
+  }
+  
+  // Show empty state if no data
+  if (!hasData) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 3rem 2rem;">
+        <div class="empty-state-icon">📊</div>
+        <div class="empty-state-title">No revenue data</div>
+        <div style="color: var(--muted); margin-top: 0.5rem;">Revenue data will appear here once invoices are paid.</div>
+      </div>
+    `;
+    return;
+  }
+  
+  // Ensure canvas exists
+  let chartCtx = container.querySelector('#revenue-chart');
+  if (!chartCtx) {
+    container.innerHTML = '<canvas id="revenue-chart"></canvas>';
+    chartCtx = document.getElementById('revenue-chart');
+  }
+  
+  if (!chartCtx || typeof Chart === 'undefined') return;
+  
+  revenueChartInstance = new Chart(chartCtx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Revenue',
+        data: data,
+        borderColor: 'rgba(59, 130, 246, 1)',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: 'rgba(59, 130, 246, 1)',
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 750,
+        easing: 'easeInOutQuart'
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          backgroundColor: 'rgba(16, 16, 16, 0.95)',
+          titleColor: '#f5f5f5',
+          bodyColor: '#f5f5f5',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: function(context) {
+              return 'Revenue: ' + formatCurrency(context.parsed.y);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { 
+            color: '#a0a0a5',
+            maxRotation: 45,
+            minRotation: 0
+          },
+          grid: { 
+            display: false
+          }
+        },
+        y: {
+          ticks: { 
+            color: '#a0a0a5',
+            callback: function(value) {
+              return formatCurrency(value);
+            }
+          },
+          grid: { 
+            color: 'rgba(255, 255, 255, 0.05)',
+            drawBorder: false
+          },
+          beginAtZero: true
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      }
+    }
+  });
+}
+
+function renderRevenueMetrics(range = 'month') {
+  const metrics = calculateRevenueMetrics(range);
+  const metricsContainer = document.getElementById('revenue-metrics');
+  if (!metricsContainer) return;
+  
+  metricsContainer.innerHTML = `
+    <div class="revenue-metric-card">
+      <div style="color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Total Revenue</div>
+      <div style="font-size: 1.75rem; font-weight: 700;">${formatCurrency(metrics.totalRevenue)}</div>
+    </div>
+    <div class="revenue-metric-card">
+      <div style="color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Average ${range === 'year' ? 'per Month' : 'per Day'}</div>
+      <div style="font-size: 1.75rem; font-weight: 700;">${formatCurrency(metrics.avgRevenuePerDay)}</div>
+    </div>
+    <div class="revenue-metric-card">
+      <div style="color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Best Performing ${range === 'year' ? 'Month' : 'Day'}</div>
+      <div style="font-size: 1.75rem; font-weight: 700;">${formatCurrency(metrics.bestDayRevenue)}</div>
+      <div style="color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem;">${metrics.bestDay}</div>
+    </div>
+    <div class="revenue-metric-card">
+      <div style="color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Invoices Paid</div>
+      <div style="font-size: 1.75rem; font-weight: 700;">${metrics.invoicesPaid}</div>
+    </div>
+  `;
+}
+
+function initializeRevenuePerformance() {
+  let currentRange = 'month';
+  
+  // Set up time range selector
+  const rangeButtons = document.querySelectorAll('.time-range-btn');
+  rangeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      rangeButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentRange = btn.dataset.range;
+      
+      // Smoothly update chart and metrics
+      renderRevenueChart(currentRange);
+      renderRevenueMetrics(currentRange);
+    });
+  });
+  
+  // Initial render
+  renderRevenueChart(currentRange);
+  renderRevenueMetrics(currentRange);
+}
+
 // ==================== ADMIN PAGES ====================
 
 function renderAdminOverview() {
@@ -1245,7 +1947,7 @@ function renderAdminOverview() {
         <div class="card-title">Active Projects</div>
         <div style="font-size: 2.5rem; font-weight: 700; margin-top: 1rem;">${store.projects.length}</div>
       </div>
-      <div class="card">
+      <div class="card clickable-card" onclick="window.location.hash = '#/admin/requests?filter=pending'">
         <div class="card-title">Pending Requests</div>
         <div style="font-size: 2.5rem; font-weight: 700; margin-top: 1rem;">${store.requests.filter(r => r.status === 'New' || r.status === 'In Review').length}</div>
       </div>
@@ -1267,6 +1969,26 @@ function renderAdminOverview() {
         <div class="chart-container">
           <canvas id="services-chart"></canvas>
         </div>
+      </div>
+    </div>
+    
+    <div class="card revenue-performance-section" style="margin-top: 2rem;">
+      <div class="card-header" style="margin-bottom: 1.5rem;">
+        <div>
+          <div class="card-title">Revenue Performance</div>
+          <div style="color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; font-weight: 400;">How your income is performing over time</div>
+        </div>
+      </div>
+      <div class="revenue-time-selector" style="margin-bottom: 1.5rem;">
+        <button class="time-range-btn active" data-range="week">Week</button>
+        <button class="time-range-btn" data-range="month">Month</button>
+        <button class="time-range-btn" data-range="year">Year</button>
+      </div>
+      <div class="chart-container" id="revenue-chart-container">
+        <canvas id="revenue-chart"></canvas>
+      </div>
+      <div class="revenue-metrics" id="revenue-metrics" style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+        <!-- Metrics will be populated by JavaScript -->
       </div>
     </div>
     
@@ -1410,6 +2132,9 @@ function renderAdminOverview() {
         }
       }
     };
+    
+    // Initialize Revenue Performance section
+    initializeRevenuePerformance();
   }, 100);
 }
 
@@ -1685,8 +2410,30 @@ function renderAdminNewInvoice() {
 }
 
 function renderAdminRequests() {
+  const filter = new URLSearchParams(window.location.hash.split('?')[1] || '').get('filter') || 'all';
+  
+  // Filter requests based on status filter
+  let filteredRequests = [...store.requests];
+  
+  if (filter === 'pending') {
+    filteredRequests = filteredRequests.filter(r => r.status === 'New' || r.status === 'In Review');
+  } else if (filter === 'completed') {
+    filteredRequests = filteredRequests.filter(r => r.status === 'Done');
+  } else if (filter === 'abandoned') {
+    filteredRequests = filteredRequests.filter(r => r.status === 'Abandoned');
+  }
+  
+  // Sort by date (newest first)
+  filteredRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
   const content = `
     <h2 style="margin-bottom: 2rem;">All Requests</h2>
+    <div class="tabs" style="margin-bottom: 2rem;">
+      <button class="tab ${filter === 'all' ? 'active' : ''}" onclick="window.location.hash = '#/admin/requests?filter=all'">All</button>
+      <button class="tab ${filter === 'pending' ? 'active' : ''}" onclick="window.location.hash = '#/admin/requests?filter=pending'">Pending</button>
+      <button class="tab ${filter === 'completed' ? 'active' : ''}" onclick="window.location.hash = '#/admin/requests?filter=completed'">Completed</button>
+      <button class="tab ${filter === 'abandoned' ? 'active' : ''}" onclick="window.location.hash = '#/admin/requests?filter=abandoned'">Abandoned</button>
+    </div>
     <div class="table-container">
       <table>
         <thead>
@@ -1700,7 +2447,7 @@ function renderAdminRequests() {
           </tr>
         </thead>
         <tbody>
-          ${store.requests.map(req => {
+          ${filteredRequests.length > 0 ? filteredRequests.map(req => {
             const customer = store.customers.find(c => c.id === req.customerId) || store.customers[0];
             return `
               <tr>
@@ -1714,11 +2461,12 @@ function renderAdminRequests() {
                     <option value="New" ${req.status === 'New' ? 'selected' : ''}>New</option>
                     <option value="In Review" ${req.status === 'In Review' ? 'selected' : ''}>In Review</option>
                     <option value="Done" ${req.status === 'Done' ? 'selected' : ''}>Done</option>
+                    <option value="Abandoned" ${req.status === 'Abandoned' ? 'selected' : ''}>Abandoned</option>
                   </select>
                 </td>
               </tr>
             `;
-          }).join('')}
+          }).join('') : '<tr><td colspan="6" style="text-align: center; padding: 3rem; color: var(--muted);">No requests found</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -1734,94 +2482,257 @@ function renderAdminRequests() {
 }
 
 function renderAdminMessages() {
-  const selectedThreadId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('thread');
+  const selectedCustomerId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('customer');
   
-  if (selectedThreadId) {
-    const thread = store.threads.find(t => t.id === selectedThreadId);
-    if (thread) {
-      const customer = store.customers.find(c => c.id === thread.customerId);
-      const threadMessages = store.messages.filter(m => m.threadId === selectedThreadId).sort((a, b) => 
-        new Date(a.createdAt) - new Date(b.createdAt)
-      );
-      
-      const content = `
-        <a href="#/admin/messages" class="back-link">← Back to Messages</a>
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">${thread.subject}</div>
-            <div style="color: var(--muted); font-size: 0.9rem;">${customer?.name || 'Customer'}</div>
-          </div>
-          <div class="message-thread" id="admin-message-thread">
-            ${threadMessages.map(msg => `
-              <div class="message ${msg.senderRole}">
-                <div class="message-header">
-                  <span>${msg.senderRole === 'customer' ? (customer?.name || 'Customer') : 'Admin'}</span>
-                  <span>${formatDate(msg.createdAt)}</span>
-                </div>
-                <div class="message-body">${msg.body}</div>
-              </div>
-            `).join('')}
-          </div>
-          <div class="message-compose">
-            <textarea id="admin-new-message" placeholder="Type your reply..."></textarea>
-            <button class="btn btn-primary" onclick="sendAdminMessage('${selectedThreadId}')">Send</button>
-          </div>
-        </div>
-      `;
-      
-      renderAdminLayout(content, 'messages');
-      document.getElementById('page-title').textContent = thread.subject;
-      
-      setTimeout(() => {
-        const threadEl = document.getElementById('admin-message-thread');
-        if (threadEl) threadEl.scrollTop = threadEl.scrollHeight;
-      }, 100);
-      
-      window.sendAdminMessage = function(threadId) {
-        const textarea = document.getElementById('admin-new-message');
-        const body = textarea.value.trim();
-        if (!body) return;
-        
-        store.addMessage({
-          threadId,
-          senderRole: 'admin',
-          body
-        });
-        
-        textarea.value = '';
-        router.handleRoute();
-      };
-      
-      return;
+  // Group threads by customer and get last message for each customer
+  const customerThreads = {};
+  store.threads.forEach(thread => {
+    if (!customerThreads[thread.customerId]) {
+      customerThreads[thread.customerId] = [];
     }
-  }
+    customerThreads[thread.customerId].push(thread);
+  });
   
-  const threadsList = store.threads.map(thread => {
-    const customer = store.customers.find(c => c.id === thread.customerId);
-    const lastMessage = store.messages
-      .filter(m => m.threadId === thread.id)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  // Get all customers who have messages, with their last message info
+  const customersWithMessages = store.customers
+    .filter(customer => customerThreads[customer.id])
+    .map(customer => {
+      // Get all messages for this customer across all their threads
+      const allCustomerMessages = store.messages.filter(msg => {
+        const thread = store.threads.find(t => t.id === msg.threadId);
+        return thread && thread.customerId === customer.id;
+      });
+      
+      const lastMessage = allCustomerMessages.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      )[0];
+      
+      return {
+        customer,
+        lastMessage,
+        unreadCount: 0 // Could be enhanced with read/unread tracking
+      };
+    })
+    .sort((a, b) => {
+      // Sort by last message time (most recent first)
+      if (!a.lastMessage && !b.lastMessage) return 0;
+      if (!a.lastMessage) return 1;
+      if (!b.lastMessage) return -1;
+      return new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt);
+    });
+  
+  // Build customer list (left sidebar)
+  const customerList = customersWithMessages.map(({ customer, lastMessage }) => {
+    const isSelected = selectedCustomerId === customer.id;
+    const preview = lastMessage ? lastMessage.body.substring(0, 50) + (lastMessage.body.length > 50 ? '...' : '') : 'No messages yet';
+    const timeAgo = lastMessage ? getTimeAgo(new Date(lastMessage.createdAt)) : '';
+    
     return `
-      <div class="list-item" onclick="window.location.hash = '#/admin/messages?thread=${thread.id}'">
-        <div class="list-item-header">
-          <div>
-            <div class="list-item-title">${thread.subject}</div>
-            <div class="list-item-meta">${customer?.name || 'Customer'}${lastMessage ? ` • ${lastMessage.body.substring(0, 60)}...` : ''}</div>
-          </div>
+      <div class="dm-contact-item ${isSelected ? 'active' : ''}" onclick="window.location.hash = '#/admin/messages?customer=${customer.id}'">
+        <div class="dm-avatar">
+          <div class="dm-avatar-initial">${customer.name.charAt(0).toUpperCase()}</div>
         </div>
+        <div class="dm-contact-info">
+          <div class="dm-contact-name">${customer.name}</div>
+          <div class="dm-contact-preview">${preview}</div>
+        </div>
+        ${timeAgo ? `<div class="dm-time">${timeAgo}</div>` : ''}
       </div>
     `;
   }).join('');
   
+  // Get selected customer's messages
+  let chatContent = '';
+  if (selectedCustomerId) {
+    const selectedCustomer = store.customers.find(c => c.id === selectedCustomerId);
+    if (selectedCustomer) {
+      // Get all messages for this customer across all threads
+      const customerThreadIds = store.threads
+        .filter(t => t.customerId === selectedCustomerId)
+        .map(t => t.id);
+      
+      const allMessages = store.messages
+        .filter(m => customerThreadIds.includes(m.threadId))
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      
+      chatContent = `
+        <div class="dm-chat-container">
+          <div class="dm-chat-header">
+            <div class="dm-chat-header-info">
+              <div class="dm-avatar dm-avatar-small">
+                <div class="dm-avatar-initial">${selectedCustomer.name.charAt(0).toUpperCase()}</div>
+              </div>
+              <div>
+                <div class="dm-chat-header-name">${selectedCustomer.name}</div>
+                <div class="dm-chat-header-meta">${selectedCustomer.company}</div>
+              </div>
+            </div>
+          </div>
+          <div class="dm-chat-messages" id="dm-chat-messages">
+            ${allMessages.map(msg => {
+              const isAdmin = msg.senderRole === 'admin';
+              return `
+                <div class="dm-message ${isAdmin ? 'dm-message-sent' : 'dm-message-received'}">
+                  <div class="dm-message-bubble">
+                    ${msg.body}
+                  </div>
+                  <div class="dm-message-time">${formatTime(new Date(msg.createdAt))}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="dm-chat-input-container">
+            <div class="dm-chat-input-wrapper">
+              <textarea id="dm-message-input" class="dm-chat-input" placeholder="Message ${selectedCustomer.name}..." rows="1"></textarea>
+              <button class="dm-send-btn" onclick="sendDMMessage('${selectedCustomerId}')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      chatContent = `
+        <div class="dm-chat-container">
+          <div class="dm-empty-chat">
+            <div class="empty-state-icon">💬</div>
+            <div class="empty-state-title">Select a customer to start messaging</div>
+          </div>
+        </div>
+      `;
+    }
+  } else {
+    chatContent = `
+      <div class="dm-chat-container">
+        <div class="dm-empty-chat">
+          <div class="empty-state-icon">💬</div>
+          <div class="empty-state-title">Select a customer to start messaging</div>
+        </div>
+      </div>
+    `;
+  }
+  
   const content = `
-    <h2 style="margin-bottom: 2rem;">All Messages</h2>
-    <div class="list">
-      ${threadsList || '<div class="empty-state">No messages</div>'}
+    <div class="dm-container">
+      <div class="dm-sidebar">
+        <div class="dm-sidebar-header">
+          <h2 style="font-size: 1.5rem; margin: 0;">Messages</h2>
+        </div>
+        <div class="dm-contacts-list">
+          ${customerList || '<div class="empty-state" style="padding: 2rem;">No conversations yet</div>'}
+        </div>
+      </div>
+      <div class="dm-chat-area">
+        ${chatContent}
+      </div>
     </div>
   `;
   
   renderAdminLayout(content, 'messages');
   document.getElementById('page-title').textContent = 'Messages';
+  
+  // Scroll to bottom of chat
+  setTimeout(() => {
+    const chatMessages = document.getElementById('dm-chat-messages');
+    if (chatMessages) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }, 100);
+  
+  // Auto-resize textarea
+  const textarea = document.getElementById('dm-message-input');
+  if (textarea) {
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+    
+    // Send on Enter (Shift+Enter for new line)
+    textarea.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (selectedCustomerId) {
+          sendDMMessage(selectedCustomerId);
+        }
+      }
+    });
+  }
+  
+  window.sendDMMessage = function(customerId) {
+    const textarea = document.getElementById('dm-message-input');
+    if (!textarea) return;
+    
+    const body = textarea.value.trim();
+    if (!body) return;
+    
+    // Find or create a thread for this customer
+    let thread = store.threads.find(t => t.customerId === customerId);
+    if (!thread) {
+      // Create a new thread
+      thread = store.addThread({
+        customerId: customerId,
+        subject: `Conversation with ${store.customers.find(c => c.id === customerId)?.name || 'Customer'}`,
+        projectId: null
+      });
+    }
+    
+    store.addMessage({
+      threadId: thread.id,
+      senderRole: 'admin',
+      body
+    });
+    
+    textarea.value = '';
+    textarea.style.height = 'auto';
+    router.handleRoute();
+  };
+}
+
+// Helper function to format time (e.g., "2:30 PM" or "Yesterday 2:30 PM")
+function formatTime(date) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const messageDate = new Date(date);
+  const messageDay = new Date(messageDate.getFullYear(), messageDate.getMonth(), messageDate.getDate());
+  
+  const diffTime = today - messageDay;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  const timeStr = messageDate.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true 
+  });
+  
+  if (diffDays === 0) {
+    return timeStr;
+  } else if (diffDays === 1) {
+    return `Yesterday ${timeStr}`;
+  } else if (diffDays < 7) {
+    return messageDate.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + timeStr;
+  } else {
+    return messageDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + timeStr;
+  }
+}
+
+// Helper function to get time ago (e.g., "2h", "3d", "1w")
+function getTimeAgo(date) {
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffWeeks = Math.floor(diffDays / 7);
+  
+  if (diffMins < 1) return 'now';
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffDays < 7) return `${diffDays}d`;
+  if (diffWeeks < 4) return `${diffWeeks}w`;
+  return formatDate(date);
 }
 
 function renderAdminInbox() {
