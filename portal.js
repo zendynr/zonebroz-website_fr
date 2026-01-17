@@ -671,6 +671,8 @@ class PortalStore {
     this.requests = [...mockRequests];
     this.adminNotifications = [...mockAdminNotifications];
     this.listeners = [];
+    // Project-first: selected project ID (null means "All Projects")
+    this.selectedProjectId = null;
   }
 
   subscribe(listener) {
@@ -796,9 +798,61 @@ class PortalStore {
   getUnreadNotificationsCount() {
     return this.adminNotifications.filter(n => !n.isRead).length;
   }
+
+  // Project-first: selected project management
+  setSelectedProject(projectId) {
+    this.selectedProjectId = projectId;
+    // Persist to localStorage
+    try {
+      if (projectId) {
+        localStorage.setItem('portalSelectedProject', projectId);
+      } else {
+        localStorage.removeItem('portalSelectedProject');
+      }
+    } catch (e) {
+      // Ignore storage errors
+    }
+    this.notify();
+  }
+
+  getSelectedProject() {
+    if (this.selectedProjectId === null) {
+      // Try to restore from localStorage
+      try {
+        const saved = localStorage.getItem('portalSelectedProject');
+        if (saved) {
+          const project = this.projects.find(p => p.id === saved);
+          if (project) {
+            this.selectedProjectId = saved;
+            return project;
+          }
+        }
+      } catch (e) {
+        // Ignore storage errors
+      }
+      // Default to first project if available
+      const firstProject = this.projects[0];
+      if (firstProject) {
+        this.selectedProjectId = firstProject.id;
+        return firstProject;
+      }
+      return null;
+    }
+    return this.projects.find(p => p.id === this.selectedProjectId) || null;
+  }
 }
 
 const store = new PortalStore();
+
+// Initialize selected project on load
+if (store.projects.length > 0) {
+  const savedProjectId = localStorage.getItem('portalSelectedProject');
+  if (savedProjectId && store.projects.find(p => p.id === savedProjectId)) {
+    store.selectedProjectId = savedProjectId;
+  } else {
+    store.selectedProjectId = store.projects[0].id;
+  }
+}
 
 // ==================== AUTH MANAGEMENT ====================
 
@@ -972,36 +1026,96 @@ function renderLogin() {
 function renderCustomerLayout(content, activeNav = '') {
   const session = AuthService.getSession();
   const customer = store.customers[0]; // Mock: use first customer
+  const customerProjects = store.projects.filter(p => p.customerId === 'cust-1'); // Mock
+  const selectedProject = store.getSelectedProject();
   const app = document.getElementById('portal-app');
+  
+  // Get unread messages count (placeholder)
+  const unreadMessagesCount = 3; // Mock value
+  
+  // Get status badge class
+  function getStatusClass(status) {
+    const statusMap = {
+      'In Progress': 'in-progress',
+      'Completed': 'completed',
+      'Paused': 'paused',
+      'Needs Funding': 'needs-funding'
+    };
+    return statusMap[status] || 'in-progress';
+  }
   
   app.innerHTML = `
     <div class="page-background" aria-hidden="true"></div>
     <div class="portal-layout">
-      <div class="sidebar-overlay" id="sidebar-overlay"></div>
-      <aside class="portal-sidebar" id="sidebar">
-        <div class="portal-sidebar-header">
-          <h2>Customer Portal</h2>
-          <p>${customer?.company || 'Dashboard'}</p>
-        </div>
-        <nav class="portal-nav">
-          <a href="#/portal" class="nav-item ${activeNav === 'overview' ? 'active' : ''}">Overview</a>
-          <a href="#/portal/projects" class="nav-item ${activeNav === 'projects' ? 'active' : ''}">Projects</a>
-          <a href="#/portal/invoices" class="nav-item ${activeNav === 'invoices' ? 'active' : ''}">Invoices</a>
-          <a href="#/portal/messages" class="nav-item ${activeNav === 'messages' ? 'active' : ''}">Messages</a>
-          <a href="#/portal/requests" class="nav-item ${activeNav === 'requests' ? 'active' : ''}">Requests</a>
-        </nav>
-      </aside>
-      <main class="portal-main">
-        <header class="portal-header">
+      <!-- Top Navigation Bar -->
+      <nav class="portal-top-nav">
+        <div class="portal-top-nav-left">
           <div>
-            <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
-            <h1 id="page-title"></h1>
+            <div class="portal-branding">ZoneBroz Customer Portal</div>
+            ${customer?.company ? `<div class="portal-company-name">${customer.company}</div>` : ''}
           </div>
-          <div class="portal-header-actions">
-            <div class="user-info">${customer?.name || 'Customer'}</div>
-            <button class="btn btn-secondary btn-small" onclick="localStorage.removeItem('portalSession'); window.location.hash = '/login';">Sign Out</button>
+        </div>
+        
+        <div class="portal-top-nav-center">
+          <div class="project-switcher-container">
+            <div class="project-switcher" id="project-switcher">
+              <div class="project-switcher-label">
+                <span class="project-switcher-name">${selectedProject ? selectedProject.title : 'All Projects'}</span>
+                ${selectedProject ? `<span class="project-status-pill ${getStatusClass(selectedProject.status)}">${selectedProject.status}</span>` : ''}
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            <div class="project-dropdown" id="project-dropdown">
+              <div class="project-dropdown-item ${!selectedProject ? 'selected' : ''}" data-project-id="">
+                <span class="project-dropdown-item-name">All Projects</span>
+              </div>
+              ${customerProjects.map(project => `
+                <div class="project-dropdown-item ${selectedProject?.id === project.id ? 'selected' : ''}" data-project-id="${project.id}">
+                  <span class="project-dropdown-item-name">${project.title}</span>
+                  <span class="project-status-pill ${getStatusClass(project.status)}">${project.status}</span>
+                </div>
+              `).join('')}
+            </div>
           </div>
-        </header>
+        </div>
+        
+        <div class="portal-top-nav-right">
+          <button class="messages-icon-btn" onclick="window.location.hash = '#/portal/messages'" title="Messages">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            ${unreadMessagesCount > 0 ? `<span class="messages-badge">${unreadMessagesCount}</span>` : ''}
+          </button>
+          
+          <button class="btn btn-primary" onclick="openRequestProjectModal()">Request New Project</button>
+          
+          <div class="user-dropdown-container">
+            <button class="user-dropdown-btn" id="user-dropdown-btn">
+              <span>${customer?.name || 'Customer'}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div class="user-dropdown-menu" id="user-dropdown-menu">
+              <div class="user-dropdown-item">Settings</div>
+              <div class="user-dropdown-item" onclick="localStorage.removeItem('portalSession'); window.location.hash = '/login';">Sign Out</div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      
+      <!-- Sub-navigation -->
+      <div class="portal-sub-nav">
+        <button class="sub-nav-item ${activeNav === 'overview' ? 'active' : ''}" onclick="window.location.hash = '#/portal'">Overview</button>
+        <button class="sub-nav-item ${activeNav === 'projects' ? 'active' : ''}" onclick="window.location.hash = '#/portal/projects'">Project Info</button>
+        <button class="sub-nav-item ${activeNav === 'invoices' ? 'active' : ''}" onclick="window.location.hash = '#/portal/invoices'">Invoices</button>
+        <button class="sub-nav-item ${activeNav === 'messages' ? 'active' : ''}" onclick="window.location.hash = '#/portal/messages'">Messages</button>
+        <button class="sub-nav-item ${activeNav === 'requests' ? 'active' : ''}" onclick="window.location.hash = '#/portal/requests'">Requests</button>
+      </div>
+      
+      <main class="portal-main">
         <div class="portal-content">
           ${content}
         </div>
@@ -1009,23 +1123,167 @@ function renderCustomerLayout(content, activeNav = '') {
     </div>
   `;
 
-  // Mobile sidebar toggle
-  const toggle = app.querySelector('#sidebar-toggle');
-  const sidebar = app.querySelector('#sidebar');
-  const overlay = app.querySelector('#sidebar-overlay');
+  // Project switcher functionality
+  const projectSwitcher = app.querySelector('#project-switcher');
+  const projectDropdown = app.querySelector('#project-dropdown');
   
-  if (toggle) {
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('show');
+  if (projectSwitcher && projectDropdown) {
+    projectSwitcher.addEventListener('click', (e) => {
+      e.stopPropagation();
+      projectSwitcher.classList.toggle('open');
+      projectDropdown.classList.toggle('show');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!projectSwitcher.contains(e.target) && !projectDropdown.contains(e.target)) {
+        projectSwitcher.classList.remove('open');
+        projectDropdown.classList.remove('show');
+      }
+    });
+    
+    // Handle project selection
+    const projectItems = projectDropdown.querySelectorAll('.project-dropdown-item');
+    projectItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const projectId = item.dataset.projectId || null;
+        store.setSelectedProject(projectId);
+        router.handleRoute();
+      });
     });
   }
   
-  if (overlay) {
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('show');
+  // User dropdown functionality
+  const userDropdownBtn = app.querySelector('#user-dropdown-btn');
+  const userDropdownMenu = app.querySelector('#user-dropdown-menu');
+  
+  if (userDropdownBtn && userDropdownMenu) {
+    userDropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdownMenu.classList.toggle('show');
     });
+    
+    document.addEventListener('click', (e) => {
+      if (!userDropdownBtn.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+        userDropdownMenu.classList.remove('show');
+      }
+    });
+  }
+}
+
+// Request New Project Modal
+function openRequestProjectModal() {
+  const app = document.getElementById('portal-app');
+  
+  // Check if modal already exists
+  let modalOverlay = document.getElementById('request-project-modal');
+  if (modalOverlay) {
+    modalOverlay.classList.add('show');
+    return;
+  }
+  
+  // Create modal
+  modalOverlay = document.createElement('div');
+  modalOverlay.id = 'request-project-modal';
+  modalOverlay.className = 'modal-overlay';
+  modalOverlay.innerHTML = `
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title">Request New Project</div>
+        <button class="modal-close-btn" onclick="closeRequestProjectModal()">&times;</button>
+      </div>
+      <form id="new-project-request-form">
+        <div class="form-group">
+          <label for="project-request-type">Request Type</label>
+          <select id="project-request-type" name="type" required>
+            <option value="">Select type...</option>
+            <option value="quote">Quote Request</option>
+            <option value="new">New Project Request</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="project-request-description">Description</label>
+          <textarea id="project-request-description" name="description" required placeholder="Describe your project needs..." rows="5"></textarea>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="project-request-budget">Budget Range (Optional)</label>
+            <select id="project-request-budget" name="budget">
+              <option value="">Not specified</option>
+              <option value="under-5k">Under $5,000</option>
+              <option value="5k-10k">$5,000 - $10,000</option>
+              <option value="10k-25k">$10,000 - $25,000</option>
+              <option value="25k-50k">$25,000 - $50,000</option>
+              <option value="50k-plus">$50,000+</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="project-request-timeline">Timeline (Optional)</label>
+            <select id="project-request-timeline" name="timeline">
+              <option value="">Not specified</option>
+              <option value="asap">As soon as possible</option>
+              <option value="1-3months">1-3 months</option>
+              <option value="3-6months">3-6 months</option>
+              <option value="6-12months">6-12 months</option>
+              <option value="flexible">Flexible</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeRequestProjectModal()" style="flex: 1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Request</button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  document.body.appendChild(modalOverlay);
+  
+  // Show modal with animation
+  setTimeout(() => {
+    modalOverlay.classList.add('show');
+  }, 10);
+  
+  // Close on overlay click
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      closeRequestProjectModal();
+    }
+  });
+  
+  // Handle form submission
+  const form = modalOverlay.querySelector('#new-project-request-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    
+    // Create a request (similar to existing request system)
+    store.addRequest({
+      customerId: 'cust-1',
+      type: formData.get('type') === 'quote' ? 'quote' : 'report',
+      category: 'Websites', // Default, could be made dynamic
+      details: {
+        notes: formData.get('description'),
+        budget: formData.get('budget'),
+        timeline: formData.get('timeline')
+      }
+    });
+    
+    alert('Your project request has been submitted! We\'ll get back to you soon.');
+    closeRequestProjectModal();
+    router.navigate('/portal/requests');
+  });
+}
+
+function closeRequestProjectModal() {
+  const modalOverlay = document.getElementById('request-project-modal');
+  if (modalOverlay) {
+    modalOverlay.classList.remove('show');
+    setTimeout(() => {
+      if (modalOverlay.parentNode) {
+        modalOverlay.parentNode.removeChild(modalOverlay);
+      }
+    }, 300);
   }
 }
 
@@ -1094,106 +1352,205 @@ function renderAdminLayout(content, activeNav = '') {
 
 function renderCustomerOverview() {
   const session = AuthService.getSession();
-  const customerId = session?.userId;
+  const selectedProject = store.getSelectedProject();
   const customerProjects = store.projects.filter(p => p.customerId === 'cust-1'); // Mock
-  const customerInvoices = store.invoices.filter(i => i.customerId === 'cust-1');
-  const customerRequests = store.requests.filter(r => r.customerId === 'cust-1');
+  
+  // Project-scoped data
+  let projectInvoices = [];
+  let projectThreads = [];
+  let projectMessages = [];
+  
+  if (selectedProject) {
+    projectInvoices = store.invoices.filter(i => i.customerId === 'cust-1' && i.projectId === selectedProject.id);
+    projectThreads = store.threads.filter(t => t.customerId === 'cust-1' && t.projectId === selectedProject.id);
+    const threadIds = projectThreads.map(t => t.id);
+    projectMessages = store.messages.filter(m => threadIds.includes(m.threadId));
+  } else {
+    projectInvoices = store.invoices.filter(i => i.customerId === 'cust-1');
+    projectThreads = store.threads.filter(t => t.customerId === 'cust-1');
+  }
+  
+  const recentMessages = projectMessages
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 3);
+  
+  const recentInvoices = projectInvoices
+    .sort((a, b) => new Date(b.issuedAt) - new Date(a.issuedAt))
+    .slice(0, 3);
   
   const content = `
-    <h2 style="margin-bottom: 2rem;">Dashboard Overview</h2>
+    <div class="project-context-header">
+      <h2>Overview${selectedProject ? ` — ${selectedProject.title}` : ' — All Projects'}</h2>
+      ${selectedProject ? `<div class="project-context-subtitle">${selectedProject.scopeSummary || 'Project overview and activity'}</div>` : '<div class="project-context-subtitle">Overview across all your projects</div>'}
+    </div>
+    
     <div class="form-grid" style="margin-bottom: 2rem;">
       <div class="card">
-        <div class="card-title">Active Projects</div>
-        <div style="font-size: 2.5rem; font-weight: 700; margin-top: 1rem;">${customerProjects.length}</div>
+        <div class="card-title">Project Status</div>
+        <div style="font-size: 2rem; font-weight: 700; margin-top: 1rem;">${selectedProject ? selectedProject.status : customerProjects.length + ' Projects'}</div>
+        ${selectedProject ? `<div style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">${getStatusBadge(selectedProject.status)}</div>` : ''}
       </div>
       <div class="card">
-        <div class="card-title">Pending Invoices</div>
-        <div style="font-size: 2.5rem; font-weight: 700; margin-top: 1rem;">${customerInvoices.filter(i => i.status === 'Pending').length}</div>
+        <div class="card-title">${selectedProject ? 'Outstanding Invoices' : 'Pending Invoices'}</div>
+        <div style="font-size: 2rem; font-weight: 700; margin-top: 1rem;">${projectInvoices.filter(i => i.status === 'Pending' || i.status === 'Overdue').length}</div>
+        <div style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">${projectInvoices.filter(i => i.status === 'Overdue').length} overdue</div>
       </div>
       <div class="card">
-        <div class="card-title">Open Requests</div>
-        <div style="font-size: 2.5rem; font-weight: 700; margin-top: 1rem;">${customerRequests.filter(r => r.status !== 'Done').length}</div>
+        <div class="card-title">Current Phase</div>
+        <div style="font-size: 2rem; font-weight: 700; margin-top: 1rem;">${selectedProject ? 'Active' : 'N/A'}</div>
+        <div style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">${selectedProject ? 'Development in progress' : 'Select a project'}</div>
       </div>
+      ${selectedProject ? `
+      <div class="card">
+        <div class="card-title">Upcoming Milestone</div>
+        <div style="font-size: 2rem; font-weight: 700; margin-top: 1rem;">Q1 2024</div>
+        <div style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">Estimated completion</div>
+      </div>
+      ` : ''}
     </div>
-    <div class="card">
+    
+    <div class="card" style="margin-bottom: 2rem;">
       <div class="card-title">Recent Activity</div>
-      <div style="margin-top: 1.5rem; color: var(--muted);">
-        <p>Welcome to your customer portal. Use the navigation menu to access your projects, invoices, messages, and requests.</p>
+      <div style="margin-top: 1.5rem;">
+        ${recentMessages.length > 0 || recentInvoices.length > 0 ? `
+          ${recentMessages.map(msg => {
+            const thread = projectThreads.find(t => t.id === msg.threadId);
+            return `
+              <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <div style="font-weight: 600; margin-bottom: 0.25rem;">New message${thread ? `: ${thread.subject}` : ''}</div>
+                  <div style="color: var(--muted); font-size: 0.9rem;">${msg.body.substring(0, 80)}${msg.body.length > 80 ? '...' : ''}</div>
+                </div>
+                <div style="color: var(--muted); font-size: 0.85rem; white-space: nowrap;">${getTimeAgo(new Date(msg.createdAt))}</div>
+              </div>
+            `;
+          }).join('')}
+          ${recentInvoices.map(inv => {
+            const project = store.projects.find(p => p.id === inv.projectId);
+            return `
+              <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <div style="font-weight: 600; margin-bottom: 0.25rem;">Invoice ${inv.id}${project ? ` - ${project.title}` : ''}</div>
+                  <div style="color: var(--muted); font-size: 0.9rem;">${formatCurrency(inv.amount)} • ${formatDate(inv.issuedAt)}</div>
+                </div>
+                <div>${getStatusBadge(inv.status)}</div>
+              </div>
+            `;
+          }).join('')}
+        ` : `
+          <div style="color: var(--muted); text-align: center; padding: 2rem;">
+            ${selectedProject ? 'No recent activity for this project.' : 'Select a project to see recent activity.'}
+          </div>
+        `}
       </div>
     </div>
   `;
   
   renderCustomerLayout(content, 'overview');
-  document.getElementById('page-title').textContent = 'Overview';
 }
 
 function renderCustomerProjects() {
   const session = AuthService.getSession();
-  const customerProjects = store.projects.filter(p => p.customerId === 'cust-1');
-  const selectedProjectId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('id');
+  const selectedProject = store.getSelectedProject();
   
-  if (selectedProjectId) {
-    const project = customerProjects.find(p => p.id === selectedProjectId);
-    if (project) {
-      const content = `
-        <a href="#/portal/projects" class="back-link">← Back to Projects</a>
-        <div class="detail-panel">
-          <div class="detail-section">
-            <div class="detail-label">Title</div>
-            <div class="detail-value">${project.title}</div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-label">Status</div>
-            <div class="detail-value">${getStatusBadge(project.status)}</div>
-          </div>
-          <div class="detail-section">
-            <div class="detail-label">Scope Summary</div>
-            <div class="detail-value">${project.scopeSummary}</div>
-          </div>
-        </div>
-      `;
-      renderCustomerLayout(content, 'projects');
-      document.getElementById('page-title').textContent = project.title;
-      return;
-    }
+  if (!selectedProject) {
+    const content = `
+      <div class="project-context-header">
+        <h2>Project Info — All Projects</h2>
+        <div class="project-context-subtitle">Select a project from the dropdown above to view details</div>
+      </div>
+      <div class="empty-state">
+        <div class="empty-state-icon">📁</div>
+        <div class="empty-state-title">No project selected</div>
+        <div style="color: var(--muted); margin-top: 0.5rem;">Use the project switcher in the top navigation to select a project</div>
+      </div>
+    `;
+    renderCustomerLayout(content, 'projects');
+    return;
   }
   
-  const projectsList = customerProjects.length > 0
-    ? customerProjects.map(project => `
-        <div class="list-item" onclick="window.location.hash = '#/portal/projects?id=${project.id}'">
-          <div class="list-item-header">
-            <div>
-              <div class="list-item-title">${project.title}</div>
-              <div class="list-item-meta">${project.scopeSummary}</div>
-            </div>
-            ${getStatusBadge(project.status)}
-          </div>
-        </div>
-      `).join('')
-    : '<div class="empty-state"><div class="empty-state-icon">📁</div><div class="empty-state-title">No projects yet</div></div>';
+  // Get project-related data
+  const projectInvoices = store.invoices.filter(i => i.projectId === selectedProject.id);
+  const projectThreads = store.threads.filter(t => t.projectId === selectedProject.id);
   
   const content = `
-    <h2 style="margin-bottom: 2rem;">My Projects</h2>
-    <div class="list">
-      ${projectsList}
+    <div class="project-context-header">
+      <h2>Project Info — ${selectedProject.title}</h2>
+      <div class="project-context-subtitle">Detailed information and project specifications</div>
+    </div>
+    
+    <div class="detail-panel" style="margin-bottom: 2rem;">
+      <div class="detail-section">
+        <div class="detail-label">Project Title</div>
+        <div class="detail-value">${selectedProject.title}</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">Status</div>
+        <div class="detail-value">${getStatusBadge(selectedProject.status)}</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-label">Scope / Deliverables</div>
+        <div class="detail-value">${selectedProject.scopeSummary || 'No scope details provided'}</div>
+      </div>
+    </div>
+    
+    <div class="form-grid" style="margin-bottom: 2rem;">
+      <div class="card">
+        <div class="card-title">Project Timeline</div>
+        <div style="margin-top: 1rem; color: var(--muted);">
+          <div style="margin-bottom: 0.75rem;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">Current Phase</div>
+            <div>Development in progress</div>
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">Estimated Completion</div>
+            <div>Q1 2024</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Team Members</div>
+        <div style="margin-top: 1rem; color: var(--muted);">
+          <div style="margin-bottom: 0.5rem;">• Project Manager: ZoneBroz Team</div>
+          <div style="margin-bottom: 0.5rem;">• Lead Developer: ZoneBroz Team</div>
+          <div>• Designer: ZoneBroz Team</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title">Notes / Next Steps</div>
+      <div style="margin-top: 1rem; color: var(--muted); line-height: 1.6;">
+        <p>This project is currently in active development. Regular updates will be shared through the Messages section.</p>
+        <p style="margin-top: 1rem;">Key milestones and deliverables will be communicated as the project progresses.</p>
+      </div>
     </div>
   `;
   
   renderCustomerLayout(content, 'projects');
-  document.getElementById('page-title').textContent = 'Projects';
 }
 
 function renderCustomerInvoices() {
   const session = AuthService.getSession();
-  const customerInvoices = store.invoices.filter(i => i.customerId === 'cust-1');
+  const selectedProject = store.getSelectedProject();
   const selectedInvoiceId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('id');
+  const invoiceFilter = new URLSearchParams(window.location.hash.split('?')[1] || '').get('filter') || (selectedProject ? 'project' : 'all');
+  
+  // Get invoices based on filter
+  let customerInvoices = store.invoices.filter(i => i.customerId === 'cust-1');
+  const showAllProjects = invoiceFilter === 'all';
+  
+  if (!showAllProjects && selectedProject) {
+    customerInvoices = customerInvoices.filter(i => i.projectId === selectedProject.id);
+  }
   
   if (selectedInvoiceId) {
     const invoice = customerInvoices.find(i => i.id === selectedInvoiceId);
     if (invoice) {
       const project = store.projects.find(p => p.id === invoice.projectId);
       const content = `
-        <a href="#/portal/invoices" class="back-link">← Back to Invoices</a>
+        <a href="#/portal/invoices${showAllProjects ? '?filter=all' : ''}" class="back-link">← Back to Invoices</a>
         <div class="detail-panel">
           <div class="detail-section">
             <div class="detail-label">Project</div>
@@ -1221,43 +1578,148 @@ function renderCustomerInvoices() {
         </div>
       `;
       renderCustomerLayout(content, 'invoices');
-      document.getElementById('page-title').textContent = 'Invoice Details';
       return;
     }
   }
   
-  const invoicesList = customerInvoices.length > 0
-    ? customerInvoices.map(invoice => {
+  // Filters UI
+  const statusFilter = new URLSearchParams(window.location.hash.split('?')[1] || '').get('status') || 'all';
+  const searchQuery = new URLSearchParams(window.location.hash.split('?')[1] || '').get('search') || '';
+  
+  let filteredInvoices = customerInvoices;
+  
+  if (statusFilter !== 'all') {
+    filteredInvoices = filteredInvoices.filter(i => i.status === statusFilter);
+  }
+  
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+    filteredInvoices = filteredInvoices.filter(invoice => {
+      const project = store.projects.find(p => p.id === invoice.projectId);
+      return project?.title.toLowerCase().includes(query) ||
+             invoice.id.toLowerCase().includes(query) ||
+             formatCurrency(invoice.amount).toLowerCase().includes(query);
+    });
+  }
+  
+  // Sort options
+  const sortBy = new URLSearchParams(window.location.hash.split('?')[1] || '').get('sort') || 'date-desc';
+  if (sortBy === 'date-desc') {
+    filteredInvoices.sort((a, b) => new Date(b.issuedAt) - new Date(a.issuedAt));
+  } else if (sortBy === 'date-asc') {
+    filteredInvoices.sort((a, b) => new Date(a.issuedAt) - new Date(b.issuedAt));
+  } else if (sortBy === 'amount-desc') {
+    filteredInvoices.sort((a, b) => b.amount - a.amount);
+  } else if (sortBy === 'amount-asc') {
+    filteredInvoices.sort((a, b) => a.amount - b.amount);
+  }
+  
+  const invoicesList = filteredInvoices.length > 0
+    ? filteredInvoices.map(invoice => {
         const project = store.projects.find(p => p.id === invoice.projectId);
         return `
-          <div class="list-item" onclick="window.location.hash = '#/portal/invoices?id=${invoice.id}'">
+          <div class="list-item" onclick="window.location.hash = '#/portal/invoices?id=${invoice.id}${showAllProjects ? '&filter=all' : ''}'">
             <div class="list-item-header">
               <div>
                 <div class="list-item-title">${project?.title || 'Invoice'}</div>
-                <div class="list-item-meta">${formatCurrency(invoice.amount)} • ${formatDate(invoice.issuedAt)}</div>
+                <div class="list-item-meta">
+                  ${formatCurrency(invoice.amount)} • ${formatDate(invoice.issuedAt)}
+                  ${showAllProjects && project ? ` • ${project.title}` : ''}
+                </div>
               </div>
               ${getStatusBadge(invoice.status)}
             </div>
           </div>
         `;
       }).join('')
-    : '<div class="empty-state"><div class="empty-state-icon">💳</div><div class="empty-state-title">No invoices yet</div></div>';
+    : '<div class="empty-state"><div class="empty-state-icon">💳</div><div class="empty-state-title">No invoices found</div></div>';
   
   const content = `
-    <h2 style="margin-bottom: 2rem;">My Invoices</h2>
+    <div class="project-context-header">
+      <h2>Invoices${selectedProject && !showAllProjects ? ` — ${selectedProject.title}` : ' — All Projects'}</h2>
+      <div class="project-context-subtitle">View and manage your project invoices</div>
+    </div>
+    
+    ${selectedProject ? `
+    <div class="project-filter-toggle">
+      <button class="filter-toggle-btn ${!showAllProjects ? 'active' : ''}" onclick="window.location.hash = '#/portal/invoices'">This Project</button>
+      <button class="filter-toggle-btn ${showAllProjects ? 'active' : ''}" onclick="window.location.hash = '#/portal/invoices?filter=all'">All Projects</button>
+    </div>
+    ` : ''}
+    
+    <div class="search-bar">
+      <input type="text" id="invoice-search" placeholder="Search invoices..." value="${searchQuery}" onkeyup="handleInvoiceSearch(event)">
+      <select id="invoice-status-filter" onchange="handleInvoiceFilterChange()" style="max-width: 150px;">
+        <option value="all" ${statusFilter === 'all' ? 'selected' : ''}>All Status</option>
+        <option value="Paid" ${statusFilter === 'Paid' ? 'selected' : ''}>Paid</option>
+        <option value="Pending" ${statusFilter === 'Pending' ? 'selected' : ''}>Pending</option>
+        <option value="Overdue" ${statusFilter === 'Overdue' ? 'selected' : ''}>Overdue</option>
+      </select>
+      <select id="invoice-sort" onchange="handleInvoiceSortChange()" style="max-width: 180px;">
+        <option value="date-desc" ${sortBy === 'date-desc' ? 'selected' : ''}>Sort: Newest First</option>
+        <option value="date-asc" ${sortBy === 'date-asc' ? 'selected' : ''}>Sort: Oldest First</option>
+        <option value="amount-desc" ${sortBy === 'amount-desc' ? 'selected' : ''}>Sort: Highest Amount</option>
+        <option value="amount-asc" ${sortBy === 'amount-asc' ? 'selected' : ''}>Sort: Lowest Amount</option>
+      </select>
+    </div>
+    
     <div class="list">
       ${invoicesList}
     </div>
   `;
   
   renderCustomerLayout(content, 'invoices');
-  document.getElementById('page-title').textContent = 'Invoices';
+  
+  // Add handlers for filters
+  window.handleInvoiceSearch = function(e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      const query = e.target.value;
+      const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
+      if (query) {
+        params.set('search', query);
+      } else {
+        params.delete('search');
+      }
+      window.location.hash = '#/portal/invoices' + (params.toString() ? '?' + params.toString() : '');
+    }
+  };
+  
+  window.handleInvoiceFilterChange = function() {
+    const status = document.getElementById('invoice-status-filter').value;
+    const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
+    if (status !== 'all') {
+      params.set('status', status);
+    } else {
+      params.delete('status');
+    }
+    window.location.hash = '#/portal/invoices' + (params.toString() ? '?' + params.toString() : '');
+  };
+  
+  window.handleInvoiceSortChange = function() {
+    const sort = document.getElementById('invoice-sort').value;
+    const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
+    if (sort !== 'date-desc') {
+      params.set('sort', sort);
+    } else {
+      params.delete('sort');
+    }
+    window.location.hash = '#/portal/invoices' + (params.toString() ? '?' + params.toString() : '');
+  };
 }
 
 function renderCustomerMessages() {
   const session = AuthService.getSession();
-  const customerThreads = store.threads.filter(t => t.customerId === 'cust-1');
+  const selectedProject = store.getSelectedProject();
   const selectedThreadId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('thread');
+  const messageFilter = new URLSearchParams(window.location.hash.split('?')[1] || '').get('filter') || (selectedProject ? 'project' : 'all');
+  
+  // Get threads based on filter
+  let customerThreads = store.threads.filter(t => t.customerId === 'cust-1');
+  const showAllProjects = messageFilter === 'all';
+  
+  if (!showAllProjects && selectedProject) {
+    customerThreads = customerThreads.filter(t => t.projectId === selectedProject.id);
+  }
   
   if (selectedThreadId) {
     const thread = customerThreads.find(t => t.id === selectedThreadId);
@@ -1309,7 +1771,6 @@ function renderCustomerMessages() {
       `;
       
       renderCustomerLayout(content, 'messages');
-      document.getElementById('page-title').textContent = 'Messages';
       
       // Scroll to bottom
       setTimeout(() => {
@@ -1360,14 +1821,16 @@ function renderCustomerMessages() {
           .filter(m => m.threadId === thread.id)
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
         const timeAgo = lastMessage ? getTimeAgo(new Date(lastMessage.createdAt)) : '';
+        const project = thread.projectId ? store.projects.find(p => p.id === thread.projectId) : null;
         return `
-          <div class="dm-contact-item" onclick="window.location.hash = '#/portal/messages?thread=${thread.id}'">
+          <div class="dm-contact-item" onclick="window.location.hash = '#/portal/messages?thread=${thread.id}${showAllProjects ? '&filter=all' : ''}'">
             <div class="dm-avatar">
               <div class="dm-avatar-initial">Z</div>
             </div>
             <div class="dm-contact-info">
               <div class="dm-contact-name">${thread.subject}</div>
               <div class="dm-contact-preview">${lastMessage ? lastMessage.body.substring(0, 50) + (lastMessage.body.length > 50 ? '...' : '') : 'No messages yet'}</div>
+              ${showAllProjects && project ? `<div style="font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem;">${project.title}</div>` : ''}
             </div>
             ${timeAgo ? `<div class="dm-time">${timeAgo}</div>` : ''}
           </div>
@@ -1376,14 +1839,24 @@ function renderCustomerMessages() {
     : '<div class="empty-state"><div class="empty-state-icon">💬</div><div class="empty-state-title">No messages yet</div></div>';
   
   const content = `
-    <h2 style="margin-bottom: 2rem;">Messages</h2>
+    <div class="project-context-header">
+      <h2>Messages${selectedProject && !showAllProjects ? ` — ${selectedProject.title}` : ' — All Projects'}</h2>
+      <div class="project-context-subtitle">Communicate with the ZoneBroz team</div>
+    </div>
+    
+    ${selectedProject ? `
+    <div class="project-filter-toggle" style="margin-bottom: 1.5rem;">
+      <button class="filter-toggle-btn ${!showAllProjects ? 'active' : ''}" onclick="window.location.hash = '#/portal/messages'">This Project</button>
+      <button class="filter-toggle-btn ${showAllProjects ? 'active' : ''}" onclick="window.location.hash = '#/portal/messages?filter=all'">All Projects</button>
+    </div>
+    ` : ''}
+    
     <div class="dm-contacts-list" style="background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 0.5rem;">
       ${threadsList}
     </div>
   `;
   
   renderCustomerLayout(content, 'messages');
-  document.getElementById('page-title').textContent = 'Messages';
 }
 
 function renderCustomerRequests() {
