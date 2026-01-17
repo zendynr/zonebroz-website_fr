@@ -435,11 +435,11 @@
         }
 
         .project-view-hero-image {
-            width: 100%;
+            width: min(100%, 900px);
             border-radius: 24px;
             overflow: hidden;
             border: 1px solid var(--border);
-            margin-bottom: 4rem;
+            margin: 0 auto 4rem;
             background: var(--panel);
         }
 
@@ -844,6 +844,7 @@
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
             overflow: hidden;
+            pointer-events: none;
         }
 
         .modal-overlay::before {
@@ -858,6 +859,7 @@
         .modal-overlay.active {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
 
         .modal-content {
@@ -876,8 +878,9 @@
                 inset 0 1px 2px rgba(255, 255, 255, 0.096),
                 inset 0 -1px 1px rgba(0, 0, 0, 0.12);
             position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
+            transform: translateY(14px) scale(0.98);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         .modal-content::before {
@@ -896,7 +899,8 @@
         }
 
         .modal-overlay.active .modal-content {
-            transform: scale(1);
+            transform: translateY(0) scale(1);
+            opacity: 1;
         }
 
         .modal-close {
@@ -1151,8 +1155,8 @@
             </div>
         </div>
 
-        <div class="project-view-hero-image" data-animate="hero">
-            <img src="../images/app mobile.jpg" alt="FurlyFuzz App preview">
+        <div class="project-view-hero-image" data-animate="media">
+            <img src="../images/app mobile.jpg" alt="FurlyFuzz App preview" decoding="async" fetchpriority="high">
         </div>
 
         <div class="project-view-content">
@@ -1503,6 +1507,7 @@
                 hero: { y: 18, scale: 1, duration: 0.9, ease: 'power3.out', useTransform: true },
                 text: { y: 16, scale: 1, duration: 0.8, ease: 'power3.out', useTransform: true },
                 card: { y: 26, scale: 0.98, duration: 0.85, ease: 'back.out(1.15)', useTransform: true },
+                media: { y: 20, scale: 0.985, duration: 0.9, ease: 'power3.out', useTransform: true },
                 fade: { duration: 0.7, ease: 'power3.out', useTransform: false }
             };
 
@@ -1570,6 +1575,7 @@
                     return;
                 }
 
+                const mediaItems = items.filter((el) => el.getAttribute('data-animate') === 'media');
                 const heroItems = items.filter((el) => el.getAttribute('data-animate') === 'hero');
                 if (heroItems.length) {
                     gsap.timeline({ defaults: { duration: 0.9, ease: 'power3.out' } })
@@ -1581,7 +1587,7 @@
                         });
                 }
 
-                const scrollItems = items.filter((el) => el.getAttribute('data-animate') !== 'hero');
+                const scrollItems = items.filter((el) => !['hero', 'media'].includes(el.getAttribute('data-animate')));
                 scrollItems.forEach((el) => {
                     if (isAboveCenterZone(el)) {
                         setVisible(el);
@@ -1632,6 +1638,30 @@
                             setVisible(el);
                         }
                     });
+                });
+
+                const animateMediaItem = (el) => {
+                    if (el.dataset.animState === 'shown') return;
+                    animateIn(el);
+                };
+
+                mediaItems.forEach((el) => {
+                    const img = el.querySelector('img');
+                    if (!img) {
+                        requestAnimationFrame(() => animateMediaItem(el));
+                        return;
+                    }
+                    if (img.complete && img.naturalWidth > 0) {
+                        requestAnimationFrame(() => animateMediaItem(el));
+                        return;
+                    }
+                    const onLoad = () => {
+                        img.removeEventListener('load', onLoad);
+                        img.removeEventListener('error', onLoad);
+                        animateMediaItem(el);
+                    };
+                    img.addEventListener('load', onLoad, { once: true });
+                    img.addEventListener('error', onLoad, { once: true });
                 });
 
                 ScrollTrigger.refresh();

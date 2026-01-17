@@ -2523,7 +2523,6 @@
                 e.preventDefault();
                 if (href === '#who-we-are') {
                     scrollToAboutCentered(true);
-                    scheduleAboutFadeReset();
                 } else {
                     target.scrollIntoView({
                         behavior: 'smooth',
@@ -2578,7 +2577,6 @@
         }
 
         function scheduleAboutFadeReset() {
-            if (!window.zonebrozScrollAnim || typeof window.zonebrozScrollAnim.reset !== 'function') return;
             const aboutSection = document.querySelector('#who-we-are');
             if (!aboutSection) return;
             const sectionTop = aboutSection.getBoundingClientRect().top + window.scrollY;
@@ -2586,51 +2584,35 @@
             const viewportHeight = window.innerHeight || 0;
             const centeredScroll = sectionTop - Math.max((viewportHeight - sectionHeight) / 2, 0);
             const targetTop = Math.max(0, Math.round(centeredScroll));
+            const isScrollingUp = window.scrollY > targetTop + 8;
             let resolved = false;
-            document.body.classList.add('about-scroll-fade');
-            document.body.classList.add('about-skip-reveal');
 
-            const maybeReset = () => {
+            const cleanup = () => {
                 if (resolved) return;
-                if (Math.abs(window.scrollY - targetTop) <= 2) {
-                    resolved = true;
-                    window.zonebrozScrollAnim.reset();
-                    setTimeout(() => {
-                        document.body.classList.remove('about-skip-reveal');
-                    }, 50);
-                }
+                resolved = true;
+                document.body.classList.remove('about-scroll-fade');
+                document.body.classList.remove('about-skip-reveal');
             };
+
+            document.body.classList.add('about-scroll-fade');
+            if (isScrollingUp) {
+                document.body.classList.add('about-skip-reveal');
+                if (window.zonebrozScrollAnim && typeof window.zonebrozScrollAnim.showAboutStatic === 'function') {
+                    window.zonebrozScrollAnim.showAboutStatic();
+                }
+            }
 
             const checkScroll = () => {
                 if (resolved) return;
-                maybeReset();
-                if (!resolved) {
+                if (Math.abs(window.scrollY - targetTop) <= 2) {
+                    cleanup();
+                } else {
                     requestAnimationFrame(checkScroll);
                 }
             };
 
             requestAnimationFrame(checkScroll);
-            setTimeout(() => {
-                if (!resolved) {
-                    resolved = true;
-                    window.zonebrozScrollAnim.reset();
-                    setTimeout(() => {
-                        document.body.classList.remove('about-skip-reveal');
-                    }, 50);
-                }
-            }, 1200);
-
-            let lastY = window.scrollY;
-            const handleScroll = () => {
-                const currentY = window.scrollY;
-                if (currentY > lastY && currentY > targetTop + 12) {
-                    document.body.classList.remove('about-scroll-fade');
-                    document.body.classList.remove('about-skip-reveal');
-                    window.removeEventListener('scroll', handleScroll);
-                }
-                lastY = currentY;
-            };
-            window.addEventListener('scroll', handleScroll, { passive: true });
+            setTimeout(cleanup, 1200);
         }
 
         function restoreScrollPosition() {
@@ -3263,6 +3245,35 @@
                 el.dataset.animState = 'shown';
             };
 
+            const showAboutStatic = () => {
+                const section = document.querySelector('#who-we-are');
+                if (!section) return;
+
+                const aboutItems = gsap.utils.toArray('#who-we-are [data-animate]');
+                aboutItems.forEach(setVisible);
+
+                const content = section.querySelector('.who-we-are-content');
+                if (!content) return;
+
+                const copy = content.querySelector('.section-copy');
+                const points = content.querySelector('.who-we-are-points');
+                const items = points ? Array.from(points.querySelectorAll('li')) : [];
+                const tweenTargets = [copy, points, ...items].filter(Boolean);
+
+                if (tweenTargets.length) {
+                    gsap.killTweensOf(tweenTargets);
+                }
+                if (points) {
+                    gsap.set(points, { '--margin-reveal': 1, '--margin-opacity': 1, opacity: 1, clearProps: 'transform,clipPath' });
+                }
+                if (copy) {
+                    gsap.set(copy, { opacity: 1, x: 0, clearProps: 'transform,clipPath' });
+                }
+                if (items.length) {
+                    gsap.set(items, { opacity: 1, x: 0, clearProps: 'transform' });
+                }
+            };
+
             const initAboutReveal = () => {
                 const section = document.querySelector('#who-we-are');
                 if (!section) return;
@@ -3465,7 +3476,8 @@
                     ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
                     resetAnimations();
                     initAnimations();
-                }
+                },
+                showAboutStatic
             };
 
             document.addEventListener('DOMContentLoaded', () => {
