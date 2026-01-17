@@ -81,6 +81,11 @@
             will-change: transform, opacity;
         }
 
+        .char-stagger {
+            display: inline-block;
+            will-change: transform, opacity;
+        }
+
         html, body {
             width: 100%;
             max-width: 100%;
@@ -606,7 +611,6 @@
         }
 
         .stat-card:hover,
-        .value-card:hover,
         .project-card:hover,
         .team-card:hover {
             transform: translateY(-6px);
@@ -3241,6 +3245,8 @@
             const CENTER_TOP = 0.35;
             const CENTER_BOTTOM = 0.65;
             const GROUP_STAGGER = 0.1;
+            const CHAR_STAGGER = 0.03;
+            const CHAR_CLASS = 'char-stagger';
 
             const PRESETS = {
                 hero: { y: 18, scale: 1, duration: 0.9, ease: 'power3.out', useTransform: true },
@@ -3254,6 +3260,58 @@
             const getPreset = (el) => {
                 const key = el.getAttribute('data-animate') || 'text';
                 return PRESETS[key] || PRESETS.text;
+            };
+
+            const isCharStaggerTarget = (el) => {
+                const animKey = el.getAttribute('data-animate') || 'text';
+                if (!['text', 'hero'].includes(animKey)) return false;
+                return el.matches('h1, h2');
+            };
+
+            const splitTextToChars = (el) => {
+                if (el.dataset.charSplit === 'true') {
+                    return Array.from(el.querySelectorAll(`.${CHAR_CLASS}`));
+                }
+
+                const textNodes = [];
+                const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+                    acceptNode: (node) => {
+                        if (!node.nodeValue) return NodeFilter.FILTER_REJECT;
+                        return node.nodeValue.trim().length ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                    }
+                });
+
+                while (walker.nextNode()) {
+                    textNodes.push(walker.currentNode);
+                }
+
+                if (!textNodes.length) return [];
+
+                if (!el.hasAttribute('aria-label')) {
+                    const label = el.textContent.replace(/\s+/g, ' ').trim();
+                    if (label) {
+                        el.setAttribute('aria-label', label);
+                    }
+                }
+
+                textNodes.forEach((node) => {
+                    const frag = document.createDocumentFragment();
+                    Array.from(node.nodeValue).forEach((char) => {
+                        if (/\s/.test(char)) {
+                            frag.appendChild(document.createTextNode(' '));
+                            return;
+                        }
+                        const span = document.createElement('span');
+                        span.className = CHAR_CLASS;
+                        span.textContent = char;
+                        span.setAttribute('aria-hidden', 'true');
+                        frag.appendChild(span);
+                    });
+                    node.parentNode.replaceChild(frag, node);
+                });
+
+                el.dataset.charSplit = 'true';
+                return Array.from(el.querySelectorAll(`.${CHAR_CLASS}`));
             };
 
             const shouldSkipAboutReveal = (el) => {
@@ -3282,11 +3340,23 @@
             const setHidden = (el) => {
                 el.dataset.animState = 'hidden';
                 gsap.set(el, { opacity: 0, clearProps: 'transform' });
+                if (el.dataset.charSplit === 'true') {
+                    const chars = el.querySelectorAll(`.${CHAR_CLASS}`);
+                    if (chars.length) {
+                        gsap.set(chars, { opacity: 0, clearProps: 'transform' });
+                    }
+                }
             };
 
             const setVisible = (el) => {
                 el.dataset.animState = 'shown';
                 gsap.set(el, { opacity: 1, clearProps: 'transform' });
+                if (el.dataset.charSplit === 'true') {
+                    const chars = el.querySelectorAll(`.${CHAR_CLASS}`);
+                    if (chars.length) {
+                        gsap.set(chars, { opacity: 1, clearProps: 'transform' });
+                    }
+                }
                 if (el.getAttribute('data-animate') === 'slider' && typeof el.revealFromScroll === 'function') {
                     el.revealFromScroll();
                 }
@@ -3314,6 +3384,29 @@
 
                 if (el.getAttribute('data-animate') === 'slider' && typeof el.revealFromScroll === 'function') {
                     toVars.onStart = () => el.revealFromScroll();
+                }
+
+                if (isCharStaggerTarget(el)) {
+                    const chars = splitTextToChars(el);
+                    if (chars.length) {
+                        gsap.set(el, { opacity: 1, clearProps: 'transform' });
+                        const charFrom = { opacity: 0 };
+                        if (preset.useTransform) {
+                            charFrom.y = preset.y || 0;
+                        }
+                        gsap.fromTo(chars, charFrom, {
+                            opacity: 1,
+                            y: 0,
+                            duration: preset.duration,
+                            ease: preset.ease,
+                            stagger: CHAR_STAGGER,
+                            delay,
+                            overwrite: 'auto',
+                            clearProps: 'transform'
+                        });
+                        el.dataset.animState = 'shown';
+                        return;
+                    }
                 }
 
                 gsap.fromTo(el, fromVars, toVars);
