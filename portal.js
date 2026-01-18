@@ -45,28 +45,38 @@ const mockProjects = [
     customerId: 'cust-1',
     title: 'E-commerce Platform Redesign',
     status: 'In Progress',
-    scopeSummary: 'Complete redesign of customer-facing e-commerce platform with new checkout flow and mobile optimization.'
+    scopeSummary: 'Complete redesign of customer-facing e-commerce platform with new checkout flow and mobile optimization.',
+    startDate: '2024-02-01',
+    dueDate: '2024-05-15',
+    updatedAt: '2024-03-05'
   },
   {
     id: 'proj-2',
     customerId: 'cust-1',
     title: 'Mobile App Development',
     status: 'Needs Funding',
-    scopeSummary: 'Native iOS and Android app for managing customer orders and inventory.'
+    scopeSummary: 'Native iOS and Android app for managing customer orders and inventory.',
+    startDate: '2024-03-10',
+    dueDate: '2024-08-01'
   },
   {
     id: 'proj-3',
     customerId: 'cust-2',
     title: 'Brand Identity Package',
     status: 'Completed',
-    scopeSummary: 'Logo design, color palette, typography guide, and brand guidelines documentation.'
+    scopeSummary: 'Logo design, color palette, typography guide, and brand guidelines documentation.',
+    startDate: '2023-11-10',
+    dueDate: '2024-01-20',
+    updatedAt: '2024-01-22'
   },
   {
     id: 'proj-4',
     customerId: 'cust-3',
     title: 'Dashboard Analytics Tool',
     status: 'Paused',
-    scopeSummary: 'Real-time analytics dashboard with custom reporting and data visualization.'
+    scopeSummary: 'Real-time analytics dashboard with custom reporting and data visualization.',
+    startDate: '2024-01-20',
+    dueDate: '2024-04-10'
   }
 ];
 
@@ -896,7 +906,20 @@ class Router {
 
   handleRoute() {
     const hash = window.location.hash.slice(1) || '/login';
-    const route = this.routes.find(r => r.path === hash);
+    const [path] = hash.split('?');
+    let params = {};
+    let route = this.routes.find(r => r.path === path);
+
+    if (!route) {
+      for (const candidate of this.routes) {
+        const match = matchRouteParams(candidate.path, path);
+        if (match) {
+          route = candidate;
+          params = match;
+          break;
+        }
+      }
+    }
 
     if (route) {
       // Check auth
@@ -919,7 +942,7 @@ class Router {
       }
 
       this.currentRoute = route;
-      route.handler();
+      route.handler(params);
     } else {
       // Default to login if route not found
       this.navigate('/login');
@@ -940,8 +963,35 @@ function formatDate(dateString) {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+function formatOptionalDate(dateString) {
+  if (!dateString) return '—';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '—';
+  return formatDate(dateString);
+}
+
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+}
+
+function matchRouteParams(routePath, currentPath) {
+  if (!routePath.includes('/:')) return null;
+  const routeParts = routePath.split('/').filter(Boolean);
+  const pathParts = currentPath.split('/').filter(Boolean);
+  if (routeParts.length !== pathParts.length) return null;
+
+  const params = {};
+  for (let i = 0; i < routeParts.length; i += 1) {
+    const routePart = routeParts[i];
+    const pathPart = pathParts[i];
+    if (routePart.startsWith(':')) {
+      params[routePart.slice(1)] = decodeURIComponent(pathPart);
+    } else if (routePart !== pathPart) {
+      return null;
+    }
+  }
+
+  return params;
 }
 
 function getStatusBadge(status) {
@@ -2612,111 +2662,13 @@ function renderAdminOverview() {
 }
 
 function renderAdminCustomers() {
-  const selectedCustomerId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('id');
-  
-  if (selectedCustomerId) {
-    const customer = store.customers.find(c => c.id === selectedCustomerId);
-    if (customer) {
-      const customerProjects = store.projects.filter(p => p.customerId === selectedCustomerId);
-      const customerInvoices = store.invoices.filter(i => i.customerId === selectedCustomerId);
-      const customerThreads = store.threads.filter(t => t.customerId === selectedCustomerId);
-      const customerRequests = store.requests.filter(r => r.customerId === selectedCustomerId);
-      
-      const [activeTab, setActiveTab] = ['projects', null];
-      let currentTab = 'projects';
-      
-      const content = `
-        <a href="#/admin/customers" class="back-link">← Back to Customers</a>
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <div class="card-title">${customer.name}</div>
-              <div style="color: var(--muted); margin-top: 0.5rem;">${customer.company} • ${customer.email}</div>
-            </div>
-          </div>
-          <div class="tabs" id="customer-tabs">
-            <button class="tab active" data-tab="projects">Projects (${customerProjects.length})</button>
-            <button class="tab" data-tab="invoices">Invoices (${customerInvoices.length})</button>
-            <button class="tab" data-tab="messages">Messages (${customerThreads.length})</button>
-            <button class="tab" data-tab="requests">Requests (${customerRequests.length})</button>
-          </div>
-          <div id="tab-content">
-            <div id="tab-projects" class="tab-panel">
-              ${customerProjects.length > 0 ? customerProjects.map(p => `
-                <div class="list-item">
-                  <div class="list-item-header">
-                    <div>
-                      <div class="list-item-title">${p.title}</div>
-                      <div class="list-item-meta">${p.scopeSummary}</div>
-                    </div>
-                    ${getStatusBadge(p.status)}
-                  </div>
-                </div>
-              `).join('') : '<div class="empty-state">No projects</div>'}
-            </div>
-            <div id="tab-invoices" class="tab-panel" style="display: none;">
-              ${customerInvoices.length > 0 ? customerInvoices.map(i => `
-                <div class="list-item">
-                  <div class="list-item-header">
-                    <div>
-                      <div class="list-item-title">Invoice ${i.id}</div>
-                      <div class="list-item-meta">${formatCurrency(i.amount)} • ${formatDate(i.issuedAt)}</div>
-                    </div>
-                    ${getStatusBadge(i.status)}
-                  </div>
-                </div>
-              `).join('') : '<div class="empty-state">No invoices</div>'}
-            </div>
-            <div id="tab-messages" class="tab-panel" style="display: none;">
-              ${customerThreads.length > 0 ? customerThreads.map(t => `
-                <div class="list-item">
-                  <div class="list-item-title">${t.subject}</div>
-                </div>
-              `).join('') : '<div class="empty-state">No messages</div>'}
-            </div>
-            <div id="tab-requests" class="tab-panel" style="display: none;">
-              ${customerRequests.length > 0 ? customerRequests.map(r => `
-                <div class="list-item">
-                  <div class="list-item-header">
-                    <div>
-                      <div class="list-item-title">${r.type.charAt(0).toUpperCase() + r.type.slice(1)} Request</div>
-                      <div class="list-item-meta">${formatDate(r.createdAt)}</div>
-                    </div>
-                    ${getStatusBadge(r.status)}
-                  </div>
-                </div>
-              `).join('') : '<div class="empty-state">No requests</div>'}
-            </div>
-          </div>
-        </div>
-      `;
-      
-      renderAdminLayout(content, 'customers');
-      document.getElementById('page-title').textContent = customer.name;
-      
-      // Tab switching
-      setTimeout(() => {
-        const tabs = document.querySelectorAll('#customer-tabs .tab');
-        tabs.forEach(tab => {
-          tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            const tabName = tab.dataset.tab;
-            document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
-            document.getElementById(`tab-${tabName}`).style.display = 'block';
-          });
-        });
-      }, 100);
-      
-      return;
-    }
-  }
-  
   const customersList = store.customers.map(customer => `
-    <div class="list-item" onclick="window.location.hash = '#/admin/customers?id=${customer.id}'">
+    <div class="list-item customer-link" role="link" tabindex="0" data-customer-id="${customer.id}">
       <div class="list-item-header">
         <div>
-          <div class="list-item-title">${customer.name}</div>
+          <div class="list-item-title">
+            ${customer.name}
+          </div>
           <div class="list-item-meta">${customer.company} • ${customer.email}</div>
         </div>
       </div>
@@ -2732,9 +2684,149 @@ function renderAdminCustomers() {
   
   renderAdminLayout(content, 'customers');
   document.getElementById('page-title').textContent = 'Customers';
+
+  setTimeout(() => {
+    document.querySelectorAll('.customer-link').forEach(el => {
+      const id = el.dataset.customerId;
+      if (!id) return;
+      const navigate = () => router.navigate(`/admin/customers/${id}`);
+      el.addEventListener('click', navigate);
+      el.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          navigate();
+        }
+      });
+    });
+  }, 0);
+}
+
+function renderAdminCustomerDetail(params = {}) {
+  const customerId = params.id;
+  const customer = store.customers.find(c => c.id === customerId);
+
+  if (!customer) {
+    const content = `
+      <a href="#/admin/customers" class="back-link">← Back to Customers</a>
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-state-title">Customer not found</div>
+          <div>We couldn’t locate that customer.</div>
+        </div>
+      </div>
+    `;
+    renderAdminLayout(content, 'customers');
+    document.getElementById('page-title').textContent = 'Customer';
+    return;
+  }
+
+  const customerProjects = store.projects.filter(p => p.customerId === customerId);
+  const customerInvoices = store.invoices.filter(i => i.customerId === customerId);
+  const totalProjects = customerProjects.length;
+  const activeProjects = customerProjects.filter(p => p.status !== 'Completed').length;
+  const overdueInvoices = customerInvoices.filter(i => i.status === 'Overdue').length;
+
+  const projectRows = customerProjects.map(project => {
+    const detailsRowId = `project-details-${project.id}`;
+    const updatedLine = project.updatedAt
+      ? `<div style="color: var(--muted); font-size: 0.9rem;">Last updated: ${formatOptionalDate(project.updatedAt)}</div>`
+      : '';
+
+    return `
+      <tr>
+        <td>${project.title}</td>
+        <td>${getStatusBadge(project.status)}</td>
+        <td>${formatOptionalDate(project.dueDate)}</td>
+        <td>${formatOptionalDate(project.startDate)}</td>
+        <td>
+          <div style="max-width: 360px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            ${project.scopeSummary}
+          </div>
+        </td>
+        <td>
+          <button class="btn btn-secondary btn-small" data-project-toggle="${detailsRowId}" aria-expanded="false">View</button>
+        </td>
+      </tr>
+      <tr id="${detailsRowId}" style="display: none;">
+        <td colspan="6">
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="font-weight: 600;">Details</div>
+            <div style="color: var(--muted);">${project.scopeSummary}</div>
+            ${updatedLine}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const emptyProjects = `
+    <div class="empty-state">
+      <div class="empty-state-title">No projects yet</div>
+      <div style="margin-bottom: 1.5rem;">Create a new project to get started.</div>
+      <a class="btn btn-primary" href="#/admin/projects/new?customerId=${customer.id}">Create New Project</a>
+    </div>
+  `;
+
+  const content = `
+    <a href="#/admin/customers" class="back-link">← Back to Customers</a>
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-header" style="align-items: center;">
+        <div>
+          <div class="card-title" style="font-size: 2rem;">${customer.name}</div>
+          <div style="color: var(--muted); margin-top: 0.5rem;">${customer.company} • ${customer.email}</div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="badge badge-primary">Total Projects: ${totalProjects}</span>
+          <span class="badge badge-info">Active Projects: ${activeProjects}</span>
+          ${customerInvoices.length > 0 ? `<span class="badge badge-danger">Overdue Invoices: ${overdueInvoices}</span>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom: 1.5rem;">Projects</div>
+      ${customerProjects.length > 0 ? `
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Project Title</th>
+                <th>Status</th>
+                <th>Due Date</th>
+                <th>Start Date</th>
+                <th>Scope Summary</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${projectRows}
+            </tbody>
+          </table>
+        </div>
+      ` : emptyProjects}
+    </div>
+  `;
+
+  renderAdminLayout(content, 'customers');
+  document.getElementById('page-title').textContent = customer.name;
+
+  setTimeout(() => {
+    document.querySelectorAll('[data-project-toggle]').forEach(button => {
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const targetId = button.getAttribute('data-project-toggle');
+        const detailRow = document.getElementById(targetId);
+        if (!detailRow) return;
+        const isOpen = detailRow.style.display === 'table-row';
+        detailRow.style.display = isOpen ? 'none' : 'table-row';
+        button.setAttribute('aria-expanded', String(!isOpen));
+        button.textContent = isOpen ? 'View' : 'Hide';
+      });
+    });
+  }, 0);
 }
 
 function renderAdminNewProject() {
+  const preselectedCustomerId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('customerId');
   const content = `
     <a href="#/admin" class="back-link">← Back to Admin</a>
     <div class="card">
@@ -2744,7 +2836,7 @@ function renderAdminNewProject() {
           <label for="project-customer">Customer</label>
           <select id="project-customer" name="customerId" required>
             <option value="">Select customer...</option>
-            ${store.customers.map(c => `<option value="${c.id}">${c.name} - ${c.company}</option>`).join('')}
+            ${store.customers.map(c => `<option value="${c.id}" ${preselectedCustomerId === c.id ? 'selected' : ''}>${c.name} - ${c.company}</option>`).join('')}
           </select>
         </div>
         <div class="form-group form-full">
@@ -3317,6 +3409,7 @@ router.addRoute('/portal/requests', renderCustomerRequests, true, 'customer');
 // Admin routes
 router.addRoute('/admin', renderAdminOverview, true, 'admin');
 router.addRoute('/admin/customers', renderAdminCustomers, true, 'admin');
+router.addRoute('/admin/customers/:id', renderAdminCustomerDetail, true, 'admin');
 router.addRoute('/admin/projects/new', renderAdminNewProject, true, 'admin');
 router.addRoute('/admin/invoices/new', renderAdminNewInvoice, true, 'admin');
 router.addRoute('/admin/requests', renderAdminRequests, true, 'admin');

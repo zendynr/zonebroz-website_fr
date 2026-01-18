@@ -28,28 +28,38 @@ export const mockProjects = [
     customerId: 'cust-1',
     title: 'E-commerce Platform Redesign',
     status: 'In Progress',
-    scopeSummary: 'Complete redesign of customer-facing e-commerce platform with new checkout flow and mobile optimization.'
+    scopeSummary: 'Complete redesign of customer-facing e-commerce platform with new checkout flow and mobile optimization.',
+    startDate: '2024-02-01',
+    dueDate: '2024-05-15',
+    updatedAt: '2024-03-05'
   },
   {
     id: 'proj-2',
     customerId: 'cust-1',
     title: 'Mobile App Development',
     status: 'Needs Funding',
-    scopeSummary: 'Native iOS and Android app for managing customer orders and inventory.'
+    scopeSummary: 'Native iOS and Android app for managing customer orders and inventory.',
+    startDate: '2024-03-10',
+    dueDate: '2024-08-01'
   },
   {
     id: 'proj-3',
     customerId: 'cust-2',
     title: 'Brand Identity Package',
     status: 'Completed',
-    scopeSummary: 'Logo design, color palette, typography guide, and brand guidelines documentation.'
+    scopeSummary: 'Logo design, color palette, typography guide, and brand guidelines documentation.',
+    startDate: '2023-11-10',
+    dueDate: '2024-01-20',
+    updatedAt: '2024-01-22'
   },
   {
     id: 'proj-4',
     customerId: 'cust-3',
     title: 'Dashboard Analytics Tool',
     status: 'Paused',
-    scopeSummary: 'Real-time analytics dashboard with custom reporting and data visualization.'
+    scopeSummary: 'Real-time analytics dashboard with custom reporting and data visualization.',
+    startDate: '2024-01-20',
+    dueDate: '2024-04-10'
   }
 ];
 
