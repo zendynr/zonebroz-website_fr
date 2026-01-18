@@ -1294,7 +1294,9 @@ class Router {
 
   async handleRoute() {
     const hash = window.location.hash.slice(1) || '/login';
-    const route = this.routes.find(r => r.path === hash);
+    // Extract path without query string for route matching
+    const path = hash.split('?')[0];
+    const route = this.routes.find(r => r.path === path);
 
     if (route) {
       // Check auth (async)
@@ -1535,7 +1537,6 @@ function renderCustomerLayout(content, activeNav = '') {
               </svg>
             </button>
             <div class="user-dropdown-menu" id="user-dropdown-menu">
-              <div class="user-dropdown-item">Settings</div>
               <div class="user-dropdown-item" onclick="localStorage.removeItem('portalSession'); window.location.hash = '/login';">Sign Out</div>
             </div>
           </div>
@@ -1985,9 +1986,11 @@ function renderCustomerInvoices() {
   let customerInvoices = store.invoices.filter(i => i.customerId === 'cust-1');
   const showAllProjects = invoiceFilter === 'all';
   
+  // Filter by project only if "This Project" is selected AND a project is selected
   if (!showAllProjects && selectedProject) {
     customerInvoices = customerInvoices.filter(i => i.projectId === selectedProject.id);
   }
+  // If showAllProjects is true, show all invoices (no filtering by project)
   
   if (selectedInvoiceId) {
     const invoice = customerInvoices.find(i => i.id === selectedInvoiceId);
@@ -2084,12 +2087,12 @@ function renderCustomerInvoices() {
       <div class="project-context-subtitle">View and manage your project invoices</div>
     </div>
     
-    ${selectedProject ? `
     <div class="project-filter-toggle">
+      ${selectedProject ? `
       <button class="filter-toggle-btn ${!showAllProjects ? 'active' : ''}" onclick="window.location.hash = '#/portal/invoices'">This Project</button>
+      ` : ''}
       <button class="filter-toggle-btn ${showAllProjects ? 'active' : ''}" onclick="window.location.hash = '#/portal/invoices?filter=all'">All Projects</button>
     </div>
-    ` : ''}
     
     <div class="search-bar">
       <input type="text" id="invoice-search" placeholder="Search invoices..." value="${searchQuery}" onkeyup="handleInvoiceSearch(event)">
@@ -2912,16 +2915,6 @@ async function renderAdminOverview() {
       </div>
       <div class="revenue-metrics" id="revenue-metrics" style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
         <!-- Metrics will be populated by JavaScript -->
-      </div>
-    </div>
-    
-    <div class="card inbox-panel">
-      <div class="card-header">
-        <div class="card-title">Inbox (Unread)</div>
-        <a href="#/admin/inbox" class="btn btn-secondary btn-small">View all inbox</a>
-      </div>
-      <div>
-        ${inboxItems}
       </div>
     </div>
   `;

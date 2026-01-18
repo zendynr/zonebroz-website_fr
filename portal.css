@@ -505,6 +505,7 @@ textarea {
 .portal-main {
     flex: 1;
     min-height: calc(100vh - 140px);
+    margin-left: 280px;
 }
 
 .portal-content {
