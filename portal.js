@@ -1341,6 +1341,14 @@ function formatDate(dateString) {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+function formatDateToQuarter(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // JavaScript months are 0-indexed
+  const quarter = Math.ceil(month / 3);
+  return `Q${quarter} ${year}`;
+}
+
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 }
@@ -1845,10 +1853,10 @@ async function renderCustomerOverview() {
         <div style="font-size: 2rem; font-weight: 700; margin-top: 1rem;">${selectedProject ? 'Active' : 'N/A'}</div>
         <div style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">${selectedProject ? 'Development in progress' : 'Select a project'}</div>
       </div>
-      ${selectedProject ? `
+      ${selectedProject && selectedProject.dueDate ? `
     <div class="card">
         <div class="card-title">Upcoming Milestone</div>
-        <div style="font-size: 2rem; font-weight: 700; margin-top: 1rem;">Q1 2024</div>
+        <div style="font-size: 2rem; font-weight: 700; margin-top: 1rem;">${formatDateToQuarter(selectedProject.dueDate)}</div>
         <div style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">Estimated completion</div>
       </div>
       ` : ''}
@@ -1934,9 +1942,15 @@ function renderCustomerProjects() {
         <div class="detail-value">${getStatusBadge(selectedProject.status)}</div>
           </div>
           <div class="detail-section">
-        <div class="detail-label">Scope / Deliverables</div>
+        <div class="detail-label">Scope Summary</div>
         <div class="detail-value">${selectedProject.scopeSummary || 'No scope details provided'}</div>
           </div>
+          ${selectedProject.dueDate ? `
+          <div class="detail-section">
+            <div class="detail-label">Estimated Due Date</div>
+            <div class="detail-value">${formatDate(selectedProject.dueDate)}</div>
+          </div>
+          ` : ''}
         </div>
     
     <div class="form-grid" style="margin-bottom: 2rem;">
@@ -1945,30 +1959,43 @@ function renderCustomerProjects() {
         <div style="margin-top: 1rem; color: var(--muted);">
           <div style="margin-bottom: 0.75rem;">
             <div style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">Current Phase</div>
-            <div>Development in progress</div>
+            <div>${selectedProject.status || 'In Progress'}</div>
             </div>
+          ${selectedProject.dueDate ? `
           <div style="margin-bottom: 0.75rem;">
-            <div style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">Estimated Completion</div>
-            <div>Q1 2024</div>
+            <div style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">Estimated Due Date</div>
+            <div>${formatDate(selectedProject.dueDate)}</div>
           </div>
+          ` : ''}
         </div>
       </div>
       
       <div class="card">
         <div class="card-title">Team Members</div>
         <div style="margin-top: 1rem; color: var(--muted);">
-          <div style="margin-bottom: 0.5rem;">• Project Manager: ZoneBroz Team</div>
-          <div style="margin-bottom: 0.5rem;">• Lead Developer: ZoneBroz Team</div>
-          <div>• Designer: ZoneBroz Team</div>
+          ${selectedProject.teamMembers && selectedProject.teamMembers.length > 0 ? 
+            selectedProject.teamMembers.map(member => {
+              const displayName = typeof member === 'string' ? member : (member.name || 'Team Member');
+              const role = typeof member === 'object' && member.role ? ` - ${member.role}` : '';
+              return `<div style="margin-bottom: 0.5rem;">• ${displayName}${role}</div>`;
+            }).join('') : 
+            '<div style="color: var(--muted);">No team members assigned yet</div>'
+          }
         </div>
       </div>
     </div>
     
+    ${selectedProject.scopeAndDeliveryRules ? `
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-title">Scope and Delivery Rules</div>
+      <div style="margin-top: 1rem; color: var(--muted); line-height: 1.6; white-space: pre-wrap;">${selectedProject.scopeAndDeliveryRules}</div>
+    </div>
+    ` : ''}
+    
     <div class="card">
       <div class="card-title">Notes / Next Steps</div>
-      <div style="margin-top: 1rem; color: var(--muted); line-height: 1.6;">
-        <p>This project is currently in active development. Regular updates will be shared through the Messages section.</p>
-        <p style="margin-top: 1rem;">Key milestones and deliverables will be communicated as the project progresses.</p>
+      <div style="margin-top: 1rem; color: var(--muted); line-height: 1.6; white-space: pre-wrap;">
+        ${selectedProject.notesNextSteps || 'No notes or next steps available yet.'}
       </div>
     </div>
   `;
@@ -3184,28 +3211,51 @@ function renderAdminNewProject() {
       <div class="card-title">Create New Project</div>
       <form id="new-project-form" style="margin-top: 2rem;">
         <div class="form-group form-full">
+          <label for="project-title">Project Title</label>
+          <input type="text" id="project-title" name="title" required placeholder="e.g., E-commerce Platform Redesign">
+        </div>
+        <div class="form-group form-full">
           <label for="project-customer">Customer</label>
           <select id="project-customer" name="customerId" required>
             <option value="">Select customer...</option>
             ${store.customers.map(c => `<option value="${c.id}">${c.name} - ${c.company}</option>`).join('')}
           </select>
         </div>
-        <div class="form-group form-full">
-          <label for="project-title">Project Title</label>
-          <input type="text" id="project-title" name="title" required placeholder="e.g., E-commerce Platform Redesign">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="project-status">Status</label>
+            <select id="project-status" name="status" required>
+              <option value="In Progress">In Progress</option>
+              <option value="Paused">Paused</option>
+              <option value="Completed">Completed</option>
+              <option value="Needs Funding">Needs Funding</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="project-due-date">Estimated Due Date</label>
+            <input type="date" id="project-due-date" name="dueDate" required>
+          </div>
         </div>
         <div class="form-group form-full">
           <label for="project-scope">Scope Summary</label>
           <textarea id="project-scope" name="scopeSummary" required placeholder="Describe the project scope..."></textarea>
         </div>
-        <div class="form-group">
-          <label for="project-status">Status</label>
-          <select id="project-status" name="status" required>
-            <option value="In Progress">In Progress</option>
-            <option value="Paused">Paused</option>
-            <option value="Completed">Completed</option>
-            <option value="Needs Funding">Needs Funding</option>
+        <div class="form-group form-full">
+          <label for="project-scope-rules">Scope and Delivery Rules</label>
+          <textarea id="project-scope-rules" name="scopeAndDeliveryRules" required placeholder="Define the scope boundaries, delivery rules, and project guidelines..."></textarea>
+        </div>
+        <div class="form-group form-full">
+          <label for="project-team-members">Team Members</label>
+          <select id="project-team-members" name="teamMembers" multiple required style="min-height: 100px;">
+            <option value="Zendyn">Zendyn</option>
+            <option value="Khanyiso">Khanyiso</option>
+            <option value="CJ">CJ</option>
           </select>
+          <div style="color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple team members</div>
+        </div>
+        <div class="form-group form-full">
+          <label for="project-notes">Notes / Next Steps</label>
+          <textarea id="project-notes" name="notesNextSteps" required placeholder="Add important notes, next steps, and project updates..."></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Create Project</button>
       </form>
@@ -3215,17 +3265,27 @@ function renderAdminNewProject() {
   renderAdminLayout(content, 'projects');
   document.getElementById('page-title').textContent = 'New Project';
   
-  document.getElementById('new-project-form').addEventListener('submit', (e) => {
+  document.getElementById('new-project-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    
+    // Get team members from multiple select
+    const teamMembersSelect = document.getElementById('project-team-members');
+    const selectedTeamMembers = Array.from(teamMembersSelect.selectedOptions).map(option => option.value);
+    const teamMembers = selectedTeamMembers.map(name => ({ name: name }));
+    
     const project = {
       customerId: formData.get('customerId'),
       title: formData.get('title'),
+      status: formData.get('status'),
+      dueDate: formData.get('dueDate'),
       scopeSummary: formData.get('scopeSummary'),
-      status: formData.get('status')
+      scopeAndDeliveryRules: formData.get('scopeAndDeliveryRules'),
+      teamMembers: teamMembers,
+      notesNextSteps: formData.get('notesNextSteps')
     };
     
-    store.addProject(project);
+    await store.addProject(project);
     alert('Project created successfully!');
     router.navigate('/admin');
   });

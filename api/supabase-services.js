@@ -26,7 +26,21 @@ const SupabaseServices = {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data || [];
+      
+      // Transform to camelCase for frontend
+      return (data || []).map(project => ({
+        id: project.id,
+        customerId: project.customer_id,
+        title: project.title,
+        status: project.status,
+        scopeSummary: project.scope_summary,
+        dueDate: project.due_date,
+        scopeAndDeliveryRules: project.scope_and_delivery_rules,
+        teamMembers: project.team_members ? (typeof project.team_members === 'string' ? JSON.parse(project.team_members) : project.team_members) : [],
+        notesNextSteps: project.notes_next_steps,
+        createdAt: project.created_at,
+        updatedAt: project.updated_at
+      }));
     },
     
     // Get single project
@@ -250,19 +264,34 @@ const SupabaseServices = {
       if (customerError) throw customerError;
       
       // Get related data
-      const [projects, invoices, threads, requests] = await Promise.all([
+      const [projectsResult, invoicesResult, threadsResult, requestsResult] = await Promise.all([
         supabase.from('projects').select('*').eq('customer_id', id),
         supabase.from('invoices').select('*').eq('customer_id', id),
         supabase.from('threads').select('*').eq('customer_id', id),
         supabase.from('requests').select('*').eq('customer_id', id)
       ]);
       
+      // Transform projects to camelCase
+      const transformedProjects = (projectsResult.data || []).map(project => ({
+        id: project.id,
+        customerId: project.customer_id,
+        title: project.title,
+        status: project.status,
+        scopeSummary: project.scope_summary,
+        dueDate: project.due_date,
+        scopeAndDeliveryRules: project.scope_and_delivery_rules,
+        teamMembers: project.team_members ? (typeof project.team_members === 'string' ? JSON.parse(project.team_members) : project.team_members) : [],
+        notesNextSteps: project.notes_next_steps,
+        createdAt: project.created_at,
+        updatedAt: project.updated_at
+      }));
+      
       return {
         ...customer,
-        projects: projects.data || [],
-        invoices: invoices.data || [],
-        threads: threads.data || [],
-        requests: requests.data || []
+        projects: transformedProjects,
+        invoices: invoicesResult.data || [],
+        threads: threadsResult.data || [],
+        requests: requestsResult.data || []
       };
     },
     
@@ -277,13 +306,31 @@ const SupabaseServices = {
           customer_id: projectData.customerId,
           title: projectData.title,
           status: projectData.status || 'In Progress',
-          scope_summary: projectData.scopeSummary
+          scope_summary: projectData.scopeSummary,
+          due_date: projectData.dueDate || null,
+          scope_and_delivery_rules: projectData.scopeAndDeliveryRules || null,
+          team_members: projectData.teamMembers ? JSON.stringify(projectData.teamMembers) : '[]',
+          notes_next_steps: projectData.notesNextSteps || null
         })
         .select()
         .single();
       
       if (error) throw error;
-      return data;
+      
+      // Transform to camelCase for frontend
+      return {
+        id: data.id,
+        customerId: data.customer_id,
+        title: data.title,
+        status: data.status,
+        scopeSummary: data.scope_summary,
+        dueDate: data.due_date,
+        scopeAndDeliveryRules: data.scope_and_delivery_rules,
+        teamMembers: data.team_members ? (typeof data.team_members === 'string' ? JSON.parse(data.team_members) : data.team_members) : [],
+        notesNextSteps: data.notes_next_steps,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      };
     },
     
     // Update project
