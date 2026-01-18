@@ -663,6 +663,12 @@ const mockAdminNotifications = [
 
 class PortalStore {
   constructor() {
+    // API Integration: Enable/disable API mode
+    // Set to true to use API calls, false to use mock data (for development)
+    // Automatically enables if API client is loaded
+    this.useAPI = typeof window !== 'undefined' && window.API && window.API_CONFIG ? true : false;
+    
+    // Initialize with mock data (will be replaced by API calls if useAPI is true)
     this.customers = [...mockCustomers];
     this.projects = [...mockProjects];
     this.invoices = [...mockInvoices];
@@ -673,6 +679,26 @@ class PortalStore {
     this.listeners = [];
     // Project-first: selected project ID (null means "All Projects")
     this.selectedProjectId = null;
+    
+    // Load initial data from API if enabled
+    if (this.useAPI) {
+      this.loadInitialData();
+    }
+  }
+  
+  // Load initial data from API
+  async loadInitialData() {
+    if (!this.useAPI || !window.API) return;
+    
+    try {
+      // Note: These will be called as needed, not all at once
+      // For now, we'll keep mock data as fallback
+      console.log('API mode enabled - will use API calls for data operations');
+    } catch (error) {
+      console.error('Failed to initialize API data:', error);
+      // Fallback to mock data if API initialization fails
+      this.useAPI = false;
+    }
   }
 
   subscribe(listener) {
@@ -856,8 +882,23 @@ if (store.projects.length > 0) {
 
 // ==================== AUTH MANAGEMENT ====================
 
+// AuthService with Supabase integration
+// Falls back to localStorage if Supabase is not available
 const AuthService = {
-  getSession() {
+  // Use Supabase Auth if available, otherwise fallback to localStorage
+  useSupabase: typeof window !== 'undefined' && window.SupabaseAuthService !== undefined,
+
+  async getSession() {
+    if (this.useSupabase && window.SupabaseAuthService) {
+      try {
+        return await window.SupabaseAuthService.getSession();
+      } catch (error) {
+        console.error('Error getting session from Supabase:', error);
+        // Fallback to localStorage
+      }
+    }
+
+    // Fallback to localStorage (mock mode)
     try {
       const session = localStorage.getItem('portalSession');
       return session ? JSON.parse(session) : null;
@@ -866,16 +907,50 @@ const AuthService = {
     }
   },
 
-  setSession(role, userId) {
+  async setSession(role, userId, email = null, password = null) {
+    // If password is provided, use Supabase login
+    if (this.useSupabase && window.SupabaseAuthService && email && password) {
+      try {
+        const result = await window.SupabaseAuthService.login(email, password, role);
+        return result;
+      } catch (error) {
+        console.error('Supabase login error:', error);
+        throw error; // Re-throw to let caller handle
+      }
+    }
+
+    // Fallback to localStorage (mock mode)
     const session = { role, userId, timestamp: Date.now() };
     localStorage.setItem('portalSession', JSON.stringify(session));
+    return session;
   },
 
-  clearSession() {
+  async clearSession() {
+    if (this.useSupabase && window.SupabaseAuthService) {
+      try {
+        await window.SupabaseAuthService.logout();
+        return;
+      } catch (error) {
+        console.error('Supabase logout error:', error);
+        // Continue to clear localStorage
+      }
+    }
+
+    // Fallback to localStorage
     localStorage.removeItem('portalSession');
   },
 
-  isAuthenticated() {
+  async isAuthenticated() {
+    if (this.useSupabase && window.SupabaseAuthService) {
+      try {
+        return await window.SupabaseAuthService.isAuthenticated();
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+        // Fallback to localStorage check
+      }
+    }
+
+    // Fallback to localStorage check
     return this.getSession() !== null;
   }
 };
@@ -894,18 +969,19 @@ class Router {
     this.routes.push({ path, handler, requiresAuth, requiredRole });
   }
 
-  handleRoute() {
+  async handleRoute() {
     const hash = window.location.hash.slice(1) || '/login';
     const route = this.routes.find(r => r.path === hash);
 
     if (route) {
-      // Check auth
-      if (route.requiresAuth && !AuthService.isAuthenticated()) {
+      // Check auth (async)
+      const isAuth = await AuthService.isAuthenticated();
+      if (route.requiresAuth && !isAuth) {
         this.navigate('/login');
         return;
       }
 
-      const session = AuthService.getSession();
+      const session = await AuthService.getSession();
       if (route.requiredRole && session?.role !== route.requiredRole) {
         // Redirect based on role
         if (session?.role === 'customer') {
@@ -1009,16 +1085,53 @@ function renderLogin() {
     });
   });
 
-  app.querySelector('#login-form').addEventListener('submit', (e) => {
+  app.querySelector('#login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = app.querySelector('#email').value;
-    const userId = `user-${Date.now()}`;
-    AuthService.setSession(selectedRole, userId);
+    const password = app.querySelector('#password').value;
+    const submitButton = app.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
     
-    if (selectedRole === 'customer') {
-      router.navigate('/portal');
-    } else {
-      router.navigate('/admin');
+    // Disable button and show loading
+    submitButton.disabled = true;
+    submitButton.textContent = 'Signing in...';
+    
+    try {
+      // Try Supabase login first (if available)
+      if (AuthService.useSupabase && window.SupabaseAuthService) {
+        await AuthService.setSession(selectedRole, null, email, password);
+        // Session is set by SupabaseAuthService
+      } else {
+        // Fallback to mock mode (no password needed)
+        const userId = `user-${Date.now()}`;
+        await AuthService.setSession(selectedRole, userId);
+      }
+      
+      // Navigate based on role
+      if (selectedRole === 'customer') {
+        router.navigate('/portal');
+      } else {
+        router.navigate('/admin');
+      }
+    } catch (error) {
+      // Show error message
+      console.error('Login error:', error);
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'error-message';
+      errorMsg.style.cssText = 'color: #f87171; margin-top: 1rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px;';
+      errorMsg.textContent = error.message || 'Login failed. Please check your credentials.';
+      
+      // Remove existing error message if any
+      const existingError = app.querySelector('.error-message');
+      if (existingError) {
+        existingError.remove();
+      }
+      
+      app.querySelector('.login-form').appendChild(errorMsg);
+      
+      // Re-enable button
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
     }
   });
 }
