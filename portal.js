@@ -663,12 +663,12 @@ const mockAdminNotifications = [
 
 class PortalStore {
   constructor() {
-    // API Integration: Enable/disable API mode
-    // Set to true to use API calls, false to use mock data (for development)
-    // Automatically enables if API client is loaded
-    this.useAPI = typeof window !== 'undefined' && window.API && window.API_CONFIG ? true : false;
+    // Supabase Integration: Enable/disable Supabase mode
+    // Set to true to use Supabase, false to use mock data (for development)
+    // Automatically enables if SupabaseServices is loaded
+    this.useSupabase = typeof window !== 'undefined' && window.SupabaseServices && window.getSupabaseClient ? true : false;
     
-    // Initialize with mock data (will be replaced by API calls if useAPI is true)
+    // Initialize with mock data (will be replaced by Supabase calls if useSupabase is true)
     this.customers = [...mockCustomers];
     this.projects = [...mockProjects];
     this.invoices = [...mockInvoices];
@@ -680,24 +680,214 @@ class PortalStore {
     // Project-first: selected project ID (null means "All Projects")
     this.selectedProjectId = null;
     
-    // Load initial data from API if enabled
-    if (this.useAPI) {
+    // Data loading flags (for Supabase mode)
+    this.dataLoaded = {
+      customers: false,
+      projects: false,
+      invoices: false,
+      threads: false,
+      messages: false,
+      requests: false,
+      notifications: false
+    };
+    
+    // Load initial data from Supabase if enabled
+    if (this.useSupabase) {
       this.loadInitialData();
     }
   }
   
-  // Load initial data from API
+  // Load initial data from Supabase
   async loadInitialData() {
-    if (!this.useAPI || !window.API) return;
+    if (!this.useSupabase || !window.SupabaseServices) {
+      console.log('Supabase mode disabled - using mock data');
+      return;
+    }
     
     try {
-      // Note: These will be called as needed, not all at once
-      // For now, we'll keep mock data as fallback
-      console.log('API mode enabled - will use API calls for data operations');
+      console.log('Supabase mode enabled - will use Supabase for data operations');
+      // Data will be loaded on-demand when pages are accessed
+      // This keeps initial load fast
     } catch (error) {
-      console.error('Failed to initialize API data:', error);
-      // Fallback to mock data if API initialization fails
-      this.useAPI = false;
+      console.error('Failed to initialize Supabase data:', error);
+      // Fallback to mock data if Supabase initialization fails
+      this.useSupabase = false;
+    }
+  }
+  
+  // Load customers (admin only)
+  async loadCustomers() {
+    if (!this.useSupabase || !window.SupabaseServices) {
+      return this.customers;
+    }
+    
+    if (this.dataLoaded.customers) {
+      return this.customers;
+    }
+    
+    try {
+      this.customers = await window.SupabaseServices.admin.getCustomers();
+      this.dataLoaded.customers = true;
+      this.notify();
+      return this.customers;
+    } catch (error) {
+      console.error('Failed to load customers:', error);
+      return this.customers; // Fallback to mock data
+    }
+  }
+  
+  // Load projects for current user
+  async loadProjects() {
+    if (!this.useSupabase || !window.SupabaseServices) {
+      return this.projects;
+    }
+    
+    if (this.dataLoaded.projects) {
+      return this.projects;
+    }
+    
+    try {
+      const session = await AuthService.getSession();
+      if (session?.role === 'admin') {
+        // Admin sees all projects (will be loaded via customers)
+        return this.projects;
+      } else {
+        // Customer sees their own projects
+        this.projects = await window.SupabaseServices.customer.getProjects();
+        this.dataLoaded.projects = true;
+        this.notify();
+        return this.projects;
+      }
+    } catch (error) {
+      console.error('Failed to load projects:', error);
+      return this.projects; // Fallback to mock data
+    }
+  }
+  
+  // Load invoices for current user
+  async loadInvoices() {
+    if (!this.useSupabase || !window.SupabaseServices) {
+      return this.invoices;
+    }
+    
+    if (this.dataLoaded.invoices) {
+      return this.invoices;
+    }
+    
+    try {
+      const session = await AuthService.getSession();
+      if (session?.role === 'admin') {
+        // Admin sees all invoices (will be loaded via customers)
+        return this.invoices;
+      } else {
+        // Customer sees their own invoices
+        this.invoices = await window.SupabaseServices.customer.getInvoices();
+        this.dataLoaded.invoices = true;
+        this.notify();
+        return this.invoices;
+      }
+    } catch (error) {
+      console.error('Failed to load invoices:', error);
+      return this.invoices; // Fallback to mock data
+    }
+  }
+  
+  // Load threads for current user
+  async loadThreads() {
+    if (!this.useSupabase || !window.SupabaseServices) {
+      return this.threads;
+    }
+    
+    if (this.dataLoaded.threads) {
+      return this.threads;
+    }
+    
+    try {
+      const session = await AuthService.getSession();
+      if (session?.role === 'admin') {
+        this.threads = await window.SupabaseServices.admin.getThreads();
+      } else {
+        this.threads = await window.SupabaseServices.customer.getThreads();
+      }
+      this.dataLoaded.threads = true;
+      this.notify();
+      return this.threads;
+    } catch (error) {
+      console.error('Failed to load threads:', error);
+      return this.threads; // Fallback to mock data
+    }
+  }
+  
+  // Load messages for a thread
+  async loadThreadMessages(threadId) {
+    if (!this.useSupabase || !window.SupabaseServices) {
+      return this.messages.filter(m => m.threadId === threadId);
+    }
+    
+    try {
+      const session = await AuthService.getSession();
+      let threadMessages;
+      
+      if (session?.role === 'admin') {
+        threadMessages = await window.SupabaseServices.admin.getThreadMessages(threadId);
+      } else {
+        threadMessages = await window.SupabaseServices.customer.getThreadMessages(threadId);
+      }
+      
+      // Update local messages array
+      // Remove old messages for this thread
+      this.messages = this.messages.filter(m => m.threadId !== threadId);
+      // Add new messages
+      this.messages.push(...threadMessages);
+      
+      this.notify();
+      return threadMessages;
+    } catch (error) {
+      console.error('Failed to load thread messages:', error);
+      return this.messages.filter(m => m.threadId === threadId); // Fallback to mock data
+    }
+  }
+  
+  // Load requests for current user
+  async loadRequests() {
+    if (!this.useSupabase || !window.SupabaseServices) {
+      return this.requests;
+    }
+    
+    if (this.dataLoaded.requests) {
+      return this.requests;
+    }
+    
+    try {
+      const session = await AuthService.getSession();
+      if (session?.role === 'admin') {
+        this.requests = await window.SupabaseServices.admin.getRequests();
+      } else {
+        this.requests = await window.SupabaseServices.customer.getRequests();
+      }
+      this.dataLoaded.requests = true;
+      this.notify();
+      return this.requests;
+    } catch (error) {
+      console.error('Failed to load requests:', error);
+      return this.requests; // Fallback to mock data
+    }
+  }
+  
+  // Load admin notifications
+  async loadNotifications(filter = 'all') {
+    if (!this.useSupabase || !window.SupabaseServices) {
+      return this.adminNotifications;
+    }
+    
+    try {
+      this.adminNotifications = await window.SupabaseServices.admin.getNotifications(filter);
+      this.dataLoaded.notifications = true;
+      this.notify();
+      return this.adminNotifications;
+    } catch (error) {
+      console.error('Failed to load notifications:', error);
+      return this.adminNotifications; // Fallback to mock data
     }
   }
 
@@ -713,7 +903,20 @@ class PortalStore {
   }
 
   // Projects
-  addProject(project) {
+  async addProject(project) {
+    if (this.useSupabase && window.SupabaseServices) {
+      try {
+        const newProject = await window.SupabaseServices.admin.createProject(project);
+        this.projects.push(newProject);
+        this.notify();
+        return newProject;
+      } catch (error) {
+        console.error('Failed to create project:', error);
+        // Fallback to mock behavior
+      }
+    }
+    
+    // Mock mode (fallback)
     const newProject = {
       ...project,
       id: `proj-${Date.now()}`
@@ -724,10 +927,47 @@ class PortalStore {
   }
 
   // Invoices
-  addInvoice(invoice) {
+  async addInvoice(invoice, pdfFile = null) {
+    if (this.useSupabase && window.SupabaseServices) {
+      try {
+        // Create invoice first (without PDF URL if file needs to be uploaded)
+        const invoiceData = { ...invoice };
+        if (pdfFile) {
+          // Will set pdfUrl after upload
+          delete invoiceData.pdfUrl;
+        }
+        
+        const newInvoice = await window.SupabaseServices.admin.createInvoice(invoiceData);
+        
+        // If there's a PDF file, upload it and update the invoice
+        if (pdfFile && newInvoice.id) {
+          try {
+            const updatedInvoice = await window.SupabaseServices.admin.uploadInvoicePDF(newInvoice.id, pdfFile);
+            newInvoice.pdf_url = updatedInvoice.pdf_url;
+            newInvoice.pdfUrl = updatedInvoice.pdf_url;
+          } catch (uploadError) {
+            console.error('Failed to upload invoice PDF:', uploadError);
+            // Invoice was created, but PDF upload failed - continue anyway
+          }
+        }
+        
+        this.invoices.push(newInvoice);
+        
+        // Notification is created by SupabaseServices
+        this.notify();
+        return newInvoice;
+      } catch (error) {
+        console.error('Failed to create invoice:', error);
+        // Fallback to mock behavior
+      }
+    }
+    
+    // Mock mode (fallback)
     const newInvoice = {
       ...invoice,
-      id: `inv-${Date.now()}`
+      id: `inv-${Date.now()}`,
+      // In mock mode, just use a placeholder URL if file was provided
+      pdfUrl: pdfFile ? `#pdf-${Date.now()}` : invoice.pdfUrl || '#'
     };
     this.invoices.push(newInvoice);
     
@@ -747,7 +987,28 @@ class PortalStore {
   }
 
   // Messages
-  addMessage(message) {
+  async addMessage(message) {
+    if (this.useSupabase && window.SupabaseServices) {
+      try {
+        const session = await AuthService.getSession();
+        let newMessage;
+        
+        if (session?.role === 'admin') {
+          newMessage = await window.SupabaseServices.admin.sendMessage(message.threadId, message.body);
+        } else {
+          newMessage = await window.SupabaseServices.customer.sendMessage(message.threadId, message.body);
+        }
+        
+        this.messages.push(newMessage);
+        this.notify();
+        return newMessage;
+      } catch (error) {
+        console.error('Failed to send message:', error);
+        // Fallback to mock behavior
+      }
+    }
+    
+    // Mock mode (fallback)
     const newMessage = {
       ...message,
       id: `msg-${Date.now()}`,
@@ -759,7 +1020,20 @@ class PortalStore {
   }
 
   // Threads
-  addThread(thread) {
+  async addThread(thread) {
+    if (this.useSupabase && window.SupabaseServices) {
+      try {
+        const newThread = await window.SupabaseServices.customer.createThread(thread.subject, thread.projectId);
+        this.threads.push(newThread);
+        this.notify();
+        return newThread;
+      } catch (error) {
+        console.error('Failed to create thread:', error);
+        // Fallback to mock behavior
+      }
+    }
+    
+    // Mock mode (fallback)
     const newThread = {
       ...thread,
       id: `thread-${Date.now()}`
@@ -770,7 +1044,22 @@ class PortalStore {
   }
 
   // Requests
-  addRequest(request) {
+  async addRequest(request) {
+    if (this.useSupabase && window.SupabaseServices) {
+      try {
+        const newRequest = await window.SupabaseServices.customer.createRequest(request);
+        this.requests.push(newRequest);
+        
+        // Notification is created by SupabaseServices
+        this.notify();
+        return newRequest;
+      } catch (error) {
+        console.error('Failed to create request:', error);
+        // Fallback to mock behavior
+      }
+    }
+    
+    // Mock mode (fallback)
     const newRequest = {
       ...request,
       id: `req-${Date.now()}`,
@@ -793,7 +1082,24 @@ class PortalStore {
     return newRequest;
   }
 
-  updateRequestStatus(requestId, status) {
+  async updateRequestStatus(requestId, status) {
+    if (this.useSupabase && window.SupabaseServices) {
+      try {
+        await window.SupabaseServices.admin.updateRequestStatus(requestId, status);
+        // Update local state
+        const request = this.requests.find(r => r.id === requestId);
+        if (request) {
+          request.status = status;
+          this.notify();
+        }
+        return;
+      } catch (error) {
+        console.error('Failed to update request status:', error);
+        // Fallback to mock behavior
+      }
+    }
+    
+    // Mock mode (fallback)
     const request = this.requests.find(r => r.id === requestId);
     if (request) {
       request.status = status;
@@ -813,7 +1119,24 @@ class PortalStore {
     return newNotification;
   }
 
-  markNotificationRead(notificationId) {
+  async markNotificationRead(notificationId) {
+    if (this.useSupabase && window.SupabaseServices) {
+      try {
+        await window.SupabaseServices.admin.markNotificationRead(notificationId);
+        // Update local state
+        const notification = this.adminNotifications.find(n => n.id === notificationId);
+        if (notification) {
+          notification.isRead = true;
+          this.notify();
+        }
+        return;
+      } catch (error) {
+        console.error('Failed to mark notification as read:', error);
+        // Fallback to mock behavior
+      }
+    }
+    
+    // Mock mode (fallback)
     const notification = this.adminNotifications.find(n => n.id === notificationId);
     if (notification) {
       notification.isRead = true;
@@ -995,7 +1318,7 @@ class Router {
       }
 
       this.currentRoute = route;
-      route.handler();
+      await route.handler();
     } else {
       // Default to login if route not found
       this.navigate('/login');
@@ -1103,15 +1426,15 @@ function renderLogin() {
         // Session is set by SupabaseAuthService
       } else {
         // Fallback to mock mode (no password needed)
-        const userId = `user-${Date.now()}`;
+    const userId = `user-${Date.now()}`;
         await AuthService.setSession(selectedRole, userId);
       }
-      
+    
       // Navigate based on role
-      if (selectedRole === 'customer') {
-        router.navigate('/portal');
-      } else {
-        router.navigate('/admin');
+    if (selectedRole === 'customer') {
+      router.navigate('/portal');
+    } else {
+      router.navigate('/admin');
       }
     } catch (error) {
       // Show error message
@@ -1167,7 +1490,7 @@ function renderCustomerLayout(content, activeNav = '') {
             <div class="portal-branding">ZoneBroz Customer Portal</div>
             ${customer?.company ? `<div class="portal-company-name">${customer.company}</div>` : ''}
           </div>
-        </div>
+          </div>
         
         <div class="portal-top-nav-center">
           <div class="project-switcher-container">
@@ -1366,12 +1689,12 @@ function openRequestProjectModal() {
   
   // Handle form submission
   const form = modalOverlay.querySelector('#new-project-request-form');
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
     
     // Create a request (similar to existing request system)
-    store.addRequest({
+    await store.addRequest({
       customerId: 'cust-1',
       type: formData.get('type') === 'quote' ? 'quote' : 'report',
       category: 'Websites', // Default, could be made dynamic
@@ -1463,10 +1786,18 @@ function renderAdminLayout(content, activeNav = '') {
 
 // ==================== CUSTOMER PAGES ====================
 
-function renderCustomerOverview() {
-  const session = AuthService.getSession();
+async function renderCustomerOverview() {
+  const session = await AuthService.getSession();
+  
+  // Load data from Supabase if enabled
+  await store.loadProjects();
+  await store.loadInvoices();
+  await store.loadThreads();
+  
   const selectedProject = store.getSelectedProject();
-  const customerProjects = store.projects.filter(p => p.customerId === 'cust-1'); // Mock
+  const sessionData = await AuthService.getSession();
+  const customerId = sessionData?.userId || 'cust-1'; // Fallback to mock ID
+  const customerProjects = store.projects.filter(p => p.customerId === customerId);
   
   // Project-scoped data
   let projectInvoices = [];
@@ -1474,13 +1805,13 @@ function renderCustomerOverview() {
   let projectMessages = [];
   
   if (selectedProject) {
-    projectInvoices = store.invoices.filter(i => i.customerId === 'cust-1' && i.projectId === selectedProject.id);
-    projectThreads = store.threads.filter(t => t.customerId === 'cust-1' && t.projectId === selectedProject.id);
+    projectInvoices = store.invoices.filter(i => i.customerId === customerId && i.projectId === selectedProject.id);
+    projectThreads = store.threads.filter(t => t.customerId === customerId && t.projectId === selectedProject.id);
     const threadIds = projectThreads.map(t => t.id);
     projectMessages = store.messages.filter(m => threadIds.includes(m.threadId));
   } else {
-    projectInvoices = store.invoices.filter(i => i.customerId === 'cust-1');
-    projectThreads = store.threads.filter(t => t.customerId === 'cust-1');
+    projectInvoices = store.invoices.filter(i => i.customerId === customerId);
+    projectThreads = store.threads.filter(t => t.customerId === customerId);
   }
   
   const recentMessages = projectMessages
@@ -1514,7 +1845,7 @@ function renderCustomerOverview() {
         <div style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">${selectedProject ? 'Development in progress' : 'Select a project'}</div>
       </div>
       ${selectedProject ? `
-      <div class="card">
+    <div class="card">
         <div class="card-title">Upcoming Milestone</div>
         <div style="font-size: 2rem; font-weight: 700; margin-top: 1rem;">Q1 2024</div>
         <div style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">Estimated completion</div>
@@ -1567,7 +1898,7 @@ function renderCustomerProjects() {
   const selectedProject = store.getSelectedProject();
   
   if (!selectedProject) {
-    const content = `
+      const content = `
       <div class="project-context-header">
         <h2>Project Info — All Projects</h2>
         <div class="project-context-subtitle">Select a project from the dropdown above to view details</div>
@@ -1593,19 +1924,19 @@ function renderCustomerProjects() {
     </div>
     
     <div class="detail-panel" style="margin-bottom: 2rem;">
-      <div class="detail-section">
+          <div class="detail-section">
         <div class="detail-label">Project Title</div>
         <div class="detail-value">${selectedProject.title}</div>
-      </div>
-      <div class="detail-section">
-        <div class="detail-label">Status</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">Status</div>
         <div class="detail-value">${getStatusBadge(selectedProject.status)}</div>
-      </div>
-      <div class="detail-section">
+          </div>
+          <div class="detail-section">
         <div class="detail-label">Scope / Deliverables</div>
         <div class="detail-value">${selectedProject.scopeSummary || 'No scope details provided'}</div>
-      </div>
-    </div>
+          </div>
+        </div>
     
     <div class="form-grid" style="margin-bottom: 2rem;">
       <div class="card">
@@ -1614,7 +1945,7 @@ function renderCustomerProjects() {
           <div style="margin-bottom: 0.75rem;">
             <div style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">Current Phase</div>
             <div>Development in progress</div>
-          </div>
+            </div>
           <div style="margin-bottom: 0.75rem;">
             <div style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">Estimated Completion</div>
             <div>Q1 2024</div>
@@ -1848,13 +2179,13 @@ function renderCustomerMessages() {
               <div class="dm-chat-header-info">
                 <div class="dm-avatar dm-avatar-small">
                   <div class="dm-avatar-initial">Z</div>
-                </div>
+          </div>
                 <div>
                   <div class="dm-chat-header-name">ZoneBroz Studios</div>
                   <div class="dm-chat-header-meta">${thread.subject}</div>
                 </div>
               </div>
-            </div>
+          </div>
             <div class="dm-chat-messages" id="message-thread">
               ${threadMessages.map(msg => {
                 const isCustomer = msg.senderRole === 'customer';
@@ -1907,12 +2238,12 @@ function renderCustomerMessages() {
         });
       }
       
-      window.sendMessage = function(threadId) {
+      window.sendMessage = async function(threadId) {
         const textarea = document.getElementById('new-message');
         const body = textarea.value.trim();
         if (!body) return;
         
-        store.addMessage({
+        await store.addMessage({
           threadId,
           senderRole: 'customer',
           body
@@ -1939,7 +2270,7 @@ function renderCustomerMessages() {
           <div class="dm-contact-item" onclick="window.location.hash = '#/portal/messages?thread=${thread.id}${showAllProjects ? '&filter=all' : ''}'">
             <div class="dm-avatar">
               <div class="dm-avatar-initial">Z</div>
-            </div>
+              </div>
             <div class="dm-contact-info">
               <div class="dm-contact-name">${thread.subject}</div>
               <div class="dm-contact-preview">${lastMessage ? lastMessage.body.substring(0, 50) + (lastMessage.body.length > 50 ? '...' : '') : 'No messages yet'}</div>
@@ -2074,7 +2405,7 @@ function renderCustomerRequests() {
       }
     });
     
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const type = typeSelect.value;
       const category = document.getElementById('request-category').value;
@@ -2089,7 +2420,7 @@ function renderCustomerRequests() {
         notes
       } : { notes };
       
-      store.addRequest({
+      await store.addRequest({
         customerId: 'cust-1',
         type,
         category,
@@ -2418,7 +2749,13 @@ function initializeRevenuePerformance() {
 
 // ==================== ADMIN PAGES ====================
 
-function renderAdminOverview() {
+async function renderAdminOverview() {
+  // Load data from Supabase if enabled
+  await store.loadInvoices();
+  await store.loadRequests();
+  await store.loadNotifications('all');
+  await store.loadCustomers();
+  
   // Calculate income data for charts
   const allInvoices = store.invoices;
   
@@ -2492,8 +2829,8 @@ function renderAdminOverview() {
     return labels[kind] || kind;
   };
   
-  const handleNotificationClick = (notification) => {
-    store.markNotificationRead(notification.id);
+  const handleNotificationClick = async (notification) => {
+    await store.markNotificationRead(notification.id);
     
     if (notification.kind === 'request') {
       router.navigate('/admin/requests');
@@ -2704,10 +3041,10 @@ function renderAdminOverview() {
     }
     
     // Set up notification click handler
-    window.handleNotificationClick = function(notificationId) {
+    window.handleNotificationClick = async function(notificationId) {
       const notification = store.adminNotifications.find(n => n.id === notificationId);
       if (notification) {
-        store.markNotificationRead(notificationId);
+        await store.markNotificationRead(notificationId);
         
         if (notification.kind === 'request') {
           router.navigate('/admin/requests');
@@ -2946,9 +3283,9 @@ function renderAdminNewInvoice() {
           </div>
         </div>
         <div class="form-group form-full">
-          <label for="invoice-pdf">PDF File</label>
+          <label for="invoice-pdf">PDF File (Optional)</label>
           <input type="file" id="invoice-pdf" name="pdf" accept=".pdf">
-          <div style="color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem;">Note: File upload will be implemented during backend integration</div>
+          <div style="color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem;">Upload the invoice PDF file. Max size: 10MB</div>
         </div>
         <button type="submit" class="btn btn-primary">Create Invoice</button>
       </form>
@@ -2974,24 +3311,48 @@ function renderAdminNewInvoice() {
   // Set today as default issued date
   document.getElementById('invoice-issued').valueAsDate = new Date();
   
-  document.getElementById('new-invoice-form').addEventListener('submit', (e) => {
+  document.getElementById('new-invoice-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const pdfFile = formData.get('pdf');
+    
+    // Validate PDF file if provided
+    if (pdfFile && pdfFile.size > 0) {
+      if (pdfFile.size > 10 * 1024 * 1024) { // 10MB limit
+        alert('PDF file is too large. Maximum size is 10MB.');
+        return;
+      }
+      if (pdfFile.type !== 'application/pdf') {
+        alert('Please upload a valid PDF file.');
+        return;
+      }
+    }
     
     const invoice = {
       customerId: formData.get('customerId'),
       projectId: formData.get('projectId'),
       amount: parseFloat(formData.get('amount')),
       status: formData.get('status'),
-      pdfUrl: pdfFile ? `#pdf-${Date.now()}` : '#',
       issuedAt: formData.get('issuedAt'),
       dueAt: formData.get('dueAt')
     };
     
-    store.addInvoice(invoice);
-    alert('Invoice created successfully!');
-    router.navigate('/admin');
+    // Show loading state
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = pdfFile && pdfFile.size > 0 ? 'Creating invoice and uploading PDF...' : 'Creating invoice...';
+    
+    try {
+      await store.addInvoice(invoice, pdfFile && pdfFile.size > 0 ? pdfFile : null);
+      alert('Invoice created successfully!');
+      router.navigate('/admin');
+    } catch (error) {
+      console.error('Error creating invoice:', error);
+      alert('Failed to create invoice. Please try again.');
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
+    }
   });
 }
 
@@ -3061,8 +3422,8 @@ function renderAdminRequests() {
   renderAdminLayout(content, 'requests');
   document.getElementById('page-title').textContent = 'Requests';
   
-  window.updateRequestStatus = function(requestId, status) {
-    store.updateRequestStatus(requestId, status);
+  window.updateRequestStatus = async function(requestId, status) {
+    await store.updateRequestStatus(requestId, status);
     router.handleRoute();
   };
 }
@@ -3117,13 +3478,13 @@ function renderAdminMessages() {
       <div class="dm-contact-item ${isSelected ? 'active' : ''}" onclick="window.location.hash = '#/admin/messages?customer=${customer.id}'">
         <div class="dm-avatar">
           <div class="dm-avatar-initial">${customer.name.charAt(0).toUpperCase()}</div>
-        </div>
+          </div>
         <div class="dm-contact-info">
           <div class="dm-contact-name">${customer.name}</div>
           <div class="dm-contact-preview">${preview}</div>
-        </div>
+                </div>
         ${timeAgo ? `<div class="dm-time">${timeAgo}</div>` : ''}
-      </div>
+              </div>
     `;
   }).join('');
   
@@ -3147,11 +3508,11 @@ function renderAdminMessages() {
             <div class="dm-chat-header-info">
               <div class="dm-avatar dm-avatar-small">
                 <div class="dm-avatar-initial">${selectedCustomer.name.charAt(0).toUpperCase()}</div>
-              </div>
+          </div>
               <div>
                 <div class="dm-chat-header-name">${selectedCustomer.name}</div>
                 <div class="dm-chat-header-meta">${selectedCustomer.company}</div>
-              </div>
+          </div>
             </div>
           </div>
           <div class="dm-chat-messages" id="dm-chat-messages">
@@ -3214,20 +3575,20 @@ function renderAdminMessages() {
       <div class="dm-chat-area">
         ${chatContent}
       </div>
-    </div>
-  `;
-  
-  renderAdminLayout(content, 'messages');
+        </div>
+      `;
+      
+      renderAdminLayout(content, 'messages');
   document.getElementById('page-title').textContent = 'Messages';
-  
+      
   // Scroll to bottom of chat
-  setTimeout(() => {
+      setTimeout(() => {
     const chatMessages = document.getElementById('dm-chat-messages');
     if (chatMessages) {
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-  }, 100);
-  
+      }, 100);
+      
   // Auto-resize textarea
   const textarea = document.getElementById('dm-message-input');
   if (textarea) {
@@ -3247,34 +3608,34 @@ function renderAdminMessages() {
     });
   }
   
-  window.sendDMMessage = function(customerId) {
+  window.sendDMMessage = async function(customerId) {
     const textarea = document.getElementById('dm-message-input');
     if (!textarea) return;
     
-    const body = textarea.value.trim();
-    if (!body) return;
-    
+        const body = textarea.value.trim();
+        if (!body) return;
+        
     // Find or create a thread for this customer
     let thread = store.threads.find(t => t.customerId === customerId);
     if (!thread) {
       // Create a new thread
-      thread = store.addThread({
+      thread = await store.addThread({
         customerId: customerId,
         subject: `Conversation with ${store.customers.find(c => c.id === customerId)?.name || 'Customer'}`,
         projectId: null
       });
     }
     
-    store.addMessage({
+    await store.addMessage({
       threadId: thread.id,
-      senderRole: 'admin',
-      body
-    });
-    
-    textarea.value = '';
+          senderRole: 'admin',
+          body
+        });
+        
+        textarea.value = '';
     textarea.style.height = 'auto';
-    router.handleRoute();
-  };
+        router.handleRoute();
+      };
 }
 
 // Helper function to format time (e.g., "2:30 PM" or "Yesterday 2:30 PM")
@@ -3406,10 +3767,10 @@ function renderAdminInbox() {
     }
   };
   
-  window.navigateToNotification = function(notificationId) {
+  window.navigateToNotification = async function(notificationId) {
     const notification = store.adminNotifications.find(n => n.id === notificationId);
     if (notification) {
-      store.markNotificationRead(notificationId);
+      await store.markNotificationRead(notificationId);
       navigateToRelated(notification);
     }
   };
