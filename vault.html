@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZoneBroz Vault - ZoneBroz Studios</title>
+    <title>ZoneBroz Vault - The Journey Timeline</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
     <script>
+        (function() {
         document.documentElement.classList.add('js-anim');
+            try {
+                if (sessionStorage.getItem('navExpanding')) {
+                    document.documentElement.classList.add('nav-precollapsed');
+                }
+            } catch (e) {}
+        })();
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -55,6 +62,8 @@
             --muted: #a0a0a5;
             --white: #ffffff;
             --border: rgba(255, 255, 255, 0.08);
+            --accent: rgba(255, 255, 255, 0.12);
+            --glow: rgba(255, 255, 255, 0.06);
         }
 
         * {
@@ -95,15 +104,7 @@
             background: radial-gradient(ellipse 70% 88% at 50% 50%, rgba(35, 35, 35, 1) 0%, rgba(20, 20, 20, 1) 30%, rgba(10, 10, 10, 1) 45%, rgba(3, 3, 3, 1) 60%, rgba(1, 1, 1, 1) 75%, #000000 100%);
         }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 120px 24px 80px;
-            box-sizing: border-box;
-        }
-
-        /* Navigation */
+        /* Navigation - Synced with main site */
         .nav-island {
             position: fixed;
             top: 2rem;
@@ -142,36 +143,74 @@
             z-index: 1;
         }
 
-        .nav-island .nav-extra {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-island .nav-divider {
-            width: 1px;
-            height: 20px;
-            background: var(--border);
-        }
-
         .nav-island a,
         .nav-island button {
             padding: 0.5rem 1rem;
             color: var(--muted);
             text-decoration: none;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-family: inherit;
             font-size: 0.9rem;
+            font-weight: 500;
             border-radius: 999px;
             transition: all 0.2s ease;
+            white-space: nowrap;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .nav-island a:hover,
         .nav-island button:hover {
             color: var(--white);
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-island .nav-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 0.25rem;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island .nav-extra {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            overflow: hidden;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 500px;
+            opacity: 1;
+        }
+
+        html.nav-precollapsed .nav-island .nav-extra {
+            max-width: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            gap: 0;
+        }
+
+        .nav-island.collapsed .nav-extra {
+            max-width: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            gap: 0;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        html.nav-precollapsed .nav-island .nav-divider {
+            width: 0;
+            opacity: 0;
+            margin: 0;
+        }
+
+        .nav-island.collapsed .nav-divider {
+            width: 0;
+            opacity: 0;
+            margin: 0;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .nav-island .nav-icon-btn {
@@ -182,11 +221,84 @@
             height: 36px;
             padding: 0;
             border-radius: 999px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        html.nav-precollapsed .nav-island .nav-icon-btn {
+            opacity: 0;
+            transform: scale(0.8);
+            width: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-island.collapsed .nav-icon-btn {
+            opacity: 0;
+            transform: scale(0.8);
+            width: 0;
+            padding: 0;
+            margin: 0;
+            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island .nav-icon-btn:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .nav-island .nav-icon-btn svg {
             width: 18px;
             height: 18px;
+        }
+
+        /* Navigation bounce animations */
+        @keyframes navBounceCollapse {
+            0% { transform: translateX(-50%) scale(1); }
+            35% { transform: translateX(-50%) scale(0.97); }
+            65% { transform: translateX(-50%) scale(1.01); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        @keyframes navBounceExpand {
+            0% { transform: translateX(-50%) scale(1); }
+            40% { transform: translateX(-50%) scale(1.02); }
+            70% { transform: translateX(-50%) scale(0.99); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        @keyframes appleBounce {
+            0% { transform: translateX(-50%) scale(1); }
+            35% { transform: translateX(-50%) scale(0.995); }
+            55% { transform: translateX(-50%) scale(1.008); }
+            75% { transform: translateX(-50%) scale(0.998); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        .nav-island.collapsing {
+            animation: navBounceCollapse 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island.expanding {
+            animation: navBounceExpand 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .nav-island.bouncing {
+            animation: appleBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            box-sizing: border-box;
         }
 
         /* Back Link */
@@ -196,8 +308,10 @@
             gap: 0.5rem;
             color: var(--muted);
             font-size: 0.95rem;
-            margin-bottom: 3rem;
+            margin-top: 120px;
+            margin-bottom: 2rem;
             transition: color 0.2s ease;
+            text-decoration: none;
         }
 
         .vault-back-link:hover {
@@ -209,11 +323,12 @@
             height: 18px;
         }
 
-        /* Vault Section */
-        .vault-section {
+        /* Hero Section */
+        .vault-hero {
+            text-align: center;
+            padding: 2rem 0 4rem;
             max-width: 900px;
             margin: 0 auto;
-            text-align: center;
         }
 
         .eyebrow {
@@ -235,102 +350,121 @@
             color: var(--muted);
             font-size: 1.2rem;
             font-style: italic;
-            margin-bottom: 3rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            margin-bottom: 2rem;
         }
 
-        .vault-description {
-            max-width: 700px;
-            margin: 0 auto 4rem;
+        .vault-intro {
             color: var(--muted);
             font-size: 1.05rem;
             line-height: 1.8;
-            letter-spacing: 0.01em;
+            max-width: 700px;
+            margin: 0 auto;
         }
 
-        .vault-description p {
-            margin-bottom: 1.5rem;
+        /* Timeline Container */
+        .timeline-wrapper {
+            position: relative;
+            width: 100%;
+            padding: 4rem 0 8rem;
         }
 
-        .vault-description p:last-child {
-            margin-bottom: 0;
+        .timeline-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .vault-description p:first-of-type {
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.1rem;
+        /* SVG Path */
+        .timeline-path-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: visible;
         }
 
-        .vault-description strong {
-            color: var(--white);
-            font-weight: 600;
+        .timeline-path {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.5);
+            stroke-width: 2;
+            stroke-linecap: round;
+            opacity: 1;
         }
 
-        .vault-container {
-            margin-top: 3rem;
+        .timeline-path-glow {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.15);
+            stroke-width: 8;
+            stroke-linecap: round;
+            filter: blur(6px);
+        }
+
+        /* Ghost path showing where the line will go */
+        .timeline-path-ghost {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.04);
+            stroke-width: 2;
+            stroke-dasharray: 4 16;
+            stroke-linecap: round;
+        }
+
+        /* Anchor Node - Archive Opens */
+        .anchor-node {
+            position: relative;
+            max-width: 560px;
+            margin: 0 auto 0;
+            padding: 3rem;
+            background: rgba(16, 16, 16, 0.8);
             border: 1px solid var(--border);
             border-radius: 24px;
-            background: rgba(16, 16, 16, 0.7);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 4rem 3rem;
-            position: relative;
-            overflow: hidden;
             box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.4),
-                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+                inset 0 1px 1px rgba(255, 255, 255, 0.05),
+                0 0 60px rgba(255, 255, 255, 0.02);
+            z-index: 10;
         }
 
-        .vault-container::before {
+        .anchor-node::before {
             content: "";
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
         }
 
-        .vault-content {
-            display: flex;
-            flex-direction: column;
-            gap: 3rem;
-        }
-
-        .vault-countdown {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .vault-countdown-label {
-            color: var(--muted);
-            font-size: 0.875rem;
+        .anchor-label {
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.2em;
-            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
 
         .countdown-display {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2rem;
+            gap: 1.5rem;
             flex-wrap: wrap;
+            margin-bottom: 2rem;
         }
 
         .countdown-unit {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .countdown-value {
-            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 800;
             line-height: 1;
             color: var(--white);
@@ -338,7 +472,7 @@
         }
 
         .countdown-unit .countdown-label {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--muted);
             text-transform: lowercase;
             letter-spacing: 0.1em;
@@ -346,124 +480,306 @@
 
         .countdown-separator {
             color: var(--muted);
-            font-size: 2rem;
+            font-size: 1.5rem;
             opacity: 0.5;
         }
 
-        .vault-meta {
+        .anchor-dates {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            padding-top: 3rem;
+            gap: 0.5rem;
+            padding-top: 1.5rem;
             border-top: 1px solid var(--border);
         }
 
-        .vault-meta-item {
+        .anchor-date {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.875rem;
-            color: var(--muted);
-            font-size: 0.95rem;
-            letter-spacing: 0.01em;
-        }
-
-        .vault-rules {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            padding-top: 3rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .vault-rule {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.875rem;
+            gap: 0.75rem;
             color: var(--muted);
             font-size: 0.9rem;
-            font-style: italic;
-            letter-spacing: 0.01em;
         }
 
-        .vault-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .anchor-date svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.6;
+        }
+
+        /* Timeline Nodes */
+        .timeline-nodes {
+            position: relative;
+            padding-top: 80px;
+        }
+
+        .timeline-node {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-bottom: 0;
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            will-change: transform, opacity;
+        }
+
+        .timeline-node:nth-child(odd) {
+            flex-direction: row;
+            justify-content: flex-start;
+            padding-left: 5%;
+            padding-right: 52%;
+        }
+
+        .timeline-node:nth-child(even) {
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+            padding-right: 5%;
+            padding-left: 52%;
+        }
+
+        .node-connector {
+            position: absolute;
             width: 16px;
             height: 16px;
-            flex-shrink: 0;
-            opacity: 0.6;
-            transition: opacity 0.2s ease;
+            background: var(--bg);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            z-index: 5;
+            opacity: 0;
+            transform: scale(0);
         }
 
-        .vault-icon svg {
+        .timeline-node:nth-child(odd) .node-connector {
+            right: 48%;
+            left: auto;
+            transform: translateX(50%);
+        }
+
+        .timeline-node:nth-child(even) .node-connector {
+            left: 48%;
+            right: auto;
+            transform: translateX(-50%);
+        }
+
+        .node-connector::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+        }
+
+        .timeline-node.revealed .node-connector {
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+        }
+
+        .timeline-node.revealed .node-connector::after {
+            background: var(--white);
+        }
+
+        /* Node Content Card */
+        .node-content {
+            flex: 1;
+            max-width: 480px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+            position: relative;
+            box-shadow: 
+                0 18px 40px rgba(0, 0, 0, 0.35),
+                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .node-content::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                120deg,
+                rgba(255, 255, 255, 0.02),
+                transparent 45%,
+                rgba(255, 255, 255, 0.04)
+            );
+            opacity: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .node-content::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .timeline-node:hover .node-content {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 24px 60px rgba(0, 0, 0, 0.45),
+                inset 0 1px 1px rgba(255, 255, 255, 0.06);
+            transform: translateY(-4px);
+        }
+
+        .timeline-node.revealed .node-content {
+            animation: cardFloat 10s ease-in-out infinite;
+        }
+
+        .timeline-node.revealed .node-content::before {
+            opacity: 0.7;
+            animation: cardSheen 12s linear infinite;
+        }
+
+        /* Importance-based sizing */
+        .node-content[data-importance="high"] {
+            max-width: 520px;
+            border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .node-content[data-importance="medium"] {
+            max-width: 440px;
+        }
+
+        .node-content[data-importance="low"] {
+            max-width: 380px;
+            opacity: 0.85;
+        }
+
+        .node-video {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .node-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            stroke: currentColor;
+            border: none;
         }
 
-        .vault-meta-item:hover .vault-icon,
-        .vault-rule:hover .vault-icon {
-            opacity: 0.9;
+        .node-video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(20, 20, 20, 1) 0%, rgba(10, 10, 10, 1) 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node-video-placeholder:hover {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 1) 0%, rgba(15, 15, 15, 1) 100%);
+        }
+
+        .node-video-placeholder svg {
+            width: 48px;
+            height: 48px;
+            color: var(--white);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .node-video-placeholder:hover svg {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .node-text {
+            padding: 1.25rem 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .node-date {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .node-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            line-height: 1.65;
+        }
+        .timeline-node.revealed .node-content[data-importance="high"] {
+            box-shadow: 
+                0 26px 70px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(255, 255, 255, 0.04),
+                inset 0 1px 1px rgba(255, 255, 255, 0.06);
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes cardSheen {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .node-content::before {
+            background-size: 200% 100%;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .timeline-node.revealed .node-content,
+            .timeline-node.revealed .node-content::before {
+                animation: none;
+            }
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 100px 20px 60px;
+        @media (max-width: 900px) {
+            .timeline-node {
+                flex-direction: column !important;
+                padding-left: 60px !important;
+                padding-right: 20px !important;
             }
 
-            .vault-description {
-                font-size: 1rem;
-                margin-bottom: 3rem;
+            .node-connector {
+                left: 24px !important;
+                transform: none !important;
             }
 
-            .vault-description p:first-of-type {
-                font-size: 1.05rem;
-            }
-
-            .vault-container {
-                padding: 3rem 2rem;
-            }
-
-            .countdown-display {
-                gap: 1.5rem;
-            }
-
-            .countdown-separator {
-                font-size: 1.5rem;
-            }
-
-            .vault-meta,
-            .vault-rules {
-                padding-top: 2rem;
+            .node-content {
+                max-width: 100% !important;
             }
         }
 
-        @media (max-width: 640px) {
-            .vault-container {
-                padding: 2.5rem 1.5rem;
-            }
-
-            .countdown-display {
-                gap: 1rem;
-            }
-
-            .countdown-separator {
-                font-size: 1.25rem;
-            }
-
-            .vault-meta,
-            .vault-rules {
-                padding-top: 1.5rem;
-            }
-
+        @media (max-width: 768px) {
             .nav-island {
                 flex-wrap: wrap;
                 max-width: calc(100% - 2rem);
                 padding: 0.75rem 1rem;
+                gap: 0.5rem;
             }
 
             .nav-island a,
@@ -471,15 +787,53 @@
                 font-size: 0.85rem;
                 padding: 0.5rem 0.75rem;
             }
+
+            .anchor-node {
+                padding: 2rem 1.5rem;
+            }
+
+            .countdown-display {
+                gap: 1rem;
+            }
+
+            .timeline-node {
+                padding-left: 50px !important;
+            }
+
+            .node-connector {
+                left: 16px !important;
+                width: 14px;
+                height: 14px;
+            }
+
+            .node-text {
+                padding: 1rem 1.25rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .vault-back-link {
+                margin-top: 100px;
+            }
+
+            .vault-hero {
+                padding: 1rem 0 3rem;
+            }
+
+            .timeline-wrapper {
+                padding: 2rem 0 6rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="vignette-overlay" aria-hidden="true"></div>
     
+    <!-- Navigation - Synced with main site -->
     <nav class="nav-island">
-        <a href="index.html">About Us</a>
+        <a href="index.html#who-we-are">About Us</a>
         <a href="index.html#projects">Projects</a>
+        <a href="vault.html" style="color: var(--white);">Vault</a>
         <button data-modal="contact">Contact Us</button>
         <div class="nav-extra">
             <span class="nav-divider"></span>
@@ -506,25 +860,38 @@
             Back to Home
         </a>
 
-        <section class="vault-section">
-            <div class="eyebrow" data-animate="text" data-anim-group="vault-flow">ZoneBroz Vault</div>
-            <h1 class="section-heading" data-animate="text" data-anim-group="vault-flow">The Look Back</h1>
-            <p class="vault-subtitle" data-animate="text" data-anim-group="vault-flow">Before the work spoke for itself.</p>
-            
-            <div class="vault-description" data-animate="text" data-anim-group="vault-flow">
-                <p>The Vault exists to preserve the journey, not just the outcome.</p>
-                <p>Every project, studio, and idea has a moment where nothing is guaranteed. This archive was created in that moment — while we were still building, still learning, still figuring things out.</p>
-                <p>The ZoneBroz Vault is a sealed collection of recordings, reflections, and milestones captured in real time. No rewrites. No hindsight. Just honest snapshots of who we were, what we believed, and what we were working toward.</p>
-                <p>Some entries are time-locked for months. Others for years.<br>Each one opens exactly when it's meant to.</p>
-                <p>At the center of the Vault is <strong>The Look Back</strong> — a message recorded on January 17, 2026, sealed for five years. It wasn't made to predict success, but to document intent. A reminder of the mindset that started everything.</p>
-                <p>This isn't content for attention.<br>It's proof of work, patience, and belief in the long game.</p>
-                <p>When the Vault opens, it doesn't rewrite history.<br>It reveals it.</p>
-            </div>
-            
-            <div class="vault-container" data-animate="fade" data-anim-group="vault-flow">
-                <div class="vault-content">
-                    <div class="vault-countdown">
-                        <p class="vault-countdown-label">This archive opens in:</p>
+        <!-- Hero Section -->
+        <section class="vault-hero">
+            <div class="eyebrow" data-animate="text">ZoneBroz Vault</div>
+            <h1 class="section-heading" data-animate="text">The Journey</h1>
+            <p class="vault-subtitle" data-animate="text">A living record of intent.</p>
+            <p class="vault-intro" data-animate="text">
+                This timeline traces the path toward the Vault — moments captured in real time, 
+                before outcomes were known. Each entry is a snapshot of what we believed, 
+                what we were building, and why it mattered.
+            </p>
+        </section>
+
+        <!-- Timeline -->
+        <div class="timeline-wrapper">
+            <div class="timeline-container">
+                <!-- SVG Path will be rendered here -->
+                <svg class="timeline-path-svg" id="timelineSvg">
+                    <defs>
+                        <linearGradient id="pathGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color: rgba(255,255,255,0.6)"/>
+                            <stop offset="50%" style="stop-color: rgba(255,255,255,0.3)"/>
+                            <stop offset="100%" style="stop-color: rgba(255,255,255,0.1)"/>
+                        </linearGradient>
+                    </defs>
+                    <path class="timeline-path-ghost" id="pathGhost"></path>
+                    <path class="timeline-path-glow" id="pathGlow"></path>
+                    <path class="timeline-path" id="pathMain"></path>
+                </svg>
+
+                <!-- Anchor Node - Archive Opens -->
+                <div class="anchor-node" data-animate="fade">
+                    <p class="anchor-label">The Archive Opens In</p>
                         <div class="countdown-display" id="vault-countdown">
                             <div class="countdown-unit">
                                 <span class="countdown-value" id="days">0</span>
@@ -541,111 +908,398 @@
                                 <span class="countdown-label">minutes</span>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="vault-meta">
-                        <p class="vault-meta-item">
-                            <span class="vault-icon">
+                    <div class="anchor-dates">
+                        <p class="anchor-date">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
                                 </svg>
-                            </span>
-                            <span>Recorded: January 17, 2026</span>
+                            <span>Sealed: January 17, 2026</span>
                         </p>
-                        <p class="vault-meta-item">
-                            <span class="vault-icon">
+                        <p class="anchor-date">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
                                 </svg>
-                            </span>
-                            <span>Release: January 17, 2031</span>
+                            <span>Opens: January 17, 2031</span>
                         </p>
                     </div>
+                    </div>
                     
-                    <div class="vault-rules">
-                        <p class="vault-rule">
-                            <span class="vault-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                </svg>
-                            </span>
-                            <span>This content cannot be accessed early</span>
-                        </p>
-                        <p class="vault-rule">
-                            <span class="vault-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                </svg>
-                            </span>
-                            <span>Unfiltered</span>
-                        </p>
+                <!-- Timeline Nodes Container -->
+                <div class="timeline-nodes" id="timelineNodes">
+                    <!-- Nodes will be generated by JavaScript -->
                     </div>
                 </div>
             </div>
-        </section>
     </div>
 
     <script>
-        // Animation setup
+        // ============================================
+        // TIMELINE DATA - Add new entries here
+        // ============================================
+        const timelineData = [
+            {
+                date: '2026-01-15',
+                importance: 'high', // high, medium, low
+                videoId: 'dQw4w9WgXcQ', // YouTube video ID (placeholder)
+                description: 'The final recording before the seal. We talked about everything we hoped this would become — and everything we were afraid it wouldn\'t.'
+            },
+            {
+                date: '2026-01-10',
+                importance: 'medium',
+                videoId: 'dQw4w9WgXcQ',
+                description: 'First look at the Vault concept. Still rough, still uncertain. But the idea was there.'
+            },
+            {
+                date: '2025-12-20',
+                importance: 'medium',
+                videoId: 'dQw4w9WgXcQ',
+                description: 'End of year reflections. What worked, what didn\'t, and what we learned about building in public.'
+            },
+            {
+                date: '2025-11-05',
+                importance: 'low',
+                videoId: 'dQw4w9WgXcQ',
+                description: 'A quiet update. Small progress, but progress nonetheless.'
+            },
+            {
+                date: '2025-09-12',
+                importance: 'high',
+                videoId: 'dQw4w9WgXcQ',
+                description: 'The moment we decided to go all in. No more half measures. This was the turning point.'
+            },
+            {
+                date: '2025-07-28',
+                importance: 'medium',
+                videoId: 'dQw4w9WgXcQ',
+                description: 'First real milestone. Something finally clicked into place.'
+            },
+            {
+                date: '2025-05-14',
+                importance: 'low',
+                videoId: 'dQw4w9WgXcQ',
+                description: 'Early struggles. We didn\'t know what we were doing yet, but we kept going anyway.'
+            },
+            {
+                date: '2025-03-01',
+                importance: 'high',
+                videoId: 'dQw4w9WgXcQ',
+                description: 'The beginning. Day one of something we hoped would matter. Raw, unpolished, but real.'
+            }
+        ];
+
+        // ============================================
+        // TIMELINE GENERATION
+        // ============================================
         gsap.registerPlugin(ScrollTrigger);
 
-        const animateElements = () => {
-            const elements = document.querySelectorAll('[data-animate]');
+        const PIXELS_PER_DAY = 3; // Spacing factor
+        const MIN_SPACING = 80; // Minimum spacing between nodes
+        const MAX_SPACING = 300; // Maximum spacing between nodes
+
+        function parseDate(dateStr) {
+            return new Date(dateStr + 'T00:00:00');
+        }
+
+        function daysBetween(date1, date2) {
+            const oneDay = 24 * 60 * 60 * 1000;
+            return Math.abs((date1 - date2) / oneDay);
+        }
+
+        function formatDate(dateStr) {
+            const date = parseDate(dateStr);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function calculateSpacing(days) {
+            const spacing = days * PIXELS_PER_DAY;
+            return Math.max(MIN_SPACING, Math.min(MAX_SPACING, spacing));
+        }
+
+        function generateTimelineNodes() {
+            const container = document.getElementById('timelineNodes');
+            if (!container) return;
+
+            // Sort by date descending (newest first)
+            const sortedData = [...timelineData].sort((a, b) => 
+                parseDate(b.date) - parseDate(a.date)
+            );
+
+            let html = '';
+            let totalHeight = 0;
+            const nodePositions = [];
+
+            sortedData.forEach((item, index) => {
+                // Calculate spacing based on time gap
+                let spacing = MIN_SPACING;
+                if (index > 0) {
+                    const prevDate = parseDate(sortedData[index - 1].date);
+                    const currDate = parseDate(item.date);
+                    const daysDiff = daysBetween(prevDate, currDate);
+                    spacing = calculateSpacing(daysDiff);
+                }
+
+                totalHeight += spacing;
+                nodePositions.push({
+                    y: totalHeight,
+                    side: index % 2 === 0 ? 'left' : 'right'
+                });
+
+                html += `
+                    <div class="timeline-node" style="margin-top: ${spacing}px;" data-index="${index}">
+                        <div class="node-connector" style="top: 20px;"></div>
+                        <div class="node-content" data-importance="${item.importance}">
+                            <div class="node-video">
+                                <div class="node-video-placeholder" data-video-id="${item.videoId}">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="node-text">
+                                <p class="node-date">${formatDate(item.date)}</p>
+                                <p class="node-description">${item.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // Store positions for path generation
+            window.timelineNodePositions = nodePositions;
+            window.timelineTotalHeight = totalHeight + 100;
+
+            // Setup video click handlers
+            setupVideoPlayers();
+
+            // Generate SVG path after layout (node animations are now synced to path)
+            requestAnimationFrame(() => {
+                generateTimelinePath();
+            });
+        }
+
+        function setupVideoPlayers() {
+            document.querySelectorAll('.node-video-placeholder').forEach(placeholder => {
+                placeholder.addEventListener('click', function() {
+                    const videoId = this.dataset.videoId;
+                    const container = this.parentElement;
+                    
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                    iframe.allowFullscreen = true;
+                    
+                    container.innerHTML = '';
+                    container.appendChild(iframe);
+                });
+            });
+        }
+
+        // Store node path positions for synced reveals
+        let nodePathPositions = [];
+        let pathTotalLength = 0;
+        const VISIBLE_RADIUS = 400; // Pixels of path visible at any time
+
+        function generateTimelinePath() {
+            const svg = document.getElementById('timelineSvg');
+            const pathMain = document.getElementById('pathMain');
+            const pathGlow = document.getElementById('pathGlow');
+            const pathGhost = document.getElementById('pathGhost');
+            const nodesContainer = document.getElementById('timelineNodes');
+            const anchorNode = document.querySelector('.anchor-node');
+
+            if (!svg || !nodesContainer || !anchorNode) return;
+
+            const nodes = document.querySelectorAll('.timeline-node');
+            if (nodes.length === 0) return;
+
+            // Get container dimensions
+            const containerRect = nodesContainer.parentElement.getBoundingClientRect();
+            const anchorRect = anchorNode.getBoundingClientRect();
+            const parentRect = nodesContainer.parentElement.getBoundingClientRect();
+
+            // Calculate SVG height
+            const lastNode = nodes[nodes.length - 1];
+            const lastNodeRect = lastNode.getBoundingClientRect();
+            const svgHeight = lastNodeRect.bottom - anchorRect.top + 100;
+
+            svg.style.height = svgHeight + 'px';
+            svg.setAttribute('viewBox', `0 0 ${containerRect.width} ${svgHeight}`);
+
+            // Build organic snakes-and-ladders path
+            const centerX = containerRect.width / 2;
+            const startY = anchorRect.height + 40;
+            const curveAmplitude = Math.min(containerRect.width * 0.15, 120);
             
-            elements.forEach((el, index) => {
-                const animType = el.getAttribute('data-animate');
-                const group = el.getAttribute('data-anim-group');
+            let pathD = `M ${centerX} ${startY}`;
+            let prevY = startY;
+            let prevX = centerX;
+
+            // Track cumulative path lengths for each node
+            const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            nodePathPositions = [];
+            let cumulativeLength = 0;
+
+            nodes.forEach((node, index) => {
+                const connector = node.querySelector('.node-connector');
+                const connectorRect = connector.getBoundingClientRect();
                 
-                if (animType === 'text') {
-                    gsap.fromTo(el, 
-                        { opacity: 0, y: 20 },
-                        { 
-                            opacity: 1, 
-                            y: 0, 
-                            duration: 0.8,
-                            ease: 'power3.out',
-                            scrollTrigger: {
-                                trigger: el,
-                                start: 'top 85%',
-                                toggleActions: 'play none none none'
-                            }
+                const nodeY = connectorRect.top - parentRect.top + connectorRect.height / 2;
+                
+                const isLeft = index % 2 === 0;
+                const targetX = centerX;
+                const midY = prevY + (nodeY - prevY) * 0.5;
+                
+                const swingDirection = isLeft ? 1 : -1;
+                const swingX = centerX + (curveAmplitude * swingDirection * 0.6);
+                
+                const cp1X = prevX + (swingX - prevX) * 0.3;
+                const cp1Y = prevY + (midY - prevY) * 0.5;
+                const cp2X = swingX;
+                const cp2Y = midY - (nodeY - prevY) * 0.15;
+                
+                pathD += ` C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${swingX} ${midY}`;
+                
+                const cp3X = swingX;
+                const cp3Y = midY + (nodeY - midY) * 0.3;
+                const cp4X = targetX + (swingX - targetX) * 0.2;
+                const cp4Y = nodeY - (nodeY - midY) * 0.2;
+                
+                pathD += ` C ${cp3X} ${cp3Y}, ${cp4X} ${cp4Y}, ${targetX} ${nodeY}`;
+                
+                // Calculate path length up to this node
+                tempPath.setAttribute('d', pathD);
+                const lengthAtNode = tempPath.getTotalLength();
+                nodePathPositions.push({
+                    node: node,
+                    pathLength: lengthAtNode,
+                    revealed: false
+                });
+                
+                prevY = nodeY;
+                prevX = targetX;
+            });
+
+            pathMain.setAttribute('d', pathD);
+            pathGlow.setAttribute('d', pathD);
+            pathGhost.setAttribute('d', pathD);
+
+            pathTotalLength = pathMain.getTotalLength();
+
+            // Setup the progressive draw animation with visible window
+            setupPathAnimation(pathMain, pathGlow, pathGhost, nodesContainer);
+        }
+
+        function setupPathAnimation(pathMain, pathGlow, pathGhost, trigger) {
+            const pathLength = pathTotalLength;
+            
+            // Create a custom scroll-based animation
+            ScrollTrigger.create({
+                trigger: trigger,
+                start: 'top 70%',
+                end: 'bottom 30%',
+                scrub: 0.3,
+                onUpdate: (self) => {
+                    const progress = self.progress;
+                    
+                    // Calculate the "head" position of the drawing
+                    const drawLength = progress * (pathLength + VISIBLE_RADIUS);
+                    
+                    // The visible window: from (drawLength - VISIBLE_RADIUS) to drawLength
+                    const visibleStart = Math.max(0, drawLength - VISIBLE_RADIUS);
+                    const visibleEnd = Math.min(pathLength, drawLength);
+                    
+                    // Create dash pattern for visible window effect
+                    const beforeLength = visibleStart;
+                    const visibleLength = visibleEnd - visibleStart;
+                    const afterLength = pathLength - visibleEnd;
+                    
+                    if (visibleLength > 0) {
+                        // Main visible path with fade at edges
+                        pathMain.style.strokeDasharray = `0 ${beforeLength} ${visibleLength} ${afterLength + pathLength}`;
+                        pathMain.style.strokeDashoffset = '0';
+                        
+                        // Glow follows same pattern
+                        pathGlow.style.strokeDasharray = `0 ${beforeLength} ${visibleLength} ${afterLength + pathLength}`;
+                        pathGlow.style.strokeDashoffset = '0';
+                    }
+                    
+                    // Reveal nodes when the path reaches them
+                    nodePathPositions.forEach((item, index) => {
+                        if (!item.revealed && drawLength >= item.pathLength) {
+                            revealNode(item.node, index);
+                            item.revealed = true;
                         }
-                    );
-                } else if (animType === 'fade') {
-                    gsap.fromTo(el,
-                        { opacity: 0 },
-                        {
-                            opacity: 1,
-                            duration: 1,
-                            ease: 'power2.out',
-                            scrollTrigger: {
-                                trigger: el,
-                                start: 'top 85%',
-                                toggleActions: 'play none none none'
-                            }
+                        // Hide nodes when scrolling back up
+                        if (item.revealed && drawLength < item.pathLength - 80) {
+                            hideNode(item.node);
+                            item.revealed = false;
                         }
-                    );
-                } else if (animType === 'hero') {
-                    gsap.fromTo(el,
-                        { opacity: 0, y: 20 },
+                    });
+                }
+            });
+            
+            // Initialize path as hidden, ghost always visible
+            pathMain.style.strokeDasharray = `0 ${pathLength}`;
+            pathGlow.style.strokeDasharray = `0 ${pathLength}`;
+            // Ghost path shows full trajectory faintly
+            pathGhost.style.strokeDasharray = '4 16';
+        }
+
+        function revealNode(node, index) {
+            const importance = node.querySelector('.node-content').dataset.importance;
+            const duration = importance === 'high' ? 0.8 : importance === 'medium' ? 0.6 : 0.5;
+            
+            node.classList.add('revealed');
+            
+            gsap.fromTo(node,
+                { 
+                    opacity: 0, 
+                    y: 30,
+                    scale: 0.95
+                },
                         {
                             opacity: 1,
                             y: 0,
-                            duration: 0.9,
-                            ease: 'power3.out',
-                            delay: 0.2
-                        }
-                    );
+                    scale: 1,
+                    duration: duration,
+                    ease: 'power3.out'
                 }
-            });
-        };
+            );
+            
+            // Animate the connector dot
+            const connector = node.querySelector('.node-connector');
+            gsap.fromTo(connector,
+                { scale: 0, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2)' }
+            );
+        }
 
-        // ZoneBroz Vault Countdown Timer
-        (function() {
+        function hideNode(node) {
+            node.classList.remove('revealed');
+            
+            gsap.to(node, {
+                opacity: 0,
+                y: 20,
+                scale: 0.95,
+                duration: 0.3,
+                ease: 'power2.in'
+            });
+        }
+
+        // ============================================
+        // COUNTDOWN TIMER
+        // ============================================
+        function updateCountdown() {
             const releaseDate = new Date('January 17, 2031 00:00:00').getTime();
             const daysEl = document.getElementById('days');
             const hoursEl = document.getElementById('hours');
@@ -653,15 +1307,13 @@
 
             if (!daysEl || !hoursEl || !minutesEl) return;
 
-            function updateCountdown() {
                 const now = new Date().getTime();
                 const distance = releaseDate - now;
 
                 if (distance < 0) {
-                    // Countdown has ended
                     daysEl.textContent = '0';
-                    hoursEl.textContent = '0';
-                    minutesEl.textContent = '0';
+                hoursEl.textContent = '00';
+                minutesEl.textContent = '00';
                     return;
                 }
 
@@ -674,19 +1326,117 @@
                 minutesEl.textContent = minutes.toString().padStart(2, '0');
             }
 
-            // Update immediately
-            updateCountdown();
+        // ============================================
+        // ANIMATIONS
+        // ============================================
+        function initAnimations() {
+            // Hero animations
+            gsap.fromTo('[data-animate="hero"]',
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: 0.2 }
+            );
 
-            // Update every minute
-            setInterval(updateCountdown, 60000);
-        })();
+            gsap.fromTo('[data-animate="text"]',
+                { opacity: 0, y: 20 },
+                { 
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.8, 
+                    ease: 'power3.out',
+                    stagger: 0.1,
+                    delay: 0.3
+                }
+            );
 
-        // Initialize animations when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', animateElements);
-        } else {
-            animateElements();
+            gsap.fromTo('[data-animate="fade"]',
+                { opacity: 0, scale: 0.98 },
+                {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: '[data-animate="fade"]',
+                        start: 'top 85%',
+                        toggleActions: 'play none none none'
+                    }
+                }
+            );
         }
+
+        // ============================================
+        // NAVIGATION BEHAVIOR (Synced with main site)
+        // ============================================
+        function initNavigation() {
+            const navIsland = document.querySelector('.nav-island');
+            if (!navIsland) return;
+
+            // Bounce animation helper
+            function bounceNavbar() {
+                navIsland.classList.remove('bouncing');
+                void navIsland.offsetWidth;
+                navIsland.classList.add('bouncing');
+                setTimeout(() => navIsland.classList.remove('bouncing'), 400);
+            }
+
+            // Add bounce on link clicks
+            navIsland.querySelectorAll('a, button').forEach(el => {
+                el.addEventListener('click', bounceNavbar);
+            });
+
+            // Scroll-based collapse (optional - can be enabled)
+            let lastScrollY = 0;
+            let ticking = false;
+
+            function handleScroll() {
+                const currentScrollY = window.scrollY;
+                
+                if (currentScrollY > 300 && currentScrollY > lastScrollY) {
+                    // Scrolling down - collapse
+                    if (!navIsland.classList.contains('collapsed')) {
+                        navIsland.classList.add('collapsing');
+                        navIsland.classList.add('collapsed');
+                        setTimeout(() => navIsland.classList.remove('collapsing'), 700);
+                    }
+                } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+                    // Scrolling up or near top - expand
+                    if (navIsland.classList.contains('collapsed')) {
+                        navIsland.classList.add('expanding');
+                        navIsland.classList.remove('collapsed');
+                        setTimeout(() => navIsland.classList.remove('expanding'), 800);
+                    }
+                }
+
+                lastScrollY = currentScrollY;
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(handleScroll);
+                    ticking = true;
+                }
+            }, { passive: true });
+        }
+
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCountdown();
+            setInterval(updateCountdown, 60000);
+            
+            initAnimations();
+            initNavigation();
+            generateTimelineNodes();
+        });
+
+        // Regenerate path on resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(generateTimelinePath, 250);
+        });
     </script>
 </body>
 </html>
