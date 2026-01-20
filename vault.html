@@ -1387,22 +1387,76 @@
         // ============================================
         // NAVIGATION BEHAVIOR (Synced with main site)
         // ============================================
-        function initNavigation() {
-            const navIsland = document.querySelector('.nav-island');
-            if (!navIsland) return;
+        const navIsland = document.querySelector('.nav-island');
 
-            // Bounce animation helper
-            function bounceNavbar() {
-                navIsland.classList.remove('bouncing');
-                void navIsland.offsetWidth;
-                navIsland.classList.add('bouncing');
-                setTimeout(() => navIsland.classList.remove('bouncing'), 400);
+        // Function to collapse navigation with bounce
+        function collapseNavigation() {
+            if (navIsland) {
+                // Remove any existing animation classes
+                navIsland.classList.remove('expanding');
+                // Add collapsing animation class
+                navIsland.classList.add('collapsing');
+                // Add collapsed class
+                navIsland.classList.add('collapsed');
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    navIsland.classList.remove('collapsing');
+                }, 700);
             }
+        }
+
+        function triggerNavBounce() {
+            if (!navIsland) {
+                return;
+            }
+            navIsland.classList.remove('bouncing');
+            void navIsland.offsetWidth;
+            navIsland.classList.add('bouncing');
+            setTimeout(() => {
+                navIsland.classList.remove('bouncing');
+            }, 400);
+        }
+
+        function initNavigation() {
+            if (!navIsland) return;
 
             // Add bounce on link clicks
             navIsland.querySelectorAll('a, button').forEach(el => {
-                el.addEventListener('click', bounceNavbar);
+                el.addEventListener('click', function(e) {
+                    // Don't bounce on links that navigate away (they'll bounce before navigation)
+                    if (this.href && this.href.includes('index.html')) {
+                        return;
+                    }
+                    triggerNavBounce();
+                });
             });
+
+            // Handle navigation links that go back to main page
+            navIsland.querySelectorAll('a[href*="index.html"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+                        return;
+                    }
+                    // Store state that we're expanding
+                    sessionStorage.setItem('navExpanding', 'true');
+                    const targetHref = this.href;
+                    triggerNavBounce();
+                    e.preventDefault();
+                    setTimeout(() => {
+                        window.location.href = targetHref;
+                    }, 200);
+                });
+            });
+
+            // Handle back link
+            const backLink = document.querySelector('.vault-back-link');
+            if (backLink) {
+                backLink.addEventListener('click', function(e) {
+                    // Store state that we're expanding
+                    sessionStorage.setItem('navExpanding', 'true');
+                    sessionStorage.setItem('scrollRestoreTarget', 'projects');
+                });
+            }
 
             // Scroll-based collapse (optional - can be enabled)
             let lastScrollY = 0;
@@ -1443,6 +1497,33 @@
         // INITIALIZE
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
+            // Check if navbar is already collapsed (coming from project page)
+            const navAlreadyCollapsed = sessionStorage.getItem('navAlreadyCollapsed');
+            if (navAlreadyCollapsed) {
+                // Navbar is already collapsed, just set it without animation
+                if (navIsland) {
+                    navIsland.classList.add('collapsed');
+                }
+                sessionStorage.removeItem('navAlreadyCollapsed');
+            } else {
+                // Check if we're coming from main page (should animate collapse)
+                const shouldCollapse = sessionStorage.getItem('navCollapsing');
+                if (shouldCollapse) {
+                    // Small delay to ensure page is rendered, then collapse with animation
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            collapseNavigation();
+                        }, 50);
+                    });
+                    sessionStorage.removeItem('navCollapsing');
+                } else {
+                    // Direct navigation or refresh - start collapsed immediately
+                    if (navIsland) {
+                        navIsland.classList.add('collapsed');
+                    }
+                }
+            }
+
             updateCountdown();
             setInterval(updateCountdown, 60000);
             

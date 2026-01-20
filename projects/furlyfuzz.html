@@ -1421,6 +1421,15 @@
             });
         });
 
+        // Handle vault link - navbar is already collapsed, so don't animate
+        document.querySelectorAll('.nav-island a[href*="vault.html"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Set flag that navbar is already collapsed
+                sessionStorage.setItem('navAlreadyCollapsed', 'true');
+                triggerNavBounce();
+            });
+        });
+
         document.querySelectorAll('[data-return="projects"]').forEach(link => {
             link.addEventListener('click', function() {
                 sessionStorage.setItem('scrollRestoreTarget', 'projects');

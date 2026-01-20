@@ -3176,6 +3176,18 @@
             });
         });
 
+        // Store collapse state when clicking vault link
+        document.querySelectorAll('.nav-island a[href*="vault.html"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Only on main page (index.html or root)
+                if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
+                    sessionStorage.setItem('navCollapsing', 'true');
+                    sessionStorage.setItem('scrollRestoreY', window.scrollY.toString());
+                    bounceNavbar();
+                }
+            });
+        });
+
         // Check navigation state on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Check if we're on a project page
