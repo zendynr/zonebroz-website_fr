@@ -1,0 +1,4 @@
+# Force HTTPS redirect
+http://zonebrozstudios.com/* https://zonebrozstudios.com/:splat 301!
+http://www.zonebrozstudios.com/* https://zonebrozstudios.com/:splat 301!
+https://www.zonebrozstudios.com/* https://zonebrozstudios.com/:splat 301!
