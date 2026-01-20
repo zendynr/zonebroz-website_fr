@@ -16,6 +16,10 @@
                 if (sessionStorage.getItem('navExpanding')) {
                     document.documentElement.classList.add('nav-precollapsed');
                 }
+                // If coming from projects page, nav is already collapsed - set it immediately
+                if (sessionStorage.getItem('navAlreadyCollapsed')) {
+                    document.documentElement.classList.add('nav-precollapsed');
+                }
             } catch (e) {}
         })();
     </script>
@@ -894,6 +898,19 @@
             </a>
         </div>
     </nav>
+    <script>
+        // Immediately collapse nav if coming from projects page (prevents flash)
+        (function() {
+            try {
+                if (sessionStorage.getItem('navAlreadyCollapsed')) {
+                    const navIsland = document.querySelector('.nav-island');
+                    if (navIsland) {
+                        navIsland.classList.add('collapsed');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
 
     <div class="container">
         <a href="index.html" class="vault-back-link" data-animate="hero">
@@ -1458,7 +1475,7 @@
                 });
             }
 
-            // Scroll-based collapse (optional - can be enabled)
+            // Scroll-based collapse only (no expanding on scroll)
             let lastScrollY = 0;
             let ticking = false;
 
@@ -1466,20 +1483,14 @@
                 const currentScrollY = window.scrollY;
                 
                 if (currentScrollY > 300 && currentScrollY > lastScrollY) {
-                    // Scrolling down - collapse
+                    // Scrolling down - collapse (if not already collapsed)
                     if (!navIsland.classList.contains('collapsed')) {
                         navIsland.classList.add('collapsing');
                         navIsland.classList.add('collapsed');
                         setTimeout(() => navIsland.classList.remove('collapsing'), 700);
                     }
-                } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
-                    // Scrolling up or near top - expand
-                    if (navIsland.classList.contains('collapsed')) {
-                        navIsland.classList.add('expanding');
-                        navIsland.classList.remove('collapsed');
-                        setTimeout(() => navIsland.classList.remove('expanding'), 800);
-                    }
                 }
+                // Removed expanding behavior - nav stays collapsed when scrolling
 
                 lastScrollY = currentScrollY;
                 ticking = false;
@@ -1503,6 +1514,10 @@
                 // Navbar is already collapsed, just set it without animation
                 if (navIsland) {
                     navIsland.classList.add('collapsed');
+                    // Trigger bounce animation after a brief delay to show it on vault page
+                    setTimeout(() => {
+                        triggerNavBounce();
+                    }, 100);
                 }
                 sessionStorage.removeItem('navAlreadyCollapsed');
             } else {
