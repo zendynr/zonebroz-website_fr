@@ -123,6 +123,20 @@
             z-index: 1;
         }
 
+        @media (max-width: 640px) {
+            #app-root {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #app-root {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+        }
+
         .full-bleed {
             width: 100vw;
             margin-left: calc(50% - 50vw);
@@ -133,6 +147,18 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 64px 24px;
+        }
+
+        @media (max-width: 640px) {
+            .section-inner {
+                padding: 3rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section-inner {
+                padding: 2.5rem 0.75rem;
+            }
         }
 
         body {
@@ -158,6 +184,13 @@
         img, video {
             max-width: 100%;
             height: auto;
+            display: block;
+        }
+
+        @media (max-width: 640px) {
+            img {
+                border-radius: 16px;
+            }
         }
 
         a {
@@ -170,6 +203,20 @@
             flex-direction: column;
             gap: 6rem;
             padding-bottom: 4rem;
+        }
+
+        @media (max-width: 640px) {
+            main {
+                gap: 4rem;
+                padding-bottom: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                gap: 3rem;
+                padding-bottom: 2.5rem;
+            }
         }
 
         main,
@@ -203,6 +250,20 @@
             padding: 5rem 1.5rem 3rem;
         }
 
+        @media (max-width: 640px) {
+            .hero {
+                padding: 5.5rem 1rem 2rem;
+                min-height: calc(100vh - 80px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: 5rem 0.75rem 1.5rem;
+                min-height: calc(100vh - 70px);
+            }
+        }
+
         .hero-logo-img {
             width: 140px;
             height: auto;
@@ -224,6 +285,18 @@
             width: 240px;
             height: auto;
             margin-bottom: 0;
+        }
+
+        @media (max-width: 640px) {
+            #logo-svg {
+                width: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #logo-svg {
+                width: 160px;
+            }
         }
 
         /* Optional stroke glow effect */
@@ -276,12 +349,33 @@
             color: #000;
             font-weight: 600;
             font-size: 1rem;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 44px;
+            min-width: 120px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .primary-btn {
+                padding: 0.85rem 2rem;
+                font-size: 0.95rem;
+                width: 100%;
+                max-width: 280px;
+            }
         }
 
         .primary-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 20px 60px rgba(255, 255, 255, 0.12);
+        }
+
+        .primary-btn:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .secondary-btn {
@@ -295,10 +389,25 @@
             font-weight: 600;
             font-size: 1rem;
             background: transparent;
-            transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 
                 inset 0 1px 2px rgba(255, 255, 255, 0.072),
                 inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+            min-height: 44px;
+            min-width: 120px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .secondary-btn {
+                padding: 0.85rem 2rem;
+                font-size: 0.95rem;
+                width: 100%;
+                max-width: 280px;
+            }
         }
 
         .secondary-btn:hover {
@@ -310,6 +419,13 @@
                 inset 0 -1px 1px rgba(0, 0, 0, 0.12);
         }
 
+        .secondary-btn:active {
+            transform: translateY(-1px) scale(0.98);
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.12);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.1s ease, background-color 0.1s ease, box-shadow 0.1s ease;
+        }
+
         .button-row {
             margin-top: 2.5rem;
             display: flex;
@@ -317,6 +433,14 @@
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
+        }
+
+        @media (max-width: 640px) {
+            .button-row {
+                flex-direction: column;
+                gap: 0.75rem;
+                margin-top: 2rem;
+            }
         }
 
         .eyebrow {
@@ -509,18 +633,29 @@
                     "card"
                     "content";
                 row-gap: 2rem;
+                padding: 0 1rem;
             }
 
             .who-we-are-header {
                 margin-bottom: 0;
+                transform: translateX(-2%);
             }
 
             .who-we-are-card {
                 justify-content: center;
+                transform: translateX(-5%);
             }
 
             .who-we-are .team-stack {
                 width: min(420px, 92vw);
+            }
+
+            .who-we-are-content {
+                padding-left: 0;
+            }
+
+            .who-we-are-content::before {
+                display: none;
             }
         }
 
@@ -567,6 +702,9 @@
                 0 4px 12px rgba(0, 0, 0, 0.15),
                 inset 0 1px 2px rgba(255, 255, 255, 0.072),
                 inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
         }
 
         .stat-card {
@@ -575,6 +713,9 @@
             background: rgba(255, 255, 255, 0.02);
             padding: 1.75rem;
             display: flex;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
             gap: 1.1rem;
             align-items: flex-start;
             transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
@@ -621,6 +762,14 @@
                 inset 0 1px 2px rgba(255, 255, 255, 0.096),
                 inset 0 -1px 1px rgba(0, 0, 0, 0.12);
             border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-card:active,
+        .project-card:active,
+        .team-card:active,
+        .value-card:active {
+            transform: translateY(-3px) scale(0.99);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s ease;
         }
 
         .value-card {
@@ -836,12 +985,22 @@
             box-shadow: 
                 inset 0 1px 2px rgba(255, 255, 255, 0.072),
                 inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
         }
 
         .slider-btn:hover {
             transform: translateY(-2px);
             border-color: rgba(255, 255, 255, 0.4);
             background: rgba(255, 255, 255, 0.08);
+        }
+
+        .slider-btn:active {
+            transform: translateY(0) scale(0.98);
+            background: rgba(255, 255, 255, 0.12);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background 0.1s ease;
         }
 
         @media (max-width: 980px) {
@@ -1006,6 +1165,62 @@
             color: var(--white);
         }
 
+        .footer-btn {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 0.5rem;
+            min-height: 44px;
+            min-width: 44px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
+        }
+
+        .footer-btn:hover {
+            color: var(--white);
+        }
+
+        .footer-btn:active {
+            transform: scale(0.95);
+            color: var(--white);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), color 0.1s ease;
+        }
+
+        .inline-link-btn {
+            color: var(--white);
+            text-decoration: underline;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 0.25rem 0.5rem;
+            margin: 0 -0.5rem;
+            border-radius: 4px;
+            font-size: inherit;
+            transition: color 0.2s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s ease;
+            min-height: 44px;
+            min-width: 44px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
+        }
+
+        .inline-link-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .inline-link-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.15);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background 0.1s ease;
+        }
+
         .top-nav {
             position: fixed;
             top: 0;
@@ -1053,9 +1268,18 @@
             inset: 0;
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: inherit;
             pointer-events: none;
             z-index: 0;
+            will-change: transform;
+        }
+
+        @media (max-width: 768px) {
+            .nav-island::before {
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
         }
 
         .nav-island > * {
@@ -1071,18 +1295,44 @@
             font-size: 0.9rem;
             font-weight: 500;
             border-radius: 999px;
-            transition: all 0.2s ease;
+            transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
             background: none;
             border: none;
             cursor: pointer;
             font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
+        }
+
+        .nav-link-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link-icon .nav-icon {
+            display: none;
+            width: 20px;
+            height: 20px;
+        }
+
+        .nav-link-icon .nav-text {
+            display: inline;
         }
 
         .nav-island a:hover,
         .nav-island button:hover {
             color: var(--white);
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-island a:active,
+        .nav-island button:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.08);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.1s ease;
         }
 
         .nav-island .nav-divider {
@@ -1104,13 +1354,22 @@
             border: none;
             color: var(--muted);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
         }
 
         .nav-island .nav-icon-btn:hover {
             color: var(--white);
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-island .nav-icon-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.08);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.1s ease;
         }
 
         .nav-island .nav-icon-btn svg {
@@ -1124,9 +1383,16 @@
             align-items: center;
             gap: 0.5rem;
             overflow: hidden;
-            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: max-width 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), gap 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
             max-width: 500px;
             opacity: 1;
+            will-change: max-width, opacity;
+        }
+
+        @media (max-width: 768px) {
+            .nav-island .nav-extra {
+                transition: max-width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), gap 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
         }
 
         html.nav-precollapsed .nav-island .nav-extra {
@@ -1143,13 +1409,26 @@
             margin: 0;
             padding: 0;
             gap: 0;
-            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: max-width 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), gap 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @media (max-width: 768px) {
+            .nav-island.collapsed .nav-extra {
+                transition: max-width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), gap 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
         }
 
         .nav-island .nav-divider {
-            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: width 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
             width: 1px;
             opacity: 1;
+            will-change: width, opacity;
+        }
+
+        @media (max-width: 768px) {
+            .nav-island .nav-divider {
+                transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
         }
 
         html.nav-precollapsed .nav-island .nav-divider {
@@ -1166,9 +1445,16 @@
         }
 
         .nav-island .nav-icon-btn {
-            transition: all 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: opacity 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.65s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
             opacity: 1;
             transform: scale(1);
+            will-change: transform, opacity;
+        }
+
+        @media (max-width: 768px) {
+            .nav-island .nav-icon-btn {
+                transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), margin 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
         }
 
         html.nav-precollapsed .nav-island .nav-icon-btn {
@@ -1191,74 +1477,94 @@
         /* Bounce animation keyframes */
         @keyframes navBounceCollapse {
             0% {
-                transform: translateX(-50%) scale(1);
+                transform: translate3d(-50%, 0, 0) scale(1);
             }
             30% {
-                transform: translateX(-50%) scale(0.99);
+                transform: translate3d(-50%, 0, 0) scale(0.99);
             }
             50% {
-                transform: translateX(-50%) scale(1.005);
+                transform: translate3d(-50%, 0, 0) scale(1.005);
             }
             65% {
-                transform: translateX(-50%) scale(0.998);
+                transform: translate3d(-50%, 0, 0) scale(0.998);
             }
             100% {
-                transform: translateX(-50%) scale(1);
+                transform: translate3d(-50%, 0, 0) scale(1);
             }
         }
 
         @keyframes navBounceExpand {
             0% {
-                transform: translateX(-50%) scale(1);
+                transform: translate3d(-50%, 0, 0) scale(1);
             }
             50% {
-                transform: translateX(-50%) scale(1.004);
+                transform: translate3d(-50%, 0, 0) scale(1.004);
             }
             65% {
-                transform: translateX(-50%) scale(0.998);
+                transform: translate3d(-50%, 0, 0) scale(0.998);
             }
             75% {
-                transform: translateX(-50%) scale(1.0005);
+                transform: translate3d(-50%, 0, 0) scale(1.0005);
             }
             100% {
-                transform: translateX(-50%) scale(1);
+                transform: translate3d(-50%, 0, 0) scale(1);
             }
         }
 
         /* Apply bounce animation to nav island */
         .nav-island {
-            transform: translateX(-50%);
+            transform: translate3d(-50%, 0, 0);
+            will-change: transform;
         }
 
         .nav-island.collapsing {
             animation: navBounceCollapse 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform;
         }
 
         .nav-island.expanding {
             animation: navBounceExpand 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform;
+        }
+
+        @media (max-width: 768px) {
+            .nav-island.collapsing {
+                animation: navBounceCollapse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .nav-island.expanding {
+                animation: navBounceExpand 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
         }
 
         /* Apple-like bounce animation */
         @keyframes appleBounce {
             0% {
-                transform: translateX(-50%) scale(1);
+                transform: translate3d(-50%, 0, 0) scale(1);
             }
             35% {
-                transform: translateX(-50%) scale(0.995);
+                transform: translate3d(-50%, 0, 0) scale(0.995);
             }
             60% {
-                transform: translateX(-50%) scale(1.005);
+                transform: translate3d(-50%, 0, 0) scale(1.005);
             }
             80% {
-                transform: translateX(-50%) scale(0.998);
+                transform: translate3d(-50%, 0, 0) scale(0.998);
             }
             100% {
-                transform: translateX(-50%) scale(1);
+                transform: translate3d(-50%, 0, 0) scale(1);
             }
         }
 
         .nav-island.bouncing {
             animation: appleBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform;
+        }
+
+        @media (max-width: 768px) {
+            .nav-island.bouncing {
+                animation: appleBounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
         }
 
 
@@ -1513,18 +1819,173 @@
             }
         }
 
+        .nav-hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 999px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            cursor: pointer;
+            gap: 4px;
+            transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-hamburger-btn span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: currentColor;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-hamburger-btn:hover {
+            color: var(--white);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-hamburger-btn:active {
+            transform: scale(0.95);
+        }
+
+        .nav-hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .nav-hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .nav-mobile-menu {
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 0.5rem;
+            min-width: 200px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 10000;
+            overflow: hidden;
+        }
+
+        .nav-mobile-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-mobile-menu button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: block;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
+        }
+
+        .nav-mobile-menu button:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-mobile-menu button:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.08);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background 0.1s ease;
+        }
+
         @media (max-width: 768px) {
             .nav-island {
-                flex-wrap: wrap;
-                max-width: calc(100% - 2rem);
-                padding: 0.75rem 1rem;
-                gap: 0.5rem;
+                flex-wrap: nowrap;
+                max-width: calc(100% - 1rem);
+                padding: 0.65rem 0.9rem;
+                gap: 0.4rem;
+                top: 1rem;
+                overflow: visible;
+            }
+
+            .nav-link-icon {
+                padding: 0.5rem;
+                min-width: 36px;
+                min-height: 36px;
+                justify-content: center;
+            }
+
+            .nav-link-icon .nav-icon {
+                display: block;
+            }
+
+            .nav-link-icon .nav-text {
+                display: none;
+            }
+
+            .nav-island a,
+            .nav-island button:not(.nav-hamburger-btn) {
+                font-size: 0.8rem;
+                padding: 0.5rem;
+                min-height: 36px;
+                min-width: 36px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .nav-extra {
+                display: none !important;
+            }
+
+            .nav-hamburger-btn {
+                display: flex;
+                flex-shrink: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-island {
+                padding: 0.5rem 0.7rem;
+                gap: 0.3rem;
+                max-width: calc(100% - 0.75rem);
+                top: 0.75rem;
             }
 
             .nav-island a,
             .nav-island button {
-                font-size: 0.85rem;
-                padding: 0.5rem 0.75rem;
+                font-size: 0.75rem;
+                padding: 0.5rem 0.7rem;
+                min-height: 40px;
             }
         }
 
@@ -1540,13 +2001,21 @@
             border-radius: 12px;
             cursor: pointer;
             padding: 0;
-            transition: all 0.25s ease;
+            transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 5px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
         }
 
         .hamburger-btn:hover {
             border-color: rgba(255, 255, 255, 0.3);
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        .hamburger-btn:active {
+            transform: scale(0.95);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hamburger-btn span {
@@ -1555,7 +2024,8 @@
             height: 2px;
             background: var(--muted);
             border-radius: 2px;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            will-change: transform;
         }
 
         .hamburger-btn:hover span {
@@ -1615,9 +2085,20 @@
 
         @media (max-width: 640px) {
             .nav-menu {
-                right: 1rem;
-                left: 1rem;
+                right: 0.75rem;
+                left: 0.75rem;
                 min-width: auto;
+                width: auto;
+                max-width: calc(100vw - 1.5rem);
+            }
+
+            .nav-menu a {
+                padding: 0.85rem 1rem;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                box-sizing: border-box;
             }
         }
 
@@ -1643,6 +2124,29 @@
             .team-stack {
                 height: 480px;
             }
+
+            .stat-grid, .value-grid, .project-grid, .team-grid {
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+
+            .stat-card, .value-card, .project-card, .team-card {
+                padding: 1.5rem;
+            }
+
+            main {
+                gap: 4rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-card, .value-card, .project-card, .team-card {
+                padding: 1.25rem;
+            }
+
+            main {
+                gap: 3rem;
+            }
         }
 
         .modal-overlay {
@@ -1661,6 +2165,7 @@
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
             overflow: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal-overlay::before {
@@ -1730,7 +2235,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
         }
 
         .modal-close:hover {
@@ -1739,9 +2248,16 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
+        .modal-close:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.08);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.1s ease;
+        }
+
         .modal-close svg {
             width: 20px;
             height: 20px;
+            pointer-events: none;
         }
 
         .modal-content h1 {
@@ -1943,6 +2459,10 @@
             box-shadow: 
                 inset 0 1px 2px rgba(255, 255, 255, 0.3),
                 inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            will-change: transform;
         }
 
         .modal-content button[type="submit"]:hover {
@@ -1953,23 +2473,74 @@
                 inset 0 -1px 1px rgba(0, 0, 0, 0.12);
         }
 
+        .modal-content button[type="submit"]:active {
+            transform: translateY(-1px) scale(0.98);
+            box-shadow: 
+                0 10px 30px rgba(255, 255, 255, 0.15),
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s ease;
+        }
+
         @media (max-width: 640px) {
+            .modal-overlay {
+                padding: 1rem 0.75rem;
+            }
+
             .modal-content {
-                padding: 2rem 1.5rem;
-                padding-right: 1.25rem;
+                padding: 2rem 1.25rem;
+                padding-right: 1rem;
+                max-height: 95vh;
             }
 
             .modal-close {
-                top: 1rem;
-                right: 1rem;
+                top: 0.75rem;
+                right: 0.75rem;
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .modal-close svg {
+                width: 22px;
+                height: 22px;
             }
 
             .modal-content h1 {
-                font-size: 1.8rem;
+                font-size: 1.75rem;
             }
 
             .modal-content h2 {
-                font-size: 1.3rem;
+                font-size: 1.25rem;
+            }
+
+            .modal-content .form-row {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .modal-content input,
+            .modal-content textarea,
+            .modal-content select {
+                font-size: 16px; /* Prevents zoom on iOS */
+                padding: 0.9rem 1rem;
+            }
+
+            .modal-content button[type="submit"] {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 1.5rem 1rem;
+                border-radius: 20px;
+            }
+
+            .modal-content h1 {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -1991,10 +2562,35 @@
         </div>
     </nav>
     <nav class="nav-island">
-        <a href="#who-we-are">About Us</a>
-        <a href="#projects">Projects</a>
-        <a href="vault.html">Vault</a>
-        <button data-modal="contact">Contact Us</button>
+        <a href="#who-we-are" class="nav-link-icon">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="nav-text">About Us</span>
+        </a>
+        <a href="#projects" class="nav-link-icon">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span class="nav-text">Projects</span>
+        </a>
+        <a href="vault.html" class="nav-link-icon">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span class="nav-text">Vault</span>
+        </a>
+        <button data-modal="contact" class="nav-link-icon">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="nav-text">Contact Us</span>
+        </button>
         <div class="nav-extra">
             <span class="nav-divider"></span>
             <button class="nav-icon-btn" data-modal="terms" aria-label="Terms & Conditions" title="Terms & Conditions">
@@ -2009,6 +2605,15 @@
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
             </button>
+        </div>
+        <button class="nav-hamburger-btn" id="navHamburger" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-mobile-menu" id="navMobileMenu">
+            <button data-modal="terms">Terms & Conditions</button>
+            <button data-modal="privacy">Privacy Policy</button>
         </div>
     </nav>
     <main>
@@ -2231,9 +2836,9 @@
 
     <footer>
         <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1.5rem; margin-bottom: 1rem;">
-            <button data-modal="terms" style="color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s ease; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0;">Terms & Conditions</button>
+            <button data-modal="terms" class="footer-btn">Terms & Conditions</button>
             <span style="color: var(--muted);">•</span>
-            <button data-modal="privacy" style="color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s ease; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0;">Privacy Policy</button>
+            <button data-modal="privacy" class="footer-btn">Privacy Policy</button>
         </div>
         <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">© 2025 ZoneBrozStudios. All Rights Reserved.</p>
     </footer>
@@ -2321,7 +2926,7 @@
             <p>We respect the confidentiality of client information and project details. We will not disclose confidential information to third parties without consent, except as required by law or as necessary to provide our services.</p>
 
             <h2>11. Data Protection</h2>
-            <p>We handle personal data in accordance with applicable data protection laws. For detailed information about how we collect, use, and protect your data, please refer to our <button data-modal="privacy" style="color: var(--white); text-decoration: underline; background: none; border: none; cursor: pointer; font-family: inherit; padding: 0;">Privacy Policy</button>.</p>
+            <p>We handle personal data in accordance with applicable data protection laws. For detailed information about how we collect, use, and protect your data, please refer to our <button data-modal="privacy" class="inline-link-btn">Privacy Policy</button>.</p>
 
             <h2>12. Modifications to Terms</h2>
             <p>We reserve the right to modify these Terms at any time. Changes will be effective immediately upon posting to our website. Continued use of our services after changes constitutes acceptance of the modified Terms.</p>
@@ -3147,25 +3752,69 @@
             });
         });
 
+        // Mobile hamburger menu toggle
+        const navHamburger = document.getElementById('navHamburger');
+        const navMobileMenu = document.getElementById('navMobileMenu');
+        
+        if (navHamburger && navMobileMenu) {
+            const toggleMobileMenu = (e) => {
+                e.stopPropagation();
+                navHamburger.classList.toggle('active');
+                navMobileMenu.classList.toggle('active');
+            };
+            
+            navHamburger.addEventListener('click', toggleMobileMenu);
+            navHamburger.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                toggleMobileMenu(e);
+            }, { passive: false });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navHamburger.contains(e.target) && !navMobileMenu.contains(e.target)) {
+                    navHamburger.classList.remove('active');
+                    navMobileMenu.classList.remove('active');
+                }
+            });
+            
+            // Close menu when clicking a menu item
+            navMobileMenu.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    navHamburger.classList.remove('active');
+                    navMobileMenu.classList.remove('active');
+                });
+            });
+        }
+
         // Close modals when close button is clicked
         document.querySelectorAll('.modal-close').forEach(closeBtn => {
-            closeBtn.addEventListener('click', () => {
+            // Use both click and touchstart for better mobile support
+            const handleClose = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const modal = closeBtn.closest('.modal-overlay');
                 if (modal) {
                     const modalId = modal.id.replace('Modal', '');
                     closeModal(modalId);
                 }
-            });
+            };
+            
+            closeBtn.addEventListener('click', handleClose);
+            closeBtn.addEventListener('touchend', handleClose, { passive: false });
         });
 
         // Close modals when clicking outside the modal content
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
+            const handleOverlayClick = (e) => {
+                // Only close if clicking directly on the overlay, not on modal content or close button
+                if (e.target === overlay || e.target === overlay.querySelector('::before')) {
                     const modalId = overlay.id.replace('Modal', '');
                     closeModal(modalId);
                 }
-            });
+            };
+            
+            overlay.addEventListener('click', handleOverlayClick);
+            overlay.addEventListener('touchend', handleOverlayClick, { passive: true });
         });
 
         // Close modals with Escape key

@@ -86,6 +86,15 @@
             padding-bottom: 32px;
         }
 
+        @media (max-width: 640px) {
+            #app-root {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                padding-top: 1.5rem;
+                padding-bottom: 1.5rem;
+            }
+        }
+
         .full-bleed {
             width: 100vw;
             margin-left: calc(50% - 50vw);
@@ -206,11 +215,43 @@
             }
 
             h1 {
-                font-size: 1.8rem;
+                font-size: clamp(1.75rem, 5vw, 2.2rem);
             }
 
             h2 {
-                font-size: 1.3rem;
+                font-size: clamp(1.25rem, 4vw, 1.5rem);
+            }
+
+            h3 {
+                font-size: 1.1rem;
+            }
+
+            p, ul, ol {
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+
+            .back-link {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .legal-container {
+                padding: 1.5rem 1.25rem;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            .contact-info {
+                padding: 1.25rem;
             }
         }
     </style>
