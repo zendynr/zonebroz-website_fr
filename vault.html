@@ -649,8 +649,10 @@
             gap: 2rem;
             margin-bottom: 0;
             opacity: 0;
-            transform: translateY(30px) scale(0.95);
+            transform: translate3d(0, 30px, 0) scale(0.95);
             will-change: transform, opacity;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
         }
 
         .timeline-node:nth-child(odd) {
@@ -1740,51 +1742,15 @@
         const timelineData = [
             {
                 date: '2025-03-01',
-                importance: 'high', // high, medium, low
-                videoId: 'dQw4w9WgXcQ', // YouTube video ID (placeholder)
+                importance: 'high',
+                videoId: 'dQw4w9WgXcQ',
                 description: 'The beginning. Day one of something we hoped would matter. Raw, unpolished, but real.'
             },
             {
-                date: '2025-02-15',
+                date: '2025-01-15',
                 importance: 'medium',
                 videoId: 'dQw4w9WgXcQ',
                 description: 'Building momentum. Early prototypes taking shape. The vision starts to feel tangible.'
-            },
-            {
-                date: '2025-01-20',
-                importance: 'high',
-                videoId: 'dQw4w9WgXcQ',
-                description: 'The spark. That first moment when the idea clicked and we knew we had to pursue this.'
-            },
-            {
-                date: '2024-12-10',
-                importance: 'low',
-                videoId: 'dQw4w9WgXcQ',
-                description: 'Initial exploration. Sketches and conversations that would eventually lead somewhere meaningful.'
-            },
-            {
-                date: '2024-11-05',
-                importance: 'medium',
-                videoId: 'dQw4w9WgXcQ',
-                description: 'Research phase. Understanding the problem space and what might be possible.'
-            },
-            {
-                date: '2024-09-18',
-                importance: 'low',
-                videoId: 'dQw4w9WgXcQ',
-                description: 'Early thoughts. Fragments of ideas that hadn\'t quite formed into anything concrete yet.'
-            },
-            {
-                date: '2024-08-22',
-                importance: 'medium',
-                videoId: 'dQw4w9WgXcQ',
-                description: 'First conversations. Late night discussions about what we could build together.'
-            },
-            {
-                date: '2024-07-04',
-                importance: 'low',
-                videoId: 'dQw4w9WgXcQ',
-                description: 'The seed. A passing thought that lingered longer than it should have.'
             }
         ];
 
@@ -1829,17 +1795,22 @@
                 parseDate(b.date) - parseDate(a.date)
             );
 
-            // Ensure consistent node generation across all devices
+            // Ensure consistent node generation across all devices - NO device filtering
             if (sortedData.length === 0) {
                 console.warn('No timeline data available');
                 return;
             }
 
+            // IMPORTANT: Generate ALL nodes for ALL devices - never filter by screen size
+            // This ensures consistent node count between mobile and PC
+            const totalNodesToRender = sortedData.length;
+            console.log(`Generating ${totalNodesToRender} timeline nodes (same count for mobile and PC)`);
+
             let html = '';
             let totalHeight = 0;
             const nodePositions = [];
 
-            // Generate ALL nodes consistently regardless of device
+            // Generate ALL nodes consistently regardless of device - no conditional logic
             sortedData.forEach((item, index) => {
                 // Calculate spacing based on time gap
                 let spacing = MIN_SPACING;
@@ -1889,13 +1860,21 @@
             window.timelineNodePositions = nodePositions;
             window.timelineTotalHeight = totalHeight + 100;
 
-            // Ensure consistent node count across all devices
+            // Verify consistent node count across all devices - this MUST match between mobile and PC
             const renderedNodes = container.querySelectorAll('.timeline-node');
             if (renderedNodes.length !== sortedData.length) {
-                console.error(`Node count mismatch! Expected ${sortedData.length}, got ${renderedNodes.length}`);
+                console.error(`❌ Node count mismatch! Expected ${sortedData.length}, got ${renderedNodes.length}`);
+                console.error('This should never happen - all nodes must render on all devices');
             } else {
-                console.log(`✓ All ${renderedNodes.length} timeline nodes rendered consistently`);
+                console.log(`✓ Successfully rendered ${renderedNodes.length} timeline nodes (consistent across mobile and PC)`);
             }
+            
+            // Ensure all nodes are visible (not hidden by CSS)
+            renderedNodes.forEach((node, index) => {
+                if (node.style.display === 'none' || node.style.visibility === 'hidden') {
+                    console.warn(`⚠️ Node ${index} is hidden - this may cause inconsistency`);
+                }
+            });
 
             // Setup video click handlers
             setupVideoPlayers();
@@ -2021,6 +2000,11 @@
         function setupPathAnimation(pathMain, pathGlow, pathGhost, trigger) {
             const pathLength = pathTotalLength;
             
+            // Performance optimization: throttle DOM updates for PC
+            let rafId = null;
+            let lastProgress = -1;
+            const PROGRESS_THRESHOLD = 0.0005; // Only update if progress changed significantly
+            
             // Create a custom scroll-based animation
             ScrollTrigger.create({
                 trigger: trigger,
@@ -2030,39 +2014,60 @@
                 onUpdate: (self) => {
                     const progress = self.progress;
                     
-                    // Calculate the "head" position of the drawing
-                    const drawLength = progress * (pathLength + VISIBLE_RADIUS);
+                    // Skip update if progress hasn't changed significantly (reduce unnecessary work)
+                    if (Math.abs(progress - lastProgress) < PROGRESS_THRESHOLD) {
+                        return;
+                    }
+                    lastProgress = progress;
                     
-                    // The visible window: from (drawLength - VISIBLE_RADIUS) to drawLength
-                    const visibleStart = Math.max(0, drawLength - VISIBLE_RADIUS);
-                    const visibleEnd = Math.min(pathLength, drawLength);
-                    
-                    // Create dash pattern for visible window effect
-                    const beforeLength = visibleStart;
-                    const visibleLength = visibleEnd - visibleStart;
-                    const afterLength = pathLength - visibleEnd;
-                    
-                    if (visibleLength > 0) {
-                        // Main visible path with fade at edges
-                        pathMain.style.strokeDasharray = `0 ${beforeLength} ${visibleLength} ${afterLength + pathLength}`;
-                        pathMain.style.strokeDashoffset = '0';
-                        
-                        // Glow follows same pattern
-                        pathGlow.style.strokeDasharray = `0 ${beforeLength} ${visibleLength} ${afterLength + pathLength}`;
-                        pathGlow.style.strokeDashoffset = '0';
+                    // Cancel any pending animation frame
+                    if (rafId !== null) {
+                        cancelAnimationFrame(rafId);
                     }
                     
-                    // Reveal nodes when the path reaches them
-                    nodePathPositions.forEach((item, index) => {
-                        if (!item.revealed && drawLength >= item.pathLength) {
-                            revealNode(item.node, index);
-                            item.revealed = true;
+                    // Batch all DOM updates in requestAnimationFrame for better performance
+                    rafId = requestAnimationFrame(() => {
+                        // Calculate the "head" position of the drawing
+                        const drawLength = progress * (pathLength + VISIBLE_RADIUS);
+                        
+                        // The visible window: from (drawLength - VISIBLE_RADIUS) to drawLength
+                        const visibleStart = Math.max(0, drawLength - VISIBLE_RADIUS);
+                        const visibleEnd = Math.min(pathLength, drawLength);
+                        
+                        // Create dash pattern for visible window effect
+                        const beforeLength = visibleStart;
+                        const visibleLength = visibleEnd - visibleStart;
+                        const afterLength = pathLength - visibleEnd;
+                        
+                        if (visibleLength > 0) {
+                            // Batch style updates - calculate once, apply to both paths
+                            const dashPattern = `0 ${beforeLength} ${visibleLength} ${afterLength + pathLength}`;
+                            pathMain.style.strokeDasharray = dashPattern;
+                            pathMain.style.strokeDashoffset = '0';
+                            
+                            // Glow follows same pattern
+                            pathGlow.style.strokeDasharray = dashPattern;
+                            pathGlow.style.strokeDashoffset = '0';
                         }
-                        // Hide nodes when scrolling back up
-                        if (item.revealed && drawLength < item.pathLength - 80) {
-                            hideNode(item.node);
-                            item.revealed = false;
+                        
+                        // Optimized node reveal/hide loop - use for loop for better performance
+                        const nodesCount = nodePathPositions.length;
+                        for (let i = 0; i < nodesCount; i++) {
+                            const item = nodePathPositions[i];
+                            
+                            // Check reveal condition
+                            if (!item.revealed && drawLength >= item.pathLength) {
+                                revealNode(item.node, i);
+                                item.revealed = true;
+                            }
+                            // Hide nodes when scrolling back up - increased threshold to prevent flicker
+                            else if (item.revealed && drawLength < item.pathLength - 100) {
+                                hideNode(item.node);
+                                item.revealed = false;
+                            }
                         }
+                        
+                        rafId = null;
                     });
                 }
             });
@@ -2076,7 +2081,7 @@
 
         function revealNode(node, index) {
             const importance = node.querySelector('.node-content').dataset.importance;
-            const duration = importance === 'high' ? 0.8 : importance === 'medium' ? 0.6 : 0.5;
+            const duration = importance === 'high' ? 0.7 : importance === 'medium' ? 0.5 : 0.4;
             
             node.classList.add('revealed');
             
@@ -2086,18 +2091,20 @@
                 gsap.set(lockOverlay, { opacity: 1, zIndex: 999 });
             }
             
+            // Use GPU-accelerated transforms for better performance on PC
             gsap.fromTo(node,
                 { 
                     opacity: 0, 
                     y: 30,
                     scale: 0.95
                 },
-                        {
-                            opacity: 1,
-                            y: 0,
+                {
+                    opacity: 1,
+                    y: 0,
                     scale: 1,
                     duration: duration,
-                    ease: 'power3.out'
+                    ease: 'power2.out',
+                    force3D: true
                 }
             );
             
@@ -2105,19 +2112,21 @@
             const connector = node.querySelector('.node-connector');
             gsap.fromTo(connector,
                 { scale: 0, opacity: 0 },
-                { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(2)' }
+                { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.5)', force3D: true }
             );
         }
 
         function hideNode(node) {
             node.classList.remove('revealed');
             
+            // Faster hide animation for better responsiveness
             gsap.to(node, {
                 opacity: 0,
                 y: 20,
                 scale: 0.95,
-                duration: 0.3,
-                ease: 'power2.in'
+                duration: 0.25,
+                ease: 'power2.in',
+                force3D: true
             });
         }
 
