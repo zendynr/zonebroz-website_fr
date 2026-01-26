@@ -1223,6 +1223,7 @@
             }
         }
 
+        @media (max-width: 480px) {
             .anchor-node {
                 padding: 2rem 1.5rem;
             }
@@ -1741,6 +1742,13 @@
         // ============================================
         const timelineData = [
             {
+                date: '2025-03-15',
+                importance: 'high',
+                videoId: 'Z4JIBbOsb8w',
+                description: 'The beginning. Day one of something we hoped would matter. Raw, unpolished, but real.',
+                unlocked: true
+            },
+            {
                 date: '2025-03-01',
                 importance: 'high',
                 videoId: 'dQw4w9WgXcQ',
@@ -1827,17 +1835,20 @@
                     side: index % 2 === 0 ? 'left' : 'right'
                 });
 
-                html += `
-                    <div class="timeline-node" style="margin-top: ${spacing}px;" data-index="${index}">
-                        <div class="node-connector" style="top: 20px;"></div>
-                        <div class="node-content" data-importance="${item.importance}">
+                const lockOverlay = item.unlocked ? '' : `
                             <div class="node-lock-overlay">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                                 </svg>
                                 <span class="node-lock-text">Locked</span>
-                            </div>
+                            </div>`;
+
+                html += `
+                    <div class="timeline-node" style="margin-top: ${spacing}px;" data-index="${index}" ${item.unlocked ? 'data-unlocked="true"' : ''}>
+                        <div class="node-connector" style="top: 20px;"></div>
+                        <div class="node-content" data-importance="${item.importance}">
+                            ${lockOverlay}
                             <div class="node-video">
                                 <div class="node-video-placeholder" data-video-id="${item.videoId}">
                                     <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1891,10 +1902,18 @@
                     const videoId = this.dataset.videoId;
                     const container = this.parentElement;
                     
+                    // Try embedding with YouTube nocookie domain first (more permissive)
                     const iframe = document.createElement('iframe');
-                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                    iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
                     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
                     iframe.allowFullscreen = true;
+                    iframe.setAttribute('frameborder', '0');
+                    iframe.setAttribute('title', 'YouTube video player');
+                    
+                    // If embed fails, fallback to opening YouTube directly
+                    iframe.onerror = function() {
+                        window.open(`https://youtu.be/${videoId}`, '_blank');
+                    };
                     
                     container.innerHTML = '';
                     container.appendChild(iframe);
@@ -2082,13 +2101,16 @@
         function revealNode(node, index) {
             const importance = node.querySelector('.node-content').dataset.importance;
             const duration = importance === 'high' ? 0.7 : importance === 'medium' ? 0.5 : 0.4;
+            const isUnlocked = node.dataset.unlocked === 'true';
             
             node.classList.add('revealed');
             
-            // Ensure lock overlay stays visible
-            const lockOverlay = node.querySelector('.node-lock-overlay');
-            if (lockOverlay) {
-                gsap.set(lockOverlay, { opacity: 1, zIndex: 999 });
+            // Ensure lock overlay stays visible (only if not unlocked)
+            if (!isUnlocked) {
+                const lockOverlay = node.querySelector('.node-lock-overlay');
+                if (lockOverlay) {
+                    gsap.set(lockOverlay, { opacity: 1, zIndex: 999 });
+                }
             }
             
             // Use GPU-accelerated transforms for better performance on PC
