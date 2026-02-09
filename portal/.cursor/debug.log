@@ -1,0 +1,78 @@
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680300302}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680308012}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680337757}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client resolve failed","data":{"error":"No client account"},"hypothesisId":"H2","timestamp":1770680337775}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client resolve failed","data":{"error":"No client account"},"hypothesisId":"H2","timestamp":1770680337993}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client resolve failed","data":{"error":"No client account"},"hypothesisId":"H2","timestamp":1770680338200}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"proj"},"hypothesisId":"H4","timestamp":1770680340771}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"dash"},"hypothesisId":"H4","timestamp":1770680341108}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"proj"},"hypothesisId":"H4","timestamp":1770680357248}
+{"location":"zonebrozstudios-admin-dashboard.jsx:updateProject","message":"updateProject entry","data":{"projectId":"f3727065-ed82-42df-b804-f67c353e138b","keys":["status"]},"hypothesisId":"H3","timestamp":1770680360599}
+{"location":"zonebrozstudios-admin-dashboard.jsx:updateProject","message":"updateProject success","data":{"projectId":"f3727065-ed82-42df-b804-f67c353e138b"},"hypothesisId":"H3","timestamp":1770680360856}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680362060}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"proj"},"hypothesisId":"H4","timestamp":1770680363211}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680363225}
+{"location":"zonebrozstudios-admin-dashboard.jsx:updateProject","message":"updateProject entry","data":{"projectId":"f3727065-ed82-42df-b804-f67c353e138b","keys":["status"]},"hypothesisId":"H3","timestamp":1770680365972}
+{"location":"zonebrozstudios-admin-dashboard.jsx:updateProject","message":"updateProject success","data":{"projectId":"f3727065-ed82-42df-b804-f67c353e138b"},"hypothesisId":"H3","timestamp":1770680366195}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680381062}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680382063}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680384061}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680391061}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client resolve failed","data":{"error":"No client account"},"hypothesisId":"H2","timestamp":1770680412536}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680412783}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client resolve failed","data":{"error":"No client account"},"hypothesisId":"H2","timestamp":1770680413939}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680414412}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"dash"},"hypothesisId":"H4","timestamp":1770680415551}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"proj"},"hypothesisId":"H4","timestamp":1770680415945}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"dash"},"hypothesisId":"H4","timestamp":1770680446722}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"proj"},"hypothesisId":"H4","timestamp":1770680447122}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680447774}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"dash"},"hypothesisId":"H4","timestamp":1770680448868}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"proj"},"hypothesisId":"H4","timestamp":1770680449665}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680450652}
+{"location":"zonebrozstudios-admin-dashboard.jsx:updateProject","message":"updateProject entry","data":{"projectId":"f3727065-ed82-42df-b804-f67c353e138b","keys":["status"]},"hypothesisId":"H3","timestamp":1770680458848}
+{"location":"zonebrozstudios-admin-dashboard.jsx:updateProject","message":"updateProject success","data":{"projectId":"f3727065-ed82-42df-b804-f67c353e138b"},"hypothesisId":"H3","timestamp":1770680459090}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"dash"},"hypothesisId":"H4","timestamp":1770680459525}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"proj"},"hypothesisId":"H4","timestamp":1770680460644}
+{"location":"zonebrozstudios-admin-dashboard.jsx:updateProject","message":"updateProject entry","data":{"projectId":"f3727065-ed82-42df-b804-f67c353e138b","keys":["status"]},"hypothesisId":"H3","timestamp":1770680463932}
+{"location":"zonebrozstudios-admin-dashboard.jsx:updateProject","message":"updateProject success","data":{"projectId":"f3727065-ed82-42df-b804-f67c353e138b"},"hypothesisId":"H3","timestamp":1770680464158}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"clients"},"hypothesisId":"H4","timestamp":1770680464985}
+{"location":"zonebrozstudios-admin-dashboard.jsx:nav","message":"Admin page change","data":{"page":"dash"},"hypothesisId":"H4","timestamp":1770680465301}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client resolve failed","data":{"error":"No client account"},"hypothesisId":"H2","timestamp":1770680467293}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680467770}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client resolve failed","data":{"error":"No client account"},"hypothesisId":"H2","timestamp":1770680469703}
+{"location":"zonebrozstudios-admin-dashboard.jsx:dataLoad","message":"Admin data load success","data":{"projects":1,"clients":1,"payments":2,"files":1,"convos":1},"hypothesisId":"H1","timestamp":1770680469943}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680473995}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680499880}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680575278}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680612654}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680612891}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680613138}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680614387}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680616614}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680616827}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680623604}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680623818}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680626379}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680637620}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680637837}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680638056}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680638612}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680638827}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680639041}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680664642}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680664857}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680665094}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680671626}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680671849}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680672070}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680683513}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680686333}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680686544}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680686760}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680691003}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680691226}
+{"location":"zonebrozstudios-client-portal.jsx:clientResolve","message":"Client and projects loaded","data":{"projectsCount":1},"hypothesisId":"H2","timestamp":1770680691452}
+{"location":"zonebrozstudios-client-portal.jsx:navigate","message":"Client page change","data":{"page":"files"},"hypothesisId":"H4","timestamp":1770680703452}
+{"location":"zonebrozstudios-client-portal.jsx:navigate","message":"Client page change","data":{"page":"messages"},"hypothesisId":"H4","timestamp":1770680704074}
+{"location":"zonebrozstudios-client-portal.jsx:navigate","message":"Client page change","data":{"page":"payments"},"hypothesisId":"H4","timestamp":1770680704860}
