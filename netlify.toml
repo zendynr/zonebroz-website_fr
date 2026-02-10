@@ -1,0 +1,7 @@
+[build]
+  command = "bash scripts/netlify-build.sh"
+  publish = "public"
+
+# Optional: set Node version for the portal build (Vite needs Node 18+)
+[build.environment]
+  NODE_VERSION = "20"
