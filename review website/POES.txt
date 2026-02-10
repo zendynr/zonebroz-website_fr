@@ -1,0 +1,421 @@
+FRONTEND-FIRST PRD
+Interactive Product Audit & Review Platform
+
+Intent:
+This PRD defines a frontend-complete, backend-agnostic implementation of an interactive, slide-based product audit system.
+All infrastructure (auth, database, storage, permissions) is intentionally abstracted, not implemented.
+
+1. Product Vision (Unchanged, but clarified)
+
+A web-based platform that renders premium, narrative-driven product audit reports (UX, functionality, market, tech) as interactive slides with animations, charts, and evidence.
+
+The system is designed around:
+
+structured data
+
+repeatable review logic
+
+tier-based visibility
+
+high perceived value
+
+Reports are rendered from data, not authored manually.
+
+2. What This PRD Explicitly DOES and DOES NOT Do
+✅ This PRD Covers
+
+Slide system & navigation
+
+Review framework & scoring
+
+Findings + priority logic
+
+Tier gating logic
+
+Animation model
+
+Media rendering rules
+
+Component boundaries
+
+Mocked data contracts
+
+❌ This PRD Does NOT Implement (by design)
+
+These are designed for, but mocked:
+
+Authentication
+
+Authorization / permissions enforcement
+
+Database persistence
+
+File storage
+
+PDF export
+
+Billing / payments
+
+Invitations / sharing
+
+These must be abstracted, not ignored.
+
+3. User Model (Mocked)
+Conceptual Roles
+
+admin – internal reviewer
+
+client – report viewer
+
+Frontend Representation (Mock)
+CurrentUser {
+  id: string
+  role: "admin" | "client"
+  tier: "snapshot" | "full" | "investor"
+}
+
+
+⚠️ Rule:
+Frontend components must never depend on real auth.
+They consume currentUser from a mocked context/provider.
+
+Backend will later replace this provider.
+
+4. Access Control Strategy (Frontend-Safe)
+❌ What NOT to do
+
+Route guards
+
+Redirects to login
+
+Server checks
+
+DB permission logic
+
+✅ What TO do
+
+Use feature visibility, not enforcement.
+
+canView(featureKey): boolean
+
+
+Examples:
+
+"competitorAnalysis"
+
+"techReview"
+
+"pdfExport"
+
+All slides and sections must respect this function.
+
+5. Report Architecture (Core System)
+Report = Data → Slides
+
+Slides are derived, not authored.
+
+Report {
+  id
+  meta
+  categoryScores[]
+  findings[]
+  competitors[]
+  roadmap[]
+}
+
+
+Slides are generated dynamically based on:
+
+report data
+
+user tier
+
+slide type availability
+
+6. Slide System (Critical for Scalability)
+Slide Container
+
+Slide-by-slide navigation (snap)
+
+Some slides allow vertical scroll
+
+Animations fire on slide entry
+
+Slides are isolated and reusable
+
+Slide Types (v1)
+
+Hero / Summary
+
+Score Breakdown
+
+Insight
+
+Evidence
+
+Deep Dive (Scrollable)
+
+Urgent Fixes
+
+Roadmap
+
+Final Verdict
+
+Each slide:
+
+Slide {
+  type
+  visible: boolean
+  data
+}
+
+7. Review Framework (Scoring)
+Fixed Categories
+
+First Impression & Clarity
+
+UI Quality
+
+UX Flow
+
+Mobile Responsiveness
+
+Accessibility Basics
+
+Onboarding & Activation
+
+Feature Completeness
+
+Monetization Logic
+
+Retention Hooks
+
+Performance
+
+Security & Trust
+
+Scalability / Build Health (tier-gated)
+
+Each score:
+
+CategoryScore {
+  category
+  score: number (0–10)
+  notes
+}
+
+
+Scores are visualized but not computed automatically.
+
+8. Findings System (This Is the “Engine”)
+
+Each finding MUST follow this shape:
+
+Finding {
+  id
+  category
+  title
+  description
+  impact (1–5)
+  effort (1–5)
+  confidence (1–5)
+  recommendation
+  evidence[]
+}
+
+Priority Formula (Frontend Logic)
+urgency = (impact * confidence) / effort
+
+
+Frontend auto-groups:
+
+Fix Now
+
+Next
+
+Nice to Have
+
+Backend will later persist this data — logic must live in frontend utilities.
+
+9. Tier System (Frontend Only)
+Tiers
+
+snapshot
+
+full
+
+investor
+
+Tier Controls
+
+Tier controls:
+
+Which slides render
+
+Which sections appear
+
+Which metrics are visible
+
+Tier does not:
+
+Change layouts
+
+Create separate code paths
+
+Fork the system
+
+10. Media Handling (Mocked Storage)
+Supported Media
+
+Images (PNG/JPG)
+
+Short video (MP4/WebM ≤10s)
+
+No raw GIFs
+
+Frontend assumes:
+
+Evidence {
+  type: "image" | "video"
+  url: string
+  caption?
+}
+
+
+⚠️ URLs are mocked/static for now.
+Storage logic comes later.
+
+11. Animation System (Frontend Focus)
+Stack
+
+GSAP for timelines & slide entry
+
+CSS / WAAPI for micro-interactions
+
+Charts animate internally
+
+Rules
+
+Animations run once per slide entry
+
+Respect reduced motion
+
+Disabled in “print mode”
+
+Frontend must support:
+
+isPrintMode: boolean
+
+12. Charts & Visualization
+
+Recharts for graphs
+
+Charts accept static data
+
+Animations optional, not required
+
+Charts must degrade cleanly to static render.
+
+13. Admin Experience (Frontend Prototype)
+Admin Capabilities (Mocked)
+
+Create/edit report data
+
+Enter scores
+
+Add findings
+
+Attach evidence
+
+Add competitors
+
+Preview report
+
+⚠️ No persistence required yet.
+Local state or mocked JSON is acceptable.
+
+14. Backend-Deferred Concerns (Explicitly Accounted For)
+
+These are designed for, but not built:
+
+Feature	Frontend Strategy
+Auth	Mock currentUser provider
+Permissions	canView() helper
+Database	Typed interfaces only
+Storage	Assume URLs
+PDF Export	printMode flag
+Versioning	reportVersion field
+Billing	Feature flags only
+
+This guarantees backend can plug in later without refactors.
+
+15. Non-Goals (v1, Enforced)
+
+Real authentication
+
+API routes
+
+Server components with logic
+
+File uploads
+
+PDF generation
+
+Multi-user editing
+
+16. Development Phases (Frontend)
+Phase 1 – Foundation
+
+Data models
+
+Slide engine
+
+Mock user + tier
+
+Static rendering
+
+No animation yet
+
+Phase 2 – Experience
+
+GSAP animations
+
+Scroll-based slides
+
+Media rendering
+
+Tier gating
+
+Phase 3 – Polish
+
+Motion refinement
+
+Print-safe mode
+
+Performance optimization
+
+17. Success Criteria (Frontend)
+
+You can create a full report with mocked data
+
+Tier changes instantly reshape the report
+
+Slides feel narrative, not static
+
+Animations enhance clarity
+
+Backend can be added without UI rewrites
+
+🔑 Final Guidance (Very Important)
+
+This PRD is intentionally infrastructure-light but structure-heavy.
+
+That’s exactly what you want.
+
+If your friends build backend later, they should:
+
+conform to these data shapes
+
+replace providers, not components
+
+never touch slide logic
