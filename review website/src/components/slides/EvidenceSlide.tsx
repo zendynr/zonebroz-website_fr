@@ -55,7 +55,9 @@ export default function EvidenceSlide({
     return "Minor friction point \u2014 low individual impact but contributes to cumulative UX debt.";
   };
 
-  // Split recommendation into steps
+  const ignoredImpact = data.finding.ifIgnored?.trim() || getImpactWarning(data.finding.impact);
+
+  // Split recommendation into high-level directions
   const recSteps = data.finding.recommendation
     .split(/\.\s+/)
     .map((s) => s.replace(/\.$/, "").trim())
@@ -128,7 +130,7 @@ export default function EvidenceSlide({
             marginBottom: "0.75rem",
           }}
         >
-          {data.finding.description.split(".")[0]}.
+          {getLeadSentence(data.finding.description)}
         </p>
 
         {/* Layer 2 — Explain: full detail behind toggle */}
@@ -138,7 +140,7 @@ export default function EvidenceSlide({
           </DetailBlock>
           <DetailBlock title="If unaddressed">
             <span style={{ color: "#991b1b" }}>
-              {getImpactWarning(data.finding.impact)}
+              {ignoredImpact}
             </span>
           </DetailBlock>
           <DetailBlock title="Impact · Effort">
@@ -147,7 +149,7 @@ export default function EvidenceSlide({
               {data.finding.confidence}/5
             </span>
           </DetailBlock>
-          <DetailBlock title="Recommended steps">
+          <DetailBlock title="Recommended direction">
             {recSteps.length > 1 ? (
               <ol style={{ margin: 0, paddingLeft: "1.1rem" }}>
                 {recSteps.map((step, i) => (
@@ -245,4 +247,11 @@ function formatCategoryName(category: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
+}
+
+function getLeadSentence(text: string): string {
+  const cleaned = text.trim();
+  if (!cleaned) return "";
+  const lead = cleaned.split(".")[0].trim();
+  return lead.endsWith(".") ? lead : `${lead}.`;
 }

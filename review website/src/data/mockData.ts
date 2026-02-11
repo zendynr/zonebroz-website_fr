@@ -181,56 +181,6 @@ export const mockReport: Report = {
       comparison: "EcoDirect has brand trust but falls behind in user experience and mobile optimization.",
     },
   ],
-  roadmap: [
-    {
-      id: "roadmap-1",
-      title: "Implement Accessibility Improvements",
-      description: "Add ARIA labels, improve keyboard navigation, and ensure WCAG 2.1 AA compliance across all pages.",
-      priority: "critical",
-      timeline: "Q1 2024",
-      dependencies: [],
-    },
-    {
-      id: "roadmap-2",
-      title: "Optimize Performance",
-      description: "Reduce initial load time to under 2s through image optimization, code splitting, and CDN implementation.",
-      priority: "high",
-      timeline: "Q1 2024",
-      dependencies: [],
-    },
-    {
-      id: "roadmap-3",
-      title: "Redesign Checkout Flow",
-      description: "Simplify checkout to 2-3 steps, add guest checkout, and implement progress saving.",
-      priority: "high",
-      timeline: "Q2 2024",
-      dependencies: ["roadmap-2"],
-    },
-    {
-      id: "roadmap-4",
-      title: "Create Pricing Page",
-      description: "Design and implement a dedicated pricing page with clear comparison table and feature explanations.",
-      priority: "medium",
-      timeline: "Q2 2024",
-      dependencies: [],
-    },
-    {
-      id: "roadmap-5",
-      title: "Mobile Touch Target Improvements",
-      description: "Increase all interactive element sizes to meet 44x44px minimum touch target requirement.",
-      priority: "medium",
-      timeline: "Q1 2024",
-      dependencies: [],
-    },
-    {
-      id: "roadmap-6",
-      title: "Engagement Campaign System",
-      description: "Build personalized recommendation engine and automated email campaigns for user retention.",
-      priority: "low",
-      timeline: "Q3 2024",
-      dependencies: ["roadmap-3"],
-    },
-  ],
   overallScore: 0, // Will be calculated below
 };
 
@@ -278,16 +228,6 @@ export const mockReport2: Report = {
     },
   ],
   competitors: [],
-  roadmap: [
-    {
-      id: "roadmap-2-1",
-      title: "Enhance Accessibility",
-      description: "Implement full keyboard navigation and ARIA labels across all components.",
-      priority: "high",
-      timeline: "Q2 2024",
-      dependencies: [],
-    },
-  ],
   overallScore: 0,
 };
 
@@ -344,16 +284,6 @@ export const mockReport3: Report = {
     },
   ],
   competitors: [],
-  roadmap: [
-    {
-      id: "roadmap-3-1",
-      title: "Simplify Data Entry",
-      description: "Redesign entry flow to reduce steps and improve user experience.",
-      priority: "critical",
-      timeline: "Q1 2024",
-      dependencies: [],
-    },
-  ],
   overallScore: 0,
 };
 
@@ -400,16 +330,6 @@ export const mockReport4: Report = {
     },
   ],
   competitors: [],
-  roadmap: [
-    {
-      id: "roadmap-4-1",
-      title: "Enhance Search Capabilities",
-      description: "Implement full-text search with filters and advanced sorting options.",
-      priority: "medium",
-      timeline: "Q2 2024",
-      dependencies: [],
-    },
-  ],
   overallScore: 0,
 };
 
@@ -444,7 +364,6 @@ export const mockReport5: Report = {
   ],
   findings: [],
   competitors: [],
-  roadmap: [],
   overallScore: 0,
 };
 

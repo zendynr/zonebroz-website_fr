@@ -7,7 +7,6 @@ import InsightSlide from "./slides/InsightSlide";
 import EvidenceSlide from "./slides/EvidenceSlide";
 import DeepDiveSlide from "./slides/DeepDiveSlide";
 import UrgentFixesSlide from "./slides/UrgentFixesSlide";
-import RoadmapSlide from "./slides/RoadmapSlide";
 import FinalVerdictSlide from "./slides/FinalVerdictSlide";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -68,8 +67,6 @@ export default function SlideContainer({ slides }: SlideContainerProps) {
         return <DeepDiveSlide data={slide.data as any} slideIndex={index} />;
       case "urgentFixes":
         return <UrgentFixesSlide data={slide.data as any} slideIndex={index} />;
-      case "roadmap":
-        return <RoadmapSlide data={slide.data as any} slideIndex={index} />;
       case "finalVerdict":
         return <FinalVerdictSlide data={slide.data as any} slideIndex={index} />;
       default:

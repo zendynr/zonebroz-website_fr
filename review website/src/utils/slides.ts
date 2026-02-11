@@ -53,6 +53,19 @@ export function generateSlides(report: Report, tier: UserTier): Slide[] {
     },
   });
 
+  // ── All findings slide (urgent + next + nice-to-have) ──
+  if (report.findings.length > 0) {
+    slides.push({
+      type: "urgentFixes",
+      visible: true,
+      data: {
+        findings: groupedFindings.fixNow,
+        nextFindings: groupedFindings.next,
+        niceToHaveFindings: groupedFindings.niceToHave,
+      },
+    });
+  }
+
   // ── Score breakdown ──
   const visibleScores = report.categoryScores.filter((cs) =>
     canViewCategory(tier, cs.category)
@@ -63,17 +76,6 @@ export function generateSlides(report: Report, tier: UserTier): Slide[] {
       visible: true,
       data: {
         scores: visibleScores,
-      },
-    });
-  }
-
-  // ── Urgent fixes ──
-  if (groupedFindings.fixNow.length > 0) {
-    slides.push({
-      type: "urgentFixes",
-      visible: true,
-      data: {
-        findings: groupedFindings.fixNow,
       },
     });
   }
@@ -90,42 +92,6 @@ export function generateSlides(report: Report, tier: UserTier): Slide[] {
       });
     }
   });
-
-  // ── Enriched insight slides for top categories ──
-  const topCategories = sortedScores.slice(0, 2);
-  topCategories.forEach((categoryScore) => {
-    if (canViewCategory(tier, categoryScore.category)) {
-      slides.push({
-        type: "insight",
-        visible: true,
-        data: generateInsightSlideData(categoryScore, report.categoryScores, report.findings),
-      });
-    }
-  });
-
-  // ── Deep dive with synthesis (if tier allows) ──
-  if (tier === "full" || tier === "investor") {
-    slides.push({
-      type: "deepDive",
-      visible: true,
-      data: {
-        title: "Deep Dive: Cross-Cutting Patterns",
-        sections: generateDeepDiveSections(report),
-      },
-    });
-  }
-
-  // ── Roadmap with justifications ──
-  if (report.roadmap.length > 0) {
-    slides.push({
-      type: "roadmap",
-      visible: true,
-      data: {
-        items: report.roadmap,
-        justifications: generateRoadmapJustifications(report),
-      },
-    });
-  }
 
   // ── Final verdict ──
   const highestImpactFinding = [...report.findings].sort((a, b) => b.impact - a.impact)[0];
@@ -202,7 +168,7 @@ function generateInsightSlideData(
 
   return {
     title: catName,
-    content: categoryScore.notes || `Score: ${categoryScore.score}/10`,
+    content: getScoreExplanation(categoryScore),
     category: categoryScore.category,
     scoreValue: categoryScore.score,
     contrastCategory,
@@ -341,11 +307,11 @@ function generateDeepDiveSections(report: Report) {
   // Fallback: if no themes matched, use the old approach
   if (sections.length === 0) {
     return report.categoryScores
-      .filter((cs) => cs.notes)
+      .filter((cs) => Boolean(getScoreExplanation(cs)))
       .slice(0, 3)
       .map((cs) => ({
         title: formatCategoryName(cs.category),
-        content: cs.notes || "",
+        content: getScoreExplanation(cs),
         evidence: report.findings
           .filter((f) => f.category === cs.category)
           .flatMap((f) => f.evidence)
@@ -354,58 +320,6 @@ function generateDeepDiveSections(report: Report) {
   }
 
   return sections;
-}
-
-// ─── Roadmap Justifications ───
-
-function generateRoadmapJustifications(report: Report): Record<string, { findingTitles: string[]; rationale: string }> {
-  const justifications: Record<string, { findingTitles: string[]; rationale: string }> = {};
-
-  report.roadmap.forEach((item) => {
-    const related = findRelatedFindings(item.title + " " + item.description, report.findings);
-    const priorityRationale = generatePriorityRationale(item.priority, related);
-
-    justifications[item.id] = {
-      findingTitles: related.map((f) => f.title),
-      rationale: priorityRationale,
-    };
-  });
-
-  return justifications;
-}
-
-function findRelatedFindings(text: string, findings: Finding[]): Finding[] {
-  const textLower = text.toLowerCase();
-  return findings.filter((f) => {
-    const catName = formatCategoryName(f.category).toLowerCase();
-    const findingKeywords = f.title
-      .toLowerCase()
-      .split(/\s+/)
-      .filter((w) => w.length > 3);
-    return textLower.includes(catName) || findingKeywords.some((kw) => textLower.includes(kw));
-  });
-}
-
-function generatePriorityRationale(
-  priority: "critical" | "high" | "medium" | "low",
-  relatedFindings: Finding[]
-): string {
-  const totalImpact = relatedFindings.reduce((sum, f) => sum + f.impact, 0);
-  const avgEffort =
-    relatedFindings.length > 0
-      ? relatedFindings.reduce((sum, f) => sum + f.effort, 0) / relatedFindings.length
-      : 3;
-
-  switch (priority) {
-    case "critical":
-      return `Critical priority: ${relatedFindings.length} related finding(s) with combined impact of ${totalImpact}. Delaying this risks compounding degradation across the user experience.`;
-    case "high":
-      return `High priority: ${relatedFindings.length > 0 ? `Supported by ${relatedFindings.length} finding(s). ` : ""}High impact-to-effort ratio (avg effort ${avgEffort.toFixed(1)}/5) makes this a strong ROI candidate.`;
-    case "medium":
-      return `Medium priority: Important for product maturity, with moderate effort (${avgEffort.toFixed(1)}/5). Best scheduled after critical and high-priority items are resolved.`;
-    case "low":
-      return `Lower priority: Valuable for long-term retention, but depends on upstream improvements being in place first.`;
-  }
 }
 
 // ─── Hero & Summary Helpers ───
@@ -435,9 +349,8 @@ function generateVerdictSummary(report: Report): string {
   const urgentFindings = report.findings.filter(
     (f) => calculateUrgency(f) >= 3.0
   );
-  const totalRoadmapItems = report.roadmap.length;
 
-  return `This audit identified ${report.findings.length} actionable findings across ${report.categoryScores.length} categories (${scoreRounded}/10 overall). ${urgentFindings.length} require immediate attention. The ${totalRoadmapItems}-item roadmap below prioritizes these by impact-to-effort ratio.`;
+  return `This audit identified ${report.findings.length} actionable findings across ${report.categoryScores.length} categories (${scoreRounded}/10 overall). ${urgentFindings.length} require immediate attention.`;
 }
 
 function extractHighlights(report: Report): string[] {
@@ -447,7 +360,11 @@ function extractHighlights(report: Report): string[] {
   // Top strength with context
   const best = sorted[0];
   if (best && best.score >= 7) {
-    highlights.push(`${formatCategoryName(best.category)}: ${best.score}/10 \u2014 ${best.notes || "strong performance"}`);
+    highlights.push(
+      `${formatCategoryName(best.category)}: ${best.score}/10 \u2014 ${
+        getPrimaryStrength(best) || "strong performance"
+      }`
+    );
   }
 
   // Most urgent finding
@@ -473,7 +390,12 @@ function extractStrengthsWithScores(report: Report): string[] {
   return report.categoryScores
     .filter((cs) => cs.score >= 7)
     .sort((a, b) => b.score - a.score)
-    .map((cs) => `${formatCategoryName(cs.category)} (${cs.score}/10)${cs.notes ? ` \u2014 ${cs.notes}` : ""}`)
+    .map((cs) => {
+      const strengthText = getPrimaryStrength(cs);
+      return `${formatCategoryName(cs.category)} (${cs.score}/10)${
+        strengthText ? ` \u2014 ${strengthText}` : ""
+      }`;
+    })
     .slice(0, 5);
 }
 
@@ -482,8 +404,13 @@ function extractWeaknessesWithScores(report: Report): string[] {
     .filter((cs) => cs.score < 7)
     .sort((a, b) => a.score - b.score)
     .map((cs) => {
+      const weaknessText = getPrimaryWeakness(cs);
       const related = report.findings.find((f) => f.category === cs.category);
-      const suffix = related ? ` \u2014 see: "${related.title}"` : "";
+      const suffixParts = [
+        weaknessText,
+        related ? `see: "${related.title}"` : undefined,
+      ].filter(Boolean);
+      const suffix = suffixParts.length > 0 ? ` \u2014 ${suffixParts.join(" \u00b7 ")}` : "";
       return `${formatCategoryName(cs.category)} (${cs.score}/10)${suffix}`;
     })
     .slice(0, 5);
@@ -500,12 +427,6 @@ function extractActionableNextSteps(report: Report): string[] {
     steps.push(`Fix: ${f.title} (urgency ${calculateUrgency(f).toFixed(1)})`);
   });
 
-  // Roadmap reference
-  const criticalItems = report.roadmap.filter((r) => r.priority === "critical");
-  if (criticalItems.length > 0) {
-    steps.push(`Execute ${criticalItems.length} critical roadmap item${criticalItems.length > 1 ? "s" : ""} in ${criticalItems[0].timeline || "next quarter"}`);
-  }
-
   steps.push("Schedule follow-up audit after implementing critical fixes");
 
   return steps;
@@ -516,4 +437,44 @@ function formatCategoryName(category: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
+}
+
+function parseBulletLines(value?: string): string[] {
+  if (!value) return [];
+  return value
+    .split("\n")
+    .map((line) => line.replace(/^[\s\-*]+/, "").trim())
+    .filter(Boolean);
+}
+
+function getPrimaryStrength(score: CategoryScore): string | undefined {
+  return parseBulletLines(score.strengths)[0] || undefined;
+}
+
+function getPrimaryWeakness(score: CategoryScore): string | undefined {
+  return parseBulletLines(score.weaknesses)[0] || undefined;
+}
+
+function getScoreExplanation(score: CategoryScore): string {
+  if (score.scoreRationale?.trim()) {
+    return score.scoreRationale.trim();
+  }
+
+  const strengths = parseBulletLines(score.strengths);
+  const weaknesses = parseBulletLines(score.weaknesses);
+  if (strengths.length || weaknesses.length) {
+    const strengthsText = strengths.length
+      ? `Strengths: ${strengths.join("; ")}.`
+      : "";
+    const weaknessesText = weaknesses.length
+      ? `Weaknesses: ${weaknesses.join("; ")}.`
+      : "";
+    return `${strengthsText} ${weaknessesText}`.trim();
+  }
+
+  if (score.notes?.trim()) {
+    return score.notes.trim();
+  }
+
+  return `Score: ${score.score}/10`;
 }

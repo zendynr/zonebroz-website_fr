@@ -12,7 +12,6 @@ export function canView(tier: UserTier, featureKey: FeatureKey): boolean {
       "scalabilityReview",
       "pdfExport",
       "detailedMetrics",
-      "roadmapView",
     ],
     full: [
       "competitorAnalysis",
@@ -20,7 +19,6 @@ export function canView(tier: UserTier, featureKey: FeatureKey): boolean {
       "scalabilityReview",
       "pdfExport",
       "detailedMetrics",
-      "roadmapView",
     ],
     investor: [
       "competitorAnalysis",
@@ -28,7 +26,6 @@ export function canView(tier: UserTier, featureKey: FeatureKey): boolean {
       "scalabilityReview",
       "pdfExport",
       "detailedMetrics",
-      "roadmapView",
     ],
   };
 

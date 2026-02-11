@@ -29,7 +29,6 @@ export interface Report {
   categoryScores: CategoryScore[];
   findings: Finding[];
   competitors: Competitor[];
-  roadmap: RoadmapItem[];
   version?: string;
   ownerId?: string; // User ID who owns/created this report
   status: ReportStatus; // draft or published
@@ -61,7 +60,11 @@ export type CategoryKey =
 
 export interface CategoryScore {
   category: CategoryKey;
-  score: number; // 0-10
+  score: number; // 1-10
+  strengths?: string;
+  weaknesses?: string;
+  scoreRationale?: string;
+  // Legacy free-text field kept for backward compatibility.
   notes?: string;
 }
 
@@ -71,6 +74,7 @@ export interface Finding {
   category: CategoryKey;
   title: string;
   description: string;
+  ifIgnored?: string;
   impact: number; // 1-5
   effort: number; // 1-5
   confidence: number; // 1-5
@@ -94,16 +98,6 @@ export interface Competitor {
   comparison?: string;
 }
 
-// Roadmap
-export interface RoadmapItem {
-  id: string;
-  title: string;
-  description: string;
-  priority: "critical" | "high" | "medium" | "low";
-  timeline?: string;
-  dependencies?: string[];
-}
-
 // Slide System
 export type SlideType =
   | "hero"
@@ -112,7 +106,6 @@ export type SlideType =
   | "evidence"
   | "deepDive"
   | "urgentFixes"
-  | "roadmap"
   | "finalVerdict";
 
 export interface Slide {
@@ -128,7 +121,6 @@ export type SlideData =
   | EvidenceSlideData
   | DeepDiveSlideData
   | UrgentFixesSlideData
-  | RoadmapSlideData
   | FinalVerdictSlideData;
 
 export interface HeroSlideData {
@@ -180,11 +172,8 @@ export interface DeepDiveSection {
 
 export interface UrgentFixesSlideData {
   findings: Finding[];
-}
-
-export interface RoadmapSlideData {
-  items: RoadmapItem[];
-  justifications?: Record<string, { findingTitles: string[]; rationale: string }>;
+  nextFindings?: Finding[];
+  niceToHaveFindings?: Finding[];
 }
 
 export interface FinalVerdictSlideData {
@@ -212,5 +201,4 @@ export type FeatureKey =
   | "techReview"
   | "scalabilityReview"
   | "pdfExport"
-  | "detailedMetrics"
-  | "roadmapView";
+  | "detailedMetrics";

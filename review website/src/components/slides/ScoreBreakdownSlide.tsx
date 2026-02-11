@@ -74,8 +74,14 @@ export default function ScoreBreakdownSlide({
     data.scores.reduce((sum, s) => sum + s.score, 0) / data.scores.length;
   const aboveAvg = data.scores.filter((s) => s.score >= avgScore).length;
 
-  // Scores that have notes for the detail panel
-  const scoresWithNotes = data.scores.filter((s) => s.notes);
+  // Scores that have supporting explanation details for the detail panel
+  const scoresWithDetails = data.scores.filter(
+    (s) =>
+      Boolean(s.scoreRationale?.trim()) ||
+      Boolean(s.strengths?.trim()) ||
+      Boolean(s.weaknesses?.trim()) ||
+      Boolean(s.notes?.trim())
+  );
 
   return (
     <div
@@ -146,13 +152,32 @@ export default function ScoreBreakdownSlide({
         </ResponsiveContainer>
       </div>
 
-      {/* Layer 2 — Explain: reviewer notes per category */}
-      {scoresWithNotes.length > 0 && (
+      {/* Layer 2 — Explain: structured score details per category */}
+      {scoresWithDetails.length > 0 && (
         <div className="score-annotation" style={{ marginTop: "1rem" }}>
-          <DetailPanel label="Reviewer notes">
-            {scoresWithNotes.map((s) => (
+          <DetailPanel label="Score details">
+            {scoresWithDetails.map((s) => (
               <DetailBlock key={s.category} title={`${formatCategoryName(s.category)} (${s.score}/10)`}>
-                {s.notes}
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                  {s.strengths?.trim() && (
+                    <div>
+                      <strong>What's working well:</strong> {formatBulletText(s.strengths)}
+                    </div>
+                  )}
+                  {s.weaknesses?.trim() && (
+                    <div>
+                      <strong>What's not working well:</strong> {formatBulletText(s.weaknesses)}
+                    </div>
+                  )}
+                  {s.scoreRationale?.trim() && (
+                    <div>
+                      <strong>Why this score:</strong> {s.scoreRationale}
+                    </div>
+                  )}
+                  {!s.strengths?.trim() && !s.weaknesses?.trim() && !s.scoreRationale?.trim() && s.notes?.trim() && (
+                    <div>{s.notes}</div>
+                  )}
+                </div>
               </DetailBlock>
             ))}
           </DetailPanel>
@@ -167,4 +192,12 @@ function formatCategoryName(category: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
+}
+
+function formatBulletText(value: string): string {
+  return value
+    .split("\n")
+    .map((line) => line.replace(/^[\s\-*]+/, "").trim())
+    .filter(Boolean)
+    .join("; ");
 }

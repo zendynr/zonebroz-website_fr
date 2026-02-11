@@ -280,8 +280,7 @@ export default function ReportsList({
                   >
                     <div>Review Date: {report.meta.reviewDate}</div>
                     <div>
-                      Findings: {report.findings.length} | Roadmap Items:{" "}
-                      {report.roadmap.length}
+                      Findings: {report.findings.length}
                     </div>
                   </div>
 

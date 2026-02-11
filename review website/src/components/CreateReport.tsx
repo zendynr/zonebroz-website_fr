@@ -108,11 +108,13 @@ export default function CreateReport({ onSave }: CreateReportProps) {
         categoryScores: categories.map((cat) => ({
           category: cat,
           score: 5,
+          strengths: "",
+          weaknesses: "",
+          scoreRationale: "",
           notes: "",
         })),
         findings: [],
         competitors: [],
-        roadmap: [],
         overallScore: 5.0,
       };
 

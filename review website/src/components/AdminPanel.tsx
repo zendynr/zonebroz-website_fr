@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Report, CategoryKey, Finding, CategoryScore, RoadmapItem } from "../types";
+import { Report, CategoryKey, Finding, CategoryScore } from "../types";
 import { useUser } from "../context/UserContext";
 import { useReports } from "../context/ReportsContext";
 import ReportViewer from "./ReportViewer";
@@ -17,11 +17,26 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
     initialReport || createEmptyReport()
   );
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [activeTab, setActiveTab] = useState<"scores" | "findings" | "roadmap">("scores");
+  const [activeTab, setActiveTab] = useState<"scores" | "findings">("scores");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [publishing, setPublishing] = useState(false);
+
+  const missingWhatIsHappeningCount = report.findings.filter(
+    (finding) => !finding.description?.trim()
+  ).length;
+
+  const validateFindings = (): boolean => {
+    if (missingWhatIsHappeningCount > 0) {
+      setSaveError(
+        `Please complete "What's happening" for ${missingWhatIsHappeningCount} urgent fix${missingWhatIsHappeningCount > 1 ? "es" : ""} before saving.`
+      );
+      setActiveTab("findings");
+      return false;
+    }
+    return true;
+  };
 
   if (currentUser.role !== "admin") {
     return (
@@ -123,6 +138,10 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
               onClick={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+
+                if (!validateFindings()) {
+                  return;
+                }
                 
                 if (!onSave) {
                   console.error("onSave is not defined");
@@ -186,6 +205,10 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
                 onClick={async (e) => {
                   e.preventDefault();
                   e.stopPropagation();
+
+                  if (!validateFindings()) {
+                    return;
+                  }
                   
                   if (!onSave) {
                     setSaveError("Save handler is not available");
@@ -468,7 +491,7 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
             borderBottom: "1px solid #e5e7eb",
           }}
         >
-          {(["scores", "findings", "roadmap"] as const).map((tab) => (
+          {(["scores", "findings"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -485,7 +508,7 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
                 textTransform: "capitalize",
               }}
             >
-              {tab}
+              {tab === "findings" ? "Urgent Fixes" : "Scores"}
             </button>
           ))}
         </div>
@@ -506,12 +529,6 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
               onChange={(findings) => setReport({ ...report, findings })}
             />
           )}
-          {activeTab === "roadmap" && (
-            <RoadmapEditor
-              items={report.roadmap}
-              onChange={(items) => setReport({ ...report, roadmap: items })}
-            />
-          )}
         </div>
       </div>
     </div>
@@ -525,9 +542,12 @@ function ScoresEditor({
   scores: CategoryScore[];
   onChange: (scores: CategoryScore[]) => void;
 }) {
-  const updateScore = (category: CategoryKey, score: number, notes?: string) => {
+  const updateScore = (
+    category: CategoryKey,
+    updates: Partial<Omit<CategoryScore, "category">>
+  ) => {
     const updated = scores.map((s) =>
-      s.category === category ? { ...s, score, notes } : s
+      s.category === category ? { ...s, ...updates } : s
     );
     onChange(updated);
   };
@@ -551,49 +571,135 @@ function ScoresEditor({
               marginBottom: "1rem",
             }}
           >
-            <label
-              style={{
-                fontSize: "1.25rem",
-                fontWeight: "bold",
-                color: "#1f2937",
-              }}
-            >
-              {formatCategoryName(score.category)}
+            <div>
+              <label
+                style={{
+                  fontSize: "1.25rem",
+                  fontWeight: "bold",
+                  color: "#1f2937",
+                  display: "block",
+                }}
+              >
+                {formatCategoryName(score.category)}
+              </label>
+              <p
+                style={{
+                  margin: "0.35rem 0 0 0",
+                  fontSize: "0.875rem",
+                  color: "#6b7280",
+                }}
+              >
+                Scores explain evaluation logic only. Put actionable fixes in Urgent Fixes.
+              </p>
+            </div>
+            <div style={{ width: "160px" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "0.35rem",
+                  fontSize: "0.875rem",
+                  color: "#4b5563",
+                  fontWeight: "bold",
+                }}
+              >
+                Overall score
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="10"
+                step="0.1"
+                value={score.score}
+                onChange={(e) =>
+                  updateScore(score.category, {
+                    score: Math.max(1, Math.min(10, parseFloat(e.target.value) || 1)),
+                  })
+                }
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  fontSize: "1.1rem",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "0.5rem",
+                }}
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1rem",
+              marginBottom: "1rem",
+            }}
+          >
+            <div>
+              <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
+                What's working well
+              </label>
+              <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280" }}>
+                List the main strengths that positively influenced this score.
+              </p>
+              <textarea
+                placeholder={"Use short bullet-style lines.\n- Strong visual hierarchy\n- Clear conversion cues"}
+                value={score.strengths || ""}
+                onChange={(e) => updateScore(score.category, { strengths: e.target.value })}
+                style={{
+                  width: "100%",
+                  minHeight: "100px",
+                  padding: "0.75rem",
+                  fontSize: "0.95rem",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "0.5rem",
+                  fontFamily: "inherit",
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
+                What's not working well
+              </label>
+              <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280" }}>
+                List observed issues or inconsistencies (do not suggest fixes).
+              </p>
+              <textarea
+                placeholder={"Use short bullet-style lines.\n- Inconsistent spacing across screens\n- Friction in checkout transitions"}
+                value={score.weaknesses || ""}
+                onChange={(e) => updateScore(score.category, { weaknesses: e.target.value })}
+                style={{
+                  width: "100%",
+                  minHeight: "100px",
+                  padding: "0.75rem",
+                  fontSize: "0.95rem",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "0.5rem",
+                  fontFamily: "inherit",
+                }}
+              />
+            </div>
+          </div>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
+              Why this score
             </label>
-            <input
-              type="number"
-              min="0"
-              max="10"
-              step="0.1"
-              value={score.score}
-              onChange={(e) =>
-                updateScore(score.category, parseFloat(e.target.value) || 0)
-              }
+            <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280" }}>
+              Explain how the strengths and weaknesses resulted in this score.
+            </p>
+            <textarea
+              placeholder="Summarize the evaluation logic only. Do not include recommendations or action steps."
+              value={score.scoreRationale || ""}
+              onChange={(e) => updateScore(score.category, { scoreRationale: e.target.value })}
               style={{
-                width: "100px",
-                padding: "0.5rem",
-                fontSize: "1.25rem",
+                width: "100%",
+                minHeight: "100px",
+                padding: "0.75rem",
+                fontSize: "1rem",
                 border: "1px solid #d1d5db",
                 borderRadius: "0.5rem",
+                fontFamily: "inherit",
               }}
             />
           </div>
-          <textarea
-            placeholder="Notes (optional)"
-            value={score.notes || ""}
-            onChange={(e) =>
-              updateScore(score.category, score.score, e.target.value)
-            }
-            style={{
-              width: "100%",
-              minHeight: "80px",
-              padding: "0.75rem",
-              fontSize: "1rem",
-              border: "1px solid #d1d5db",
-              borderRadius: "0.5rem",
-              fontFamily: "inherit",
-            }}
-          />
         </div>
       ))}
     </div>
@@ -611,8 +717,9 @@ function FindingsEditor({
     const newFinding: Finding = {
       id: `finding-${Date.now()}`,
       category: "firstImpression",
-      title: "New Finding",
+      title: "New issue",
       description: "",
+      ifIgnored: "",
       impact: 3,
       effort: 3,
       confidence: 3,
@@ -634,6 +741,15 @@ function FindingsEditor({
 
   return (
     <div>
+      <p
+        style={{
+          margin: "0 0 1rem 0",
+          fontSize: "0.9rem",
+          color: "#6b7280",
+        }}
+      >
+        Findings are Urgent Fixes: define what is wrong, why it matters, and the direction to fix it.
+      </p>
       <button
         onClick={addFinding}
         style={{
@@ -670,23 +786,30 @@ function FindingsEditor({
                 marginBottom: "1rem",
               }}
             >
-              <input
-                type="text"
-                value={finding.title}
-                onChange={(e) =>
-                  updateFinding(finding.id, { title: e.target.value })
-                }
-                placeholder="Finding Title"
-                style={{
-                  flex: 1,
-                  padding: "0.75rem",
-                  fontSize: "1.25rem",
-                  fontWeight: "bold",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  marginRight: "1rem",
-                }}
-              />
+              <div style={{ flex: 1, marginRight: "1rem" }}>
+                <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
+                  Issue title
+                </label>
+                <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280" }}>
+                  Short, problem-focused name (no solutions or "fix" wording).
+                </p>
+                <input
+                  type="text"
+                  value={finding.title}
+                  onChange={(e) =>
+                    updateFinding(finding.id, { title: e.target.value })
+                  }
+                  placeholder="e.g., Critical actions are hard to discover"
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    fontSize: "1.1rem",
+                    fontWeight: "bold",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "0.5rem",
+                  }}
+                />
+              </div>
               <button
                 onClick={() => deleteFinding(finding.id)}
                 style={{
@@ -704,9 +827,12 @@ function FindingsEditor({
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
               <div>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", color: "#6b7280" }}>
-                  Category
+                <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
+                  Primary category affected
                 </label>
+                <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280" }}>
+                  Map this issue to the primary score category.
+                </p>
                 <select
                   value={finding.category}
                   onChange={(e) =>
@@ -743,22 +869,56 @@ function FindingsEditor({
               </div>
             </div>
 
+            <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
+              What's happening <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: !finding.description.trim() ? "#b91c1c" : "#6b7280" }}>
+              {!finding.description.trim()
+                ? "Required: describe the issue before saving or publishing."
+                : "Describe the issue as it exists today. Be factual and observable."}
+            </p>
             <textarea
               value={finding.description}
               onChange={(e) =>
                 updateFinding(finding.id, { description: e.target.value })
               }
-              placeholder="Description"
+              placeholder="Describe the issue as it exists today. Be factual and observable."
               style={{
                 width: "100%",
                 minHeight: "100px",
                 padding: "0.75rem",
                 marginBottom: "1rem",
-                border: "1px solid #d1d5db",
+                border: !finding.description.trim()
+                  ? "2px solid #ef4444"
+                  : "1px solid #d1d5db",
                 borderRadius: "0.5rem",
                 fontFamily: "inherit",
               }}
             />
+
+            <div style={{ marginBottom: "1rem" }}>
+              <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
+                If ignored
+              </label>
+              <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280" }}>
+                What negative outcome occurs if this is not addressed?
+              </p>
+              <textarea
+                value={finding.ifIgnored || ""}
+                onChange={(e) =>
+                  updateFinding(finding.id, { ifIgnored: e.target.value })
+                }
+                placeholder="Describe the likely user or business impact if this issue is left unresolved."
+                style={{
+                  width: "100%",
+                  minHeight: "80px",
+                  padding: "0.75rem",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "0.5rem",
+                  fontFamily: "inherit",
+                }}
+              />
+            </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem", marginBottom: "1rem" }}>
               <div>
@@ -829,12 +989,18 @@ function FindingsEditor({
               </div>
             </div>
 
+            <label style={{ display: "block", margin: "0.5rem 0 0.35rem 0", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
+              Recommended direction
+            </label>
+            <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: "#6b7280" }}>
+              High-level direction for addressing the issue (not implementation steps).
+            </p>
             <textarea
               value={finding.recommendation}
               onChange={(e) =>
                 updateFinding(finding.id, { recommendation: e.target.value })
               }
-              placeholder="Recommendation"
+              placeholder="High-level direction for addressing the issue (not step-by-step instructions)."
               style={{
                 width: "100%",
                 minHeight: "80px",
@@ -844,164 +1010,6 @@ function FindingsEditor({
                 fontFamily: "inherit",
               }}
             />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function RoadmapEditor({
-  items,
-  onChange,
-}: {
-  items: RoadmapItem[];
-  onChange: (items: RoadmapItem[]) => void;
-}) {
-  const addItem = () => {
-    const newItem: RoadmapItem = {
-      id: `roadmap-${Date.now()}`,
-      title: "New Roadmap Item",
-      description: "",
-      priority: "medium",
-    };
-    onChange([...items, newItem]);
-  };
-
-  const updateItem = (id: string, updates: Partial<RoadmapItem>) => {
-    onChange(items.map((item) => (item.id === id ? { ...item, ...updates } : item)));
-  };
-
-  const deleteItem = (id: string) => {
-    onChange(items.filter((item) => item.id !== id));
-  };
-
-  return (
-    <div>
-      <button
-        onClick={addItem}
-        style={{
-          marginBottom: "1.5rem",
-          padding: "0.75rem 1.5rem",
-          background: "#10b981",
-          color: "white",
-          border: "none",
-          borderRadius: "0.5rem",
-          cursor: "pointer",
-          fontSize: "1rem",
-          fontWeight: "bold",
-        }}
-      >
-        + Add Roadmap Item
-      </button>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        {items.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              background: "#f9fafb",
-              padding: "1.5rem",
-              borderRadius: "0.5rem",
-              border: "1px solid #e5e7eb",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "start",
-                marginBottom: "1rem",
-              }}
-            >
-              <input
-                type="text"
-                value={item.title}
-                onChange={(e) => updateItem(item.id, { title: e.target.value })}
-                placeholder="Roadmap Item Title"
-                style={{
-                  flex: 1,
-                  padding: "0.75rem",
-                  fontSize: "1.25rem",
-                  fontWeight: "bold",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  marginRight: "1rem",
-                }}
-              />
-              <button
-                onClick={() => deleteItem(item.id)}
-                style={{
-                  padding: "0.5rem 1rem",
-                  background: "#ef4444",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "0.5rem",
-                  cursor: "pointer",
-                }}
-              >
-                Delete
-              </button>
-            </div>
-
-            <textarea
-              value={item.description}
-              onChange={(e) => updateItem(item.id, { description: e.target.value })}
-              placeholder="Description"
-              style={{
-                width: "100%",
-                minHeight: "100px",
-                padding: "0.75rem",
-                marginBottom: "1rem",
-                border: "1px solid #d1d5db",
-                borderRadius: "0.5rem",
-                fontFamily: "inherit",
-              }}
-            />
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              <div>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", color: "#6b7280" }}>
-                  Priority
-                </label>
-                <select
-                  value={item.priority}
-                  onChange={(e) =>
-                    updateItem(item.id, {
-                      priority: e.target.value as RoadmapItem["priority"],
-                    })
-                  }
-                  style={{
-                    width: "100%",
-                    padding: "0.5rem",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "0.5rem",
-                  }}
-                >
-                  <option value="critical">Critical</option>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", color: "#6b7280" }}>
-                  Timeline (optional)
-                </label>
-                <input
-                  type="text"
-                  value={item.timeline || ""}
-                  onChange={(e) => updateItem(item.id, { timeline: e.target.value })}
-                  placeholder="e.g., Q1 2024"
-                  style={{
-                    width: "100%",
-                    padding: "0.5rem",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "0.5rem",
-                  }}
-                />
-              </div>
-            </div>
           </div>
         ))}
       </div>
@@ -1041,10 +1049,12 @@ function createEmptyReport(): Report {
     categoryScores: categories.map((cat) => ({
       category: cat,
       score: 5,
+      strengths: "",
+      weaknesses: "",
+      scoreRationale: "",
       notes: "",
     })),
     findings: [],
     competitors: [],
-    roadmap: [],
   };
 }

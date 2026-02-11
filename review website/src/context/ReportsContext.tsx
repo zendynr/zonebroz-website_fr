@@ -36,7 +36,6 @@ function transformReportFromDB(dbReport: any): Report {
     categoryScores: dbReport.category_scores || [],
     findings: dbReport.findings || [],
     competitors: dbReport.competitors || [],
-    roadmap: dbReport.roadmap || [],
   };
 }
 
@@ -52,7 +51,6 @@ function transformReportToDB(report: Report, includeId = true): any {
     category_scores: report.categoryScores,
     findings: report.findings,
     competitors: report.competitors,
-    roadmap: report.roadmap,
   };
   // Only include id for updates, not inserts (let Postgres generate the UUID)
   if (includeId && report.id) {
