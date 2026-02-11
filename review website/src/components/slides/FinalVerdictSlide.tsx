@@ -55,9 +55,9 @@ export default function FinalVerdictSlide({
   }, [slideIndex, isPrintMode, prefersReducedMotion]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "#10b981";
-    if (score >= 6) return "#f59e0b";
-    return "#ef4444";
+    if (score >= 8) return "#5ec7a0";
+    if (score >= 6) return "#e0b45c";
+    return "#e07070";
   };
 
   return (
@@ -69,259 +69,268 @@ export default function FinalVerdictSlide({
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
-        padding: "4rem",
-        background: "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
-        color: "white",
+        padding: "3.5rem 4rem",
+        background: "linear-gradient(160deg, #1a1d28 0%, #252a3a 60%, #2c3044 100%)",
+        color: "var(--text-on-dark)",
       }}
     >
-      {/* Header: title + score (score as secondary, not hero-sized) */}
-      <div
-        className="verdict-header"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1.5rem",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "2.5rem",
-            fontWeight: "bold",
-          }}
-        >
-          Final Verdict
-        </h2>
+      <div style={{ maxWidth: "var(--canvas-max-width)", margin: "0 auto", width: "100%" }}>
+        {/* Header */}
         <div
+          className="verdict-header"
           style={{
-            fontSize: "2.5rem",
-            fontWeight: "bold",
-            color: getScoreColor(data.overallScore),
-            textShadow: "0 2px 10px rgba(0,0,0,0.3)",
-          }}
-        >
-          {data.overallScore}/10
-        </div>
-      </div>
-
-      <p
-        className="verdict-summary"
-        style={{
-          fontSize: "1.15rem",
-          lineHeight: 1.7,
-          maxWidth: "850px",
-          marginBottom: "1.5rem",
-          opacity: 0.95,
-        }}
-      >
-        {data.summary}
-      </p>
-
-      {/* Risk / Opportunity callouts */}
-      {(data.topRisk || data.topOpportunity) && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: data.topRisk && data.topOpportunity ? "1fr 1fr" : "1fr",
-            gap: "1rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             marginBottom: "1.5rem",
           }}
         >
-          {data.topRisk && (
-            <div
-              className="verdict-callout"
-              style={{
-                background: "rgba(239, 68, 68, 0.15)",
-                border: "1px solid rgba(239, 68, 68, 0.3)",
-                borderRadius: "0.75rem",
-                padding: "1rem 1.25rem",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  marginBottom: "0.4rem",
-                  fontSize: "0.8rem",
-                  fontWeight: "bold",
-                  color: "#fca5a5",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                <ShieldAlert size={16} />
-                Top Risk
-              </div>
-              <div style={{ fontSize: "0.95rem", lineHeight: 1.5, opacity: 0.9 }}>
-                {data.topRisk}
-              </div>
-            </div>
-          )}
-          {data.topOpportunity && (
-            <div
-              className="verdict-callout"
-              style={{
-                background: "rgba(16, 185, 129, 0.15)",
-                border: "1px solid rgba(16, 185, 129, 0.3)",
-                borderRadius: "0.75rem",
-                padding: "1rem 1.25rem",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  marginBottom: "0.4rem",
-                  fontSize: "0.8rem",
-                  fontWeight: "bold",
-                  color: "#6ee7b7",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                <Sparkles size={16} />
-                Top Opportunity
-              </div>
-              <div style={{ fontSize: "0.95rem", lineHeight: 1.5, opacity: 0.9 }}>
-                {data.topOpportunity}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Strengths / Weaknesses */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "1.5rem",
-          marginBottom: "1.5rem",
-        }}
-      >
-        <div>
-          <h3
+          <h2
             style={{
-              fontSize: "1.25rem",
-              fontWeight: "bold",
-              marginBottom: "1rem",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
+              fontSize: "var(--text-3xl)",
+              fontWeight: 700,
+              letterSpacing: "var(--tracking-tight)",
             }}
           >
-            <CheckCircle size={20} color="#10b981" />
-            Strengths
-          </h3>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {data.strengths.map((strength, index) => (
-              <li
-                key={index}
-                className="verdict-list-item"
-                style={{
-                  padding: "0.5rem 0",
-                  borderBottom: "1px solid rgba(255,255,255,0.08)",
-                  fontSize: "0.95rem",
-                  lineHeight: 1.5,
-                }}
-              >
-                {strength}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h3
+            Final Verdict
+          </h2>
+          <div
             style={{
-              fontSize: "1.25rem",
-              fontWeight: "bold",
-              marginBottom: "1rem",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
+              fontSize: "var(--text-3xl)",
+              fontWeight: 700,
+              color: getScoreColor(data.overallScore),
+              lineHeight: 1,
+              letterSpacing: "-0.02em",
             }}
           >
-            <XCircle size={20} color="#ef4444" />
-            Areas for Improvement
-          </h3>
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {data.weaknesses.map((weakness, index) => (
-              <li
-                key={index}
-                className="verdict-list-item"
-                style={{
-                  padding: "0.5rem 0",
-                  borderBottom: "1px solid rgba(255,255,255,0.08)",
-                  fontSize: "0.95rem",
-                  lineHeight: 1.5,
-                }}
-              >
-                {weakness}
-              </li>
-            ))}
-          </ul>
+            {data.overallScore}
+            <span style={{ fontSize: "0.45em", opacity: 0.5, fontWeight: 500 }}>/10</span>
+          </div>
         </div>
-      </div>
 
-      {/* Next Steps */}
-      <div
-        style={{
-          background: "rgba(255, 255, 255, 0.08)",
-          backdropFilter: "blur(10px)",
-          padding: "1.25rem 1.5rem",
-          borderRadius: "0.75rem",
-          border: "1px solid rgba(255, 255, 255, 0.15)",
-        }}
-      >
-        <h3
+        <p
+          className="verdict-summary"
           style={{
-            fontSize: "1.25rem",
-            fontWeight: "bold",
-            marginBottom: "0.75rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
+            fontSize: "var(--text-lg)",
+            lineHeight: "var(--leading-relaxed)",
+            maxWidth: "780px",
+            marginBottom: "1.75rem",
+            color: "var(--text-on-dark-secondary)",
           }}
         >
-          <ArrowRight size={20} />
-          Recommended Next Steps
-        </h3>
-        <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-          {data.nextSteps.map((step, index) => (
-            <li
-              key={index}
-              className="verdict-list-item"
+          {data.summary}
+        </p>
+
+        {/* Risk / Opportunity callouts */}
+        {(data.topRisk || data.topOpportunity) && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: data.topRisk && data.topOpportunity ? "1fr 1fr" : "1fr",
+              gap: "0.875rem",
+              marginBottom: "1.75rem",
+            }}
+          >
+            {data.topRisk && (
+              <div
+                className="verdict-callout"
+                style={{
+                  background: "rgba(201, 65, 59, 0.1)",
+                  border: "1px solid rgba(201, 65, 59, 0.2)",
+                  borderRadius: "var(--radius-md)",
+                  padding: "1rem 1.25rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    marginBottom: "0.4rem",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: 600,
+                    color: "#e07070",
+                    textTransform: "uppercase",
+                    letterSpacing: "var(--tracking-wider)",
+                  }}
+                >
+                  <ShieldAlert size={15} />
+                  Top Risk
+                </div>
+                <div style={{ fontSize: "var(--text-base)", lineHeight: "var(--leading-normal)", color: "var(--text-on-dark-secondary)" }}>
+                  {data.topRisk}
+                </div>
+              </div>
+            )}
+            {data.topOpportunity && (
+              <div
+                className="verdict-callout"
+                style={{
+                  background: "rgba(94, 199, 160, 0.1)",
+                  border: "1px solid rgba(94, 199, 160, 0.2)",
+                  borderRadius: "var(--radius-md)",
+                  padding: "1rem 1.25rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    marginBottom: "0.4rem",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: 600,
+                    color: "#5ec7a0",
+                    textTransform: "uppercase",
+                    letterSpacing: "var(--tracking-wider)",
+                  }}
+                >
+                  <Sparkles size={15} />
+                  Top Opportunity
+                </div>
+                <div style={{ fontSize: "var(--text-base)", lineHeight: "var(--leading-normal)", color: "var(--text-on-dark-secondary)" }}>
+                  {data.topOpportunity}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Strengths / Weaknesses */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "1.5rem",
+            marginBottom: "1.75rem",
+          }}
+        >
+          <div>
+            <h3
               style={{
-                padding: "0.35rem 0",
-                fontSize: "0.95rem",
+                fontSize: "var(--text-lg)",
+                fontWeight: 600,
+                marginBottom: "0.875rem",
                 display: "flex",
-                alignItems: "baseline",
+                alignItems: "center",
                 gap: "0.5rem",
               }}
             >
-              <span
+              <CheckCircle size={18} color="#5ec7a0" />
+              Strengths
+            </h3>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {data.strengths.map((strength, index) => (
+                <li
+                  key={index}
+                  className="verdict-list-item"
+                  style={{
+                    padding: "0.5rem 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    fontSize: "var(--text-base)",
+                    lineHeight: "var(--leading-normal)",
+                    color: "var(--text-on-dark-secondary)",
+                  }}
+                >
+                  {strength}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3
+              style={{
+                fontSize: "var(--text-lg)",
+                fontWeight: 600,
+                marginBottom: "0.875rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <XCircle size={18} color="#e07070" />
+              Areas for Improvement
+            </h3>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {data.weaknesses.map((weakness, index) => (
+                <li
+                  key={index}
+                  className="verdict-list-item"
+                  style={{
+                    padding: "0.5rem 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    fontSize: "var(--text-base)",
+                    lineHeight: "var(--leading-normal)",
+                    color: "var(--text-on-dark-secondary)",
+                  }}
+                >
+                  {weakness}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Next Steps */}
+        <div
+          style={{
+            background: "rgba(255, 255, 255, 0.05)",
+            backdropFilter: "blur(12px)",
+            padding: "1.25rem 1.5rem",
+            borderRadius: "var(--radius-md)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+          }}
+        >
+          <h3
+            style={{
+              fontSize: "var(--text-lg)",
+              fontWeight: 600,
+              marginBottom: "0.75rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+            }}
+          >
+            <ArrowRight size={18} />
+            Recommended Next Steps
+          </h3>
+          <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+            {data.nextSteps.map((step, index) => (
+              <li
+                key={index}
+                className="verdict-list-item"
                 style={{
-                  background: "rgba(255,255,255,0.2)",
-                  borderRadius: "50%",
-                  width: "1.4rem",
-                  height: "1.4rem",
+                  padding: "0.4rem 0",
+                  fontSize: "var(--text-base)",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "0.75rem",
-                  fontWeight: "bold",
-                  flexShrink: 0,
+                  alignItems: "baseline",
+                  gap: "0.625rem",
+                  color: "var(--text-on-dark-secondary)",
                 }}
               >
-                {index + 1}
-              </span>
-              {step}
-            </li>
-          ))}
-        </ul>
+                <span
+                  style={{
+                    background: "rgba(255,255,255,0.12)",
+                    borderRadius: "50%",
+                    width: "1.35rem",
+                    height: "1.35rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: 600,
+                    flexShrink: 0,
+                    color: "var(--text-on-dark)",
+                  }}
+                >
+                  {index + 1}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

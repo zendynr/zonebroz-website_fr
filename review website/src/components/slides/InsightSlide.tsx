@@ -40,9 +40,9 @@ export default function InsightSlide({
   }, [slideIndex, isPrintMode, prefersReducedMotion]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "#10b981";
-    if (score >= 6) return "#f59e0b";
-    return "#ef4444";
+    if (score >= 8) return "var(--accent-success)";
+    if (score >= 6) return "var(--accent-warning)";
+    return "var(--accent-danger)";
   };
 
   const hasDepth = !!(data.contrastNote || data.relatedFinding || data.decisionFrame);
@@ -56,24 +56,26 @@ export default function InsightSlide({
         display: "flex",
         flexDirection: "column",
         padding: "4rem",
-        background: "white",
+        background: "var(--surface-raised)",
         justifyContent: "center",
-        maxWidth: "1200px",
+        maxWidth: "var(--canvas-max-width)",
         margin: "0 auto",
         width: "100%",
       }}
     >
-      {/* Layer 1 — Story: title + score + headline note */}
+      {/* Title + score */}
       <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginBottom: "1.5rem" }}>
         <h2
           className="insight-title"
           style={{
-            fontSize: "3rem",
-            fontWeight: "bold",
-            color: "#1f2937",
-            borderLeft: "6px solid #3b82f6",
-            paddingLeft: "1.5rem",
+            fontSize: "clamp(2rem, 4vw, 2.75rem)",
+            fontWeight: 700,
+            color: "var(--text-primary)",
+            borderLeft: "4px solid var(--accent-primary)",
+            paddingLeft: "1.25rem",
             flex: 1,
+            lineHeight: "var(--leading-tight)",
+            letterSpacing: "var(--tracking-tight)",
           }}
         >
           {data.title}
@@ -82,13 +84,16 @@ export default function InsightSlide({
           <div
             className="insight-title"
             style={{
-              fontSize: "2.5rem",
-              fontWeight: "bold",
+              fontSize: "var(--text-4xl)",
+              fontWeight: 700,
               color: getScoreColor(data.scoreValue),
               flexShrink: 0,
+              lineHeight: 1,
+              letterSpacing: "-0.02em",
             }}
           >
-            {data.scoreValue}/10
+            {data.scoreValue}
+            <span style={{ fontSize: "0.45em", opacity: 0.5, fontWeight: 500 }}>/10</span>
           </div>
         )}
       </div>
@@ -96,30 +101,40 @@ export default function InsightSlide({
       <div
         className="insight-content"
         style={{
-          fontSize: "1.35rem",
-          lineHeight: 1.7,
-          color: "#4b5563",
+          fontSize: "var(--text-xl)",
+          lineHeight: "var(--leading-relaxed)",
+          color: "var(--text-secondary)",
           marginBottom: "1.5rem",
           display: "flex",
           alignItems: "flex-start",
           gap: "0.75rem",
         }}
       >
-        <TrendingUp
-          size={22}
-          color="#10b981"
-          style={{ flexShrink: 0, marginTop: "0.3rem" }}
-        />
+        <div
+          style={{
+            flexShrink: 0,
+            marginTop: "0.2rem",
+            width: "2rem",
+            height: "2rem",
+            borderRadius: "var(--radius-sm)",
+            background: "var(--accent-success-soft)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <TrendingUp size={16} color="var(--accent-success)" />
+        </div>
         <span>{data.content}</span>
       </div>
 
-      {/* Layer 2 — Explain: contrast, finding, decision behind toggle */}
+      {/* Explain panel */}
       {hasDepth && (
         <DetailPanel label="Why this matters">
           {data.contrastNote && (
             <DetailBlock title="Contrasting weakness">
               {data.contrastCategory && data.contrastScore != null && (
-                <div style={{ fontSize: "0.8rem", color: "#991b1b", marginBottom: "0.2rem" }}>
+                <div style={{ fontSize: "var(--text-xs)", color: "var(--accent-danger-text)", marginBottom: "0.2rem", fontWeight: 500 }}>
                   {data.contrastCategory}: {data.contrastScore}/10
                 </div>
               )}

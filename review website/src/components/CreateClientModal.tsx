@@ -72,6 +72,36 @@ export default function CreateClientModal({
     }
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "0.7rem 0.75rem 0.7rem 2.75rem",
+    border: "1px solid var(--border-default)",
+    borderRadius: "var(--radius-sm)",
+    fontSize: "var(--text-base)",
+    color: "var(--text-primary)",
+    background: "var(--surface-card)",
+    transition: "border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease",
+    outline: "none",
+    fontFamily: "inherit",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    marginBottom: "0.4rem",
+    fontSize: "var(--text-sm)",
+    fontWeight: 600,
+    color: "var(--text-secondary)",
+    letterSpacing: "0.01em",
+  };
+
+  const iconStyle: React.CSSProperties = {
+    position: "absolute",
+    left: "0.75rem",
+    top: "50%",
+    transform: "translateY(-50%)",
+    color: "var(--text-muted)",
+  };
+
   return (
     <div
       style={{
@@ -80,7 +110,7 @@ export default function CreateClientModal({
         left: 0,
         right: 0,
         bottom: 0,
-        background: "rgba(0, 0, 0, 0.5)",
+        background: "rgba(0, 0, 0, 0.4)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -91,14 +121,14 @@ export default function CreateClientModal({
     >
       <div
         style={{
-          background: "white",
-          borderRadius: "0.5rem",
-          padding: "2rem",
-          maxWidth: "500px",
+          background: "var(--surface-card)",
+          borderRadius: "var(--radius-lg)",
+          padding: "1.75rem 2rem",
+          maxWidth: "480px",
           width: "100%",
           maxHeight: "90vh",
           overflow: "auto",
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+          boxShadow: "var(--shadow-xl)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -113,9 +143,10 @@ export default function CreateClientModal({
         >
           <h2
             style={{
-              fontSize: "1.5rem",
-              fontWeight: "bold",
-              color: "#1f2937",
+              fontSize: "var(--text-xl)",
+              fontWeight: 700,
+              color: "var(--text-primary)",
+              letterSpacing: "var(--tracking-tight)",
             }}
           >
             Create New Client
@@ -123,16 +154,24 @@ export default function CreateClientModal({
           <button
             onClick={onClose}
             style={{
-              background: "transparent",
+              background: "var(--surface-sunken)",
               border: "none",
               cursor: "pointer",
-              padding: "0.5rem",
+              padding: "0.4rem",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              borderRadius: "var(--radius-sm)",
+              transition: "background var(--duration-fast) ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--surface-ground)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "var(--surface-sunken)";
             }}
           >
-            <X size={24} style={{ color: "#6b7280" }} />
+            <X size={20} style={{ color: "var(--text-tertiary)" }} />
           </button>
         </div>
 
@@ -141,13 +180,14 @@ export default function CreateClientModal({
           {error && (
             <div
               style={{
-                padding: "0.75rem",
-                background: "#fee2e2",
-                border: "1px solid #fecaca",
-                borderRadius: "0.5rem",
+                padding: "0.7rem 0.875rem",
+                background: "var(--accent-danger-soft)",
+                border: "1px solid var(--accent-danger)",
+                borderRadius: "var(--radius-sm)",
                 marginBottom: "1rem",
-                color: "#991b1b",
-                fontSize: "0.875rem",
+                color: "var(--accent-danger-text)",
+                fontSize: "var(--text-sm)",
+                fontWeight: 500,
               }}
             >
               {error}
@@ -156,40 +196,25 @@ export default function CreateClientModal({
 
           {/* Name */}
           <div style={{ marginBottom: "1rem" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: "bold",
-                color: "#374151",
-              }}
-            >
+            <label style={labelStyle}>
               Client Name *
             </label>
             <div style={{ position: "relative" }}>
-              <User
-                size={20}
-                style={{
-                  position: "absolute",
-                  left: "0.75rem",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#9ca3af",
-                }}
-              />
+              <User size={18} style={iconStyle} />
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., John Doe"
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem 0.75rem 0.75rem 2.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
+                style={inputStyle}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent-primary)";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border-default)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               />
             </div>
@@ -197,39 +222,24 @@ export default function CreateClientModal({
 
           {/* Company */}
           <div style={{ marginBottom: "1rem" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: "bold",
-                color: "#374151",
-              }}
-            >
+            <label style={labelStyle}>
               Company (Optional)
             </label>
             <div style={{ position: "relative" }}>
-              <Building2
-                size={20}
-                style={{
-                  position: "absolute",
-                  left: "0.75rem",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#9ca3af",
-                }}
-              />
+              <Building2 size={18} style={iconStyle} />
               <input
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder="e.g., Acme Inc."
-                style={{
-                  width: "100%",
-                  padding: "0.75rem 0.75rem 0.75rem 2.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
+                style={inputStyle}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent-primary)";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border-default)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               />
             </div>
@@ -237,40 +247,25 @@ export default function CreateClientModal({
 
           {/* Email */}
           <div style={{ marginBottom: "1rem" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: "bold",
-                color: "#374151",
-              }}
-            >
+            <label style={labelStyle}>
               Email Address *
             </label>
             <div style={{ position: "relative" }}>
-              <Mail
-                size={20}
-                style={{
-                  position: "absolute",
-                  left: "0.75rem",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#9ca3af",
-                }}
-              />
+              <Mail size={18} style={iconStyle} />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="client@example.com"
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem 0.75rem 0.75rem 2.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
+                style={inputStyle}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent-primary)";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border-default)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               />
             </div>
@@ -278,28 +273,11 @@ export default function CreateClientModal({
 
           {/* Password */}
           <div style={{ marginBottom: "1.5rem" }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: "bold",
-                color: "#374151",
-              }}
-            >
+            <label style={labelStyle}>
               Password *
             </label>
             <div style={{ position: "relative" }}>
-              <Lock
-                size={20}
-                style={{
-                  position: "absolute",
-                  left: "0.75rem",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: "#9ca3af",
-                }}
-              />
+              <Lock size={18} style={iconStyle} />
               <input
                 type="password"
                 value={password}
@@ -307,16 +285,18 @@ export default function CreateClientModal({
                 placeholder="Minimum 6 characters"
                 required
                 minLength={6}
-                style={{
-                  width: "100%",
-                  padding: "0.75rem 0.75rem 0.75rem 2.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
+                style={inputStyle}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent-primary)";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border-default)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               />
             </div>
-            <p style={{ fontSize: "0.75rem", color: "#6b7280", marginTop: "0.25rem" }}>
+            <p style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)", marginTop: "0.35rem" }}>
               This password will be used for client login
             </p>
           </div>
@@ -325,8 +305,10 @@ export default function CreateClientModal({
           <div
             style={{
               display: "flex",
-              gap: "0.75rem",
+              gap: "0.625rem",
               justifyContent: "flex-end",
+              paddingTop: "0.5rem",
+              borderTop: "1px solid var(--border-subtle)",
             }}
           >
             <button
@@ -334,14 +316,27 @@ export default function CreateClientModal({
               onClick={onClose}
               disabled={loading}
               style={{
-                padding: "0.75rem 1.5rem",
-                background: "#f3f4f6",
-                color: "#1f2937",
-                border: "none",
-                borderRadius: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: "bold",
+                padding: "0.6rem 1.25rem",
+                background: "var(--surface-sunken)",
+                color: "var(--text-secondary)",
+                border: "1px solid var(--border-default)",
+                borderRadius: "var(--radius-sm)",
+                fontSize: "var(--text-sm)",
+                fontWeight: 600,
                 cursor: loading ? "not-allowed" : "pointer",
+                transition: "all var(--duration-fast) ease",
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.background = "var(--surface-ground)";
+                  e.currentTarget.style.borderColor = "var(--border-strong)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.background = "var(--surface-sunken)";
+                  e.currentTarget.style.borderColor = "var(--border-default)";
+                }
               }}
             >
               Cancel
@@ -350,14 +345,26 @@ export default function CreateClientModal({
               type="submit"
               disabled={loading}
               style={{
-                padding: "0.75rem 1.5rem",
-                background: loading ? "#9ca3af" : "#3b82f6",
+                padding: "0.6rem 1.5rem",
+                background: loading ? "var(--text-muted)" : "var(--accent-primary)",
                 color: "white",
                 border: "none",
-                borderRadius: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: "bold",
+                borderRadius: "var(--radius-sm)",
+                fontSize: "var(--text-sm)",
+                fontWeight: 600,
                 cursor: loading ? "not-allowed" : "pointer",
+                boxShadow: "var(--shadow-sm)",
+                transition: "all var(--duration-fast) ease",
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.background = "var(--accent-primary-hover)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.background = "var(--accent-primary)";
+                }
               }}
             >
               {loading ? "Creating..." : "Create Client"}

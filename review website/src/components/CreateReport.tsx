@@ -130,53 +130,110 @@ export default function CreateReport({ onSave }: CreateReportProps) {
     }
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "0.7rem 0.75rem",
+    border: "1px solid var(--border-default)",
+    borderRadius: "var(--radius-sm)",
+    fontSize: "var(--text-base)",
+    color: "var(--text-primary)",
+    background: "var(--surface-card)",
+    transition: "border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease",
+    outline: "none",
+    fontFamily: "inherit",
+  };
+
+  const inputWithIconStyle: React.CSSProperties = {
+    ...inputStyle,
+    paddingLeft: "2.75rem",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    marginBottom: "0.4rem",
+    fontSize: "var(--text-sm)",
+    fontWeight: 600,
+    color: "var(--text-secondary)",
+    letterSpacing: "0.01em",
+  };
+
+  const iconStyle: React.CSSProperties = {
+    position: "absolute",
+    left: "0.75rem",
+    top: "50%",
+    transform: "translateY(-50%)",
+    color: "var(--text-muted)",
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.style.borderColor = "var(--accent-primary)";
+    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(91, 106, 191, 0.1)";
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.currentTarget.style.borderColor = "var(--border-default)";
+    e.currentTarget.style.boxShadow = "none";
+  };
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#f9fafb",
+        background: "var(--surface-ground)",
         padding: "2rem",
       }}
     >
       <div
         style={{
-          maxWidth: "800px",
+          maxWidth: "720px",
           margin: "0 auto",
-          background: "white",
-          borderRadius: "0.5rem",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          background: "var(--surface-card)",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-md)",
+          border: "1px solid var(--border-subtle)",
         }}
       >
         {/* Header */}
         <div
           style={{
-            padding: "2rem",
-            borderBottom: "1px solid #e5e7eb",
+            padding: "1.5rem 2rem",
+            borderBottom: "1px solid var(--border-default)",
             display: "flex",
             alignItems: "center",
-            gap: "1rem",
+            gap: "0.875rem",
           }}
         >
           <button
             onClick={() => navigate("/admin/reports")}
             style={{
-              padding: "0.5rem",
-              background: "#f3f4f6",
-              border: "none",
-              borderRadius: "0.5rem",
+              padding: "0.45rem",
+              background: "var(--surface-sunken)",
+              border: "1px solid var(--border-default)",
+              borderRadius: "var(--radius-sm)",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              transition: "all var(--duration-fast) ease",
+              color: "var(--text-secondary)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--surface-ground)";
+              e.currentTarget.style.borderColor = "var(--border-strong)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "var(--surface-sunken)";
+              e.currentTarget.style.borderColor = "var(--border-default)";
             }}
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} />
           </button>
           <h1
             style={{
-              fontSize: "2rem",
-              fontWeight: "bold",
-              color: "#1f2937",
+              fontSize: "var(--text-2xl)",
+              fontWeight: 700,
+              color: "var(--text-primary)",
+              letterSpacing: "var(--tracking-tight)",
             }}
           >
             Create New Report
@@ -184,75 +241,55 @@ export default function CreateReport({ onSave }: CreateReportProps) {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={{ padding: "2rem" }}>
+        <form onSubmit={handleSubmit} style={{ padding: "1.75rem 2rem" }}>
           {error && (
             <div
               style={{
-                padding: "0.75rem",
-                background: "#fee2e2",
-                border: "1px solid #fecaca",
-                borderRadius: "0.5rem",
+                padding: "0.7rem 0.875rem",
+                background: "var(--accent-danger-soft)",
+                border: "1px solid var(--accent-danger)",
+                borderRadius: "var(--radius-sm)",
                 marginBottom: "1.5rem",
-                color: "#991b1b",
-                fontSize: "0.875rem",
+                color: "var(--accent-danger-text)",
+                fontSize: "var(--text-sm)",
+                fontWeight: 500,
               }}
             >
               {error}
             </div>
           )}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             {/* Client Email */}
             <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  fontWeight: "bold",
-                  color: "#6b7280",
-                }}
-              >
-                Client Email <span style={{ color: "#ef4444" }}>*</span>
+              <label style={labelStyle}>
+                Client Email <span style={{ color: "var(--accent-danger)" }}>*</span>
               </label>
               <div style={{ position: "relative" }}>
-                <Mail
-                  size={20}
-                  style={{
-                    position: "absolute",
-                    left: "0.75rem",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#9ca3af",
-                  }}
-                />
+                <Mail size={18} style={iconStyle} />
                 <input
                   type="email"
                   value={clientEmail}
                   onChange={(e) => setClientEmail(e.target.value)}
                   placeholder="client@example.com"
                   required
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem 0.75rem 0.75rem 2.75rem",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "0.5rem",
-                    fontSize: "1rem",
-                  }}
+                  style={inputWithIconStyle}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
                 />
               </div>
               {existingClient && (
                 <p
                   style={{
-                    marginTop: "0.5rem",
-                    fontSize: "0.875rem",
-                    color: "#10b981",
-                    fontWeight: "500",
+                    marginTop: "0.4rem",
+                    fontSize: "var(--text-sm)",
+                    color: "var(--accent-success-text)",
+                    fontWeight: 500,
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.5rem",
+                    gap: "0.4rem",
                   }}
                 >
-                  <User size={16} />
+                  <User size={14} />
                   Existing client: {existingClient.name}
                   {existingClient.company && ` (${existingClient.company})`}
                 </p>
@@ -260,10 +297,10 @@ export default function CreateReport({ onSave }: CreateReportProps) {
               {!existingClient && clientEmail.trim() && (
                 <p
                   style={{
-                    marginTop: "0.5rem",
-                    fontSize: "0.875rem",
-                    color: "#3b82f6",
-                    fontWeight: "500",
+                    marginTop: "0.4rem",
+                    fontSize: "var(--text-sm)",
+                    color: "var(--accent-primary)",
+                    fontWeight: 500,
                   }}
                 >
                   New client will be created
@@ -273,100 +310,54 @@ export default function CreateReport({ onSave }: CreateReportProps) {
 
             {/* Client Name */}
             <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  fontWeight: "bold",
-                  color: "#6b7280",
-                }}
-              >
+              <label style={labelStyle}>
                 Client Name {existingClient ? "(auto-filled)" : "(optional)"}
               </label>
               <div style={{ position: "relative" }}>
-                <User
-                  size={20}
-                  style={{
-                    position: "absolute",
-                    left: "0.75rem",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#9ca3af",
-                  }}
-                />
+                <User size={18} style={iconStyle} />
                 <input
                   type="text"
                   value={clientName}
                   onChange={(e) => setClientName(e.target.value)}
                   placeholder="e.g., John Doe"
                   style={{
-                    width: "100%",
-                    padding: "0.75rem 0.75rem 0.75rem 2.75rem",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "0.5rem",
-                    fontSize: "1rem",
-                    background: existingClient ? "#f3f4f6" : "white",
+                    ...inputWithIconStyle,
+                    background: existingClient ? "var(--surface-sunken)" : "var(--surface-card)",
                   }}
                   disabled={!!existingClient}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
                 />
               </div>
             </div>
 
             {/* Client Company */}
             <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  fontWeight: "bold",
-                  color: "#6b7280",
-                }}
-              >
+              <label style={labelStyle}>
                 Company Name {existingClient ? "(auto-filled)" : "(optional)"}
               </label>
               <div style={{ position: "relative" }}>
-                <Building2
-                  size={20}
-                  style={{
-                    position: "absolute",
-                    left: "0.75rem",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: "#9ca3af",
-                  }}
-                />
+                <Building2 size={18} style={iconStyle} />
                 <input
                   type="text"
                   value={clientCompany}
                   onChange={(e) => setClientCompany(e.target.value)}
                   placeholder="e.g., Acme Corporation"
                   style={{
-                    width: "100%",
-                    padding: "0.75rem 0.75rem 0.75rem 2.75rem",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "0.5rem",
-                    fontSize: "1rem",
-                    background: existingClient ? "#f3f4f6" : "white",
+                    ...inputWithIconStyle,
+                    background: existingClient ? "var(--surface-sunken)" : "var(--surface-card)",
                   }}
                   disabled={!!existingClient}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
                 />
               </div>
             </div>
 
             {/* Product Name */}
             <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  fontWeight: "bold",
-                  color: "#6b7280",
-                }}
-              >
-                Product Name <span style={{ color: "#ef4444" }}>*</span>
+              <label style={labelStyle}>
+                Product Name <span style={{ color: "var(--accent-danger)" }}>*</span>
               </label>
               <input
                 type="text"
@@ -374,27 +365,15 @@ export default function CreateReport({ onSave }: CreateReportProps) {
                 onChange={(e) => setProductName(e.target.value)}
                 placeholder="e.g., EcoShop Marketplace"
                 required
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
-                }}
+                style={inputStyle}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
               />
             </div>
 
             {/* Product URL */}
             <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  fontWeight: "bold",
-                  color: "#6b7280",
-                }}
-              >
+              <label style={labelStyle}>
                 Product URL (optional)
               </label>
               <input
@@ -402,40 +381,24 @@ export default function CreateReport({ onSave }: CreateReportProps) {
                 value={productUrl}
                 onChange={(e) => setProductUrl(e.target.value)}
                 placeholder="https://example.com/product"
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
-                }}
+                style={inputStyle}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
               />
             </div>
 
             {/* Review Date */}
             <div>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  fontWeight: "bold",
-                  color: "#6b7280",
-                }}
-              >
+              <label style={labelStyle}>
                 Review Date
               </label>
               <input
                 type="date"
                 value={reviewDate}
                 onChange={(e) => setReviewDate(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
-                }}
+                style={inputStyle}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
               />
             </div>
 
@@ -443,10 +406,10 @@ export default function CreateReport({ onSave }: CreateReportProps) {
             <div
               style={{
                 display: "flex",
-                gap: "1rem",
-                marginTop: "1rem",
-                paddingTop: "1.5rem",
-                borderTop: "1px solid #e5e7eb",
+                gap: "0.625rem",
+                marginTop: "0.5rem",
+                paddingTop: "1.25rem",
+                borderTop: "1px solid var(--border-subtle)",
               }}
             >
               <button
@@ -454,34 +417,58 @@ export default function CreateReport({ onSave }: CreateReportProps) {
                 disabled={saving}
                 style={{
                   flex: 1,
-                  padding: "0.75rem 1.5rem",
-                  background: saving ? "#9ca3af" : "#3b82f6",
+                  padding: "0.65rem 1.5rem",
+                  background: saving ? "var(--text-muted)" : "var(--accent-primary)",
                   color: "white",
                   border: "none",
-                  borderRadius: "0.5rem",
+                  borderRadius: "var(--radius-sm)",
                   cursor: saving ? "not-allowed" : "pointer",
-                  fontSize: "1rem",
-                  fontWeight: "bold",
+                  fontSize: "var(--text-base)",
+                  fontWeight: 600,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "0.5rem",
+                  gap: "0.45rem",
+                  boxShadow: "var(--shadow-sm)",
+                  transition: "all var(--duration-fast) ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (!saving) {
+                    e.currentTarget.style.background = "var(--accent-primary-hover)";
+                    e.currentTarget.style.boxShadow = "var(--shadow-md)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!saving) {
+                    e.currentTarget.style.background = "var(--accent-primary)";
+                    e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+                  }
                 }}
               >
-                <Save size={20} />
+                <Save size={18} />
                 {saving ? "Creating..." : "Create Report"}
               </button>
               <button
                 type="button"
                 onClick={() => navigate("/admin/reports")}
                 style={{
-                  padding: "0.75rem 1.5rem",
-                  background: "#f3f4f6",
-                  color: "#1f2937",
-                  border: "none",
-                  borderRadius: "0.5rem",
+                  padding: "0.65rem 1.5rem",
+                  background: "var(--surface-sunken)",
+                  color: "var(--text-secondary)",
+                  border: "1px solid var(--border-default)",
+                  borderRadius: "var(--radius-sm)",
                   cursor: "pointer",
-                  fontSize: "1rem",
+                  fontSize: "var(--text-base)",
+                  fontWeight: 500,
+                  transition: "all var(--duration-fast) ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--surface-ground)";
+                  e.currentTarget.style.borderColor = "var(--border-strong)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "var(--surface-sunken)";
+                  e.currentTarget.style.borderColor = "var(--border-default)";
                 }}
               >
                 Cancel

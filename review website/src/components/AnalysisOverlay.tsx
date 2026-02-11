@@ -47,7 +47,8 @@ export default function AnalysisOverlay({
         position: "fixed",
         inset: 0,
         zIndex: 3000,
-        background: "rgba(17, 24, 39, 0.2)",
+        background: "rgba(26, 29, 35, 0.18)",
+        backdropFilter: "blur(2px)",
         display: "flex",
         alignItems: isMobile ? "flex-end" : "stretch",
         justifyContent: isMobile ? "stretch" : "flex-end",
@@ -76,78 +77,92 @@ export default function AnalysisOverlay({
           minWidth: isMobile ? "100%" : "460px",
           maxHeight: isMobile ? "92vh" : "100vh",
           height: isMobile ? "92vh" : "100vh",
-          background: "#ffffff",
-          borderTopLeftRadius: isMobile ? "1rem" : 0,
-          borderTopRightRadius: isMobile ? "1rem" : 0,
-          boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+          background: "var(--surface-raised)",
+          borderTopLeftRadius: isMobile ? "var(--radius-lg)" : 0,
+          borderTopRightRadius: isMobile ? "var(--radius-lg)" : 0,
+          boxShadow: "var(--shadow-xl)",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
         }}
       >
+        {/* Header */}
         <div
           style={{
-            padding: "1rem 1rem 0.85rem 1rem",
-            borderBottom: "1px solid #e5e7eb",
+            padding: "1.125rem 1.25rem 1rem 1.25rem",
+            borderBottom: "1px solid var(--border-default)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             gap: "0.75rem",
           }}
         >
-          <h3 style={{ fontSize: "1.05rem", color: "#111827", margin: 0 }}>
+          <h3 style={{ fontSize: "var(--text-md)", color: "var(--text-primary)", margin: 0, fontWeight: 600 }}>
             {title}
           </h3>
           <button
             type="button"
             onClick={onClose}
             style={{
-              border: "1px solid #d1d5db",
-              borderRadius: "0.45rem",
-              background: "#ffffff",
-              color: "#374151",
+              border: "1px solid var(--border-default)",
+              borderRadius: "var(--radius-sm)",
+              background: "var(--surface-raised)",
+              color: "var(--text-secondary)",
               width: "2rem",
               height: "2rem",
               cursor: "pointer",
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
+              transition: "background var(--duration-fast) ease, border-color var(--duration-fast) ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--surface-sunken)";
+              e.currentTarget.style.borderColor = "var(--border-strong)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "var(--surface-raised)";
+              e.currentTarget.style.borderColor = "var(--border-default)";
             }}
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
+
+        {/* Content */}
         <div
           style={{
-            padding: "1rem",
+            padding: "1.125rem 1.25rem",
             overflowY: "auto",
             display: "flex",
             flexDirection: "column",
-            gap: "0.9rem",
+            gap: "0.75rem",
           }}
         >
           {sections.map((section) => (
             <div
               key={`${section.title}-${section.content.slice(0, 24)}`}
               style={{
-                border: "1px solid #e5e7eb",
-                borderRadius: "0.5rem",
-                padding: "0.75rem",
+                border: "1px solid var(--border-default)",
+                borderRadius: "var(--radius-sm)",
+                padding: "0.875rem 1rem",
+                background: "var(--surface-ground)",
               }}
             >
               <div
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: "var(--text-xs)",
                   textTransform: "uppercase",
-                  letterSpacing: "0.04em",
-                  color: "#6b7280",
-                  fontWeight: 700,
-                  marginBottom: "0.3rem",
+                  letterSpacing: "0.06em",
+                  color: "var(--text-muted)",
+                  fontWeight: 600,
+                  marginBottom: "0.35rem",
+                  lineHeight: 1.4,
                 }}
               >
                 {section.title}
               </div>
-              <div style={{ color: "#374151", lineHeight: 1.55, fontSize: "0.95rem" }}>
+              <div style={{ color: "var(--text-secondary)", lineHeight: 1.6, fontSize: "var(--text-base)" }}>
                 {section.content}
               </div>
             </div>

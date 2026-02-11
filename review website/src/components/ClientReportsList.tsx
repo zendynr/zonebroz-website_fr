@@ -11,16 +11,16 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
 
   const getStatusIcon = (status: ReportStatus) => {
     if (status === "published") {
-      return <CheckCircle size={18} style={{ color: "#10b981" }} />;
+      return <CheckCircle size={15} style={{ color: "var(--accent-success)" }} />;
     }
-    return <Clock size={18} style={{ color: "#f59e0b" }} />;
+    return <Clock size={15} style={{ color: "var(--accent-warning)" }} />;
   };
 
-  const getStatusColor = (status: ReportStatus) => {
+  const getStatusStyle = (status: ReportStatus): React.CSSProperties => {
     if (status === "published") {
-      return { background: "#d1fae5", color: "#065f46" };
+      return { background: "var(--accent-success-soft)", color: "var(--accent-success-text)" };
     }
-    return { background: "#fef3c7", color: "#92400e" };
+    return { background: "var(--accent-warning-soft)", color: "var(--accent-warning-text)" };
   };
 
   const formatDate = (dateString: string) => {
@@ -39,14 +39,14 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
   return (
     <div
       style={{
-        minHeight: "calc(100vh - 4rem)",
-        background: "#f9fafb",
+        minHeight: "calc(100vh - 3.5rem)",
+        background: "var(--surface-ground)",
         padding: "2rem",
       }}
     >
       <div
         style={{
-          maxWidth: "1400px",
+          maxWidth: "var(--canvas-max-width)",
           margin: "0 auto",
         }}
       >
@@ -58,15 +58,16 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
         >
           <h1
             style={{
-              fontSize: "2rem",
-              fontWeight: "bold",
-              color: "#1f2937",
-              marginBottom: "0.5rem",
+              fontSize: "var(--text-3xl)",
+              fontWeight: 700,
+              color: "var(--text-primary)",
+              marginBottom: "0.375rem",
+              letterSpacing: "var(--tracking-tight)",
             }}
           >
             My Reports
           </h1>
-          <p style={{ color: "#6b7280", fontSize: "1rem" }}>
+          <p style={{ color: "var(--text-tertiary)", fontSize: "var(--text-base)" }}>
             Select a report to view your product audit details
           </p>
         </div>
@@ -75,15 +76,16 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
         {reports.length === 0 ? (
           <div
             style={{
-              background: "white",
+              background: "var(--surface-card)",
               padding: "3rem",
-              borderRadius: "0.5rem",
+              borderRadius: "var(--radius-md)",
               textAlign: "center",
-              border: "1px solid #e5e7eb",
+              border: "1px solid var(--border-default)",
+              boxShadow: "var(--shadow-xs)",
             }}
           >
-            <FileText size={48} style={{ color: "#9ca3af", marginBottom: "1rem" }} />
-            <p style={{ color: "#6b7280", fontSize: "1.125rem" }}>
+            <FileText size={44} style={{ color: "var(--text-muted)", marginBottom: "0.875rem" }} />
+            <p style={{ color: "var(--text-tertiary)", fontSize: "var(--text-lg)" }}>
               No reports available. Please contact an administrator.
             </p>
           </div>
@@ -91,31 +93,33 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-              gap: "1.5rem",
+              gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+              gap: "1rem",
             }}
           >
             {reports.map((report) => {
-              const statusStyle = getStatusColor(report.status);
+              const statusStyle = getStatusStyle(report.status);
               return (
                 <div
                   key={report.id}
                   style={{
-                    background: "white",
-                    borderRadius: "0.5rem",
-                    border: "1px solid #e5e7eb",
-                    padding: "1.5rem",
+                    background: "var(--surface-card)",
+                    borderRadius: "var(--radius-md)",
+                    border: "1px solid var(--border-default)",
+                    padding: "1.375rem 1.5rem",
                     cursor: "pointer",
-                    transition: "all 0.2s",
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    transition: "all var(--duration-normal) var(--ease-out)",
+                    boxShadow: "var(--shadow-sm)",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
-                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "var(--shadow-md)";
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                    e.currentTarget.style.borderColor = "var(--border-strong)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                    e.currentTarget.style.boxShadow = "var(--shadow-sm)";
                     e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.borderColor = "var(--border-default)";
                   }}
                   onClick={() => navigate(`/client/report/${report.id}`)}
                 >
@@ -125,16 +129,17 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "start",
-                      marginBottom: "1rem",
+                      marginBottom: "0.875rem",
                     }}
                   >
                     <div style={{ flex: 1 }}>
                       <h3
                         style={{
-                          fontSize: "1.25rem",
-                          fontWeight: "bold",
-                          color: "#1f2937",
-                          marginBottom: "0.5rem",
+                          fontSize: "var(--text-lg)",
+                          fontWeight: 600,
+                          color: "var(--text-primary)",
+                          marginBottom: "0.35rem",
+                          letterSpacing: "var(--tracking-tight)",
                         }}
                       >
                         {report.meta.productName}
@@ -142,31 +147,32 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
                       {report.meta.clientName && (
                         <p
                           style={{
-                            fontSize: "0.875rem",
-                            color: "#6b7280",
-                            marginBottom: "0.25rem",
+                            fontSize: "var(--text-sm)",
+                            color: "var(--text-tertiary)",
                           }}
                         >
                           {report.meta.clientName}
                         </p>
                       )}
                     </div>
-                    <div
+                    {/* Status badge — informational */}
+                    <span
                       style={{
-                        display: "flex",
+                        display: "inline-flex",
                         alignItems: "center",
-                        gap: "0.5rem",
-                        padding: "0.25rem 0.75rem",
-                        borderRadius: "0.5rem",
+                        gap: "0.35rem",
+                        padding: "0.2rem 0.6rem",
+                        borderRadius: "var(--radius-full)",
                         ...statusStyle,
-                        fontSize: "0.75rem",
-                        fontWeight: "bold",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: 600,
                         textTransform: "uppercase",
+                        letterSpacing: "var(--tracking-wide)",
                       }}
                     >
                       {getStatusIcon(report.status)}
                       {report.status}
-                    </div>
+                    </span>
                   </div>
 
                   {/* Review Date */}
@@ -174,13 +180,13 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "0.5rem",
-                      fontSize: "0.875rem",
-                      color: "#6b7280",
-                      marginBottom: "1rem",
+                      gap: "0.4rem",
+                      fontSize: "var(--text-sm)",
+                      color: "var(--text-tertiary)",
+                      marginBottom: "0.875rem",
                     }}
                   >
-                    <Calendar size={16} style={{ color: "#9ca3af" }} />
+                    <Calendar size={14} style={{ color: "var(--text-muted)" }} />
                     <span>Reviewed: {formatDate(report.meta.reviewDate)}</span>
                   </div>
 
@@ -190,25 +196,26 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
                       display: "flex",
                       alignItems: "center",
                       gap: "0.5rem",
-                      marginBottom: "1rem",
-                      padding: "0.75rem",
-                      background: "#f3f4f6",
-                      borderRadius: "0.5rem",
+                      marginBottom: "0.875rem",
+                      padding: "0.625rem 0.875rem",
+                      background: "var(--surface-sunken)",
+                      borderRadius: "var(--radius-sm)",
                     }}
                   >
-                    <span style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                    <span style={{ fontSize: "var(--text-sm)", color: "var(--text-muted)" }}>
                       Overall Score:
                     </span>
                     <span
                       style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#1f2937",
+                        fontSize: "var(--text-xl)",
+                        fontWeight: 700,
+                        color: "var(--text-primary)",
+                        letterSpacing: "-0.02em",
                       }}
                     >
                       {report.overallScore?.toFixed(1) || "N/A"}
                     </span>
-                    <span style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                    <span style={{ fontSize: "var(--text-sm)", color: "var(--text-muted)" }}>
                       / 10
                     </span>
                   </div>
@@ -216,9 +223,9 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
                   {/* Metadata */}
                   <div
                     style={{
-                      fontSize: "0.875rem",
-                      color: "#6b7280",
-                      marginBottom: "1.5rem",
+                      fontSize: "var(--text-sm)",
+                      color: "var(--text-tertiary)",
+                      marginBottom: "1.25rem",
                     }}
                   >
                     <div>
@@ -226,7 +233,7 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
                     </div>
                   </div>
 
-                  {/* View Button */}
+                  {/* View Button — feels pressable */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -234,28 +241,37 @@ export default function ClientReportsList({ reports }: ClientReportsListProps) {
                     }}
                     style={{
                       width: "100%",
-                      padding: "0.75rem 1rem",
-                      background: "#10b981",
+                      padding: "0.6rem 1rem",
+                      background: "var(--accent-success)",
                       color: "white",
                       border: "none",
-                      borderRadius: "0.5rem",
+                      borderRadius: "var(--radius-sm)",
                       cursor: "pointer",
-                      fontSize: "0.875rem",
-                      fontWeight: "bold",
+                      fontSize: "var(--text-sm)",
+                      fontWeight: 600,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: "0.5rem",
-                      transition: "background 0.2s",
+                      gap: "0.4rem",
+                      transition: "all var(--duration-fast) ease",
+                      boxShadow: "var(--shadow-xs)",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "#059669";
+                      e.currentTarget.style.background = "#258a66";
+                      e.currentTarget.style.boxShadow = "var(--shadow-sm)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "#10b981";
+                      e.currentTarget.style.background = "var(--accent-success)";
+                      e.currentTarget.style.boxShadow = "var(--shadow-xs)";
+                    }}
+                    onMouseDown={(e) => {
+                      e.currentTarget.style.transform = "scale(0.97)";
+                    }}
+                    onMouseUp={(e) => {
+                      e.currentTarget.style.transform = "scale(1)";
                     }}
                   >
-                    <Eye size={16} />
+                    <Eye size={15} />
                     View Report
                   </button>
                 </div>

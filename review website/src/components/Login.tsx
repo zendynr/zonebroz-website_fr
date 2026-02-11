@@ -33,20 +33,18 @@ export default function Login() {
       return;
     }
 
-    // Login succeeded and role was determined - navigate directly
     if (isClientLogin) {
       navigate("/client/report", { replace: true });
     } else {
       navigate("/admin/reports", { replace: true });
     }
-    // Don't setLoading(false) - we're navigating away
   };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(160deg, #2d3250 0%, #3b2f5c 40%, #4a3568 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -55,12 +53,13 @@ export default function Login() {
     >
       <div
         style={{
-          background: "white",
-          borderRadius: "1rem",
-          padding: "3rem",
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-          maxWidth: "450px",
+          background: "var(--surface-raised)",
+          borderRadius: "var(--radius-xl)",
+          padding: "2.75rem 2.5rem",
+          boxShadow: "var(--shadow-xl)",
+          maxWidth: "420px",
           width: "100%",
+          border: "1px solid var(--border-subtle)",
         }}
       >
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
@@ -69,26 +68,27 @@ export default function Login() {
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              width: "64px",
-              height: "64px",
-              background: "#667eea",
-              borderRadius: "50%",
+              width: "56px",
+              height: "56px",
+              background: "var(--accent-primary-soft)",
+              borderRadius: "var(--radius-md)",
               marginBottom: "1rem",
             }}
           >
-            <Shield size={32} style={{ color: "white" }} />
+            <Shield size={28} style={{ color: "var(--accent-primary)" }} />
           </div>
           <h1
             style={{
-              fontSize: "2rem",
-              fontWeight: "bold",
-              color: "#1f2937",
-              marginBottom: "0.5rem",
+              fontSize: "var(--text-2xl)",
+              fontWeight: 700,
+              color: "var(--text-primary)",
+              marginBottom: "0.375rem",
+              letterSpacing: "var(--tracking-tight)",
             }}
           >
             Product Review Platform
           </h1>
-          <p style={{ color: "#6b7280", fontSize: "1rem" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: "var(--text-base)" }}>
             {isClientLogin
               ? "Sign in to view your report"
               : isAdminLogin
@@ -98,27 +98,27 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "1.5rem" }}>
+          <div style={{ marginBottom: "1.25rem" }}>
             <label
               style={{
                 display: "block",
-                marginBottom: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: "bold",
-                color: "#374151",
+                marginBottom: "0.4rem",
+                fontSize: "var(--text-sm)",
+                fontWeight: 600,
+                color: "var(--text-secondary)",
               }}
             >
               Email Address
             </label>
             <div style={{ position: "relative" }}>
               <Mail
-                size={20}
+                size={18}
                 style={{
                   position: "absolute",
-                  left: "1rem",
+                  left: "0.875rem",
                   top: "50%",
                   transform: "translateY(-50%)",
-                  color: "#9ca3af",
+                  color: "var(--text-muted)",
                 }}
               />
               <input
@@ -129,15 +129,23 @@ export default function Login() {
                 required
                 style={{
                   width: "100%",
-                  padding: "0.75rem 0.75rem 0.75rem 3rem",
-                  border: error ? "2px solid #ef4444" : "2px solid #e5e7eb",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
+                  padding: "0.7rem 0.75rem 0.7rem 2.75rem",
+                  border: error ? `1.5px solid var(--accent-danger)` : `1.5px solid var(--border-strong)`,
+                  borderRadius: "var(--radius-sm)",
+                  fontSize: "var(--text-base)",
                   outline: "none",
-                  transition: "border-color 0.2s",
+                  transition: "border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease",
+                  background: "var(--surface-raised)",
+                  color: "var(--text-primary)",
                 }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "#667eea"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = error ? "#ef4444" : "#e5e7eb"; }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent-primary)";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px var(--accent-primary-soft)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = error ? "var(--accent-danger)" : "var(--border-strong)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
               />
             </div>
           </div>
@@ -146,23 +154,23 @@ export default function Login() {
             <label
               style={{
                 display: "block",
-                marginBottom: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: "bold",
-                color: "#374151",
+                marginBottom: "0.4rem",
+                fontSize: "var(--text-sm)",
+                fontWeight: 600,
+                color: "var(--text-secondary)",
               }}
             >
               Password
             </label>
             <div style={{ position: "relative" }}>
               <Lock
-                size={20}
+                size={18}
                 style={{
                   position: "absolute",
-                  left: "1rem",
+                  left: "0.875rem",
                   top: "50%",
                   transform: "translateY(-50%)",
-                  color: "#9ca3af",
+                  color: "var(--text-muted)",
                 }}
               />
               <input
@@ -173,19 +181,27 @@ export default function Login() {
                 required
                 style={{
                   width: "100%",
-                  padding: "0.75rem 0.75rem 0.75rem 3rem",
-                  border: error ? "2px solid #ef4444" : "2px solid #e5e7eb",
-                  borderRadius: "0.5rem",
-                  fontSize: "1rem",
+                  padding: "0.7rem 0.75rem 0.7rem 2.75rem",
+                  border: error ? `1.5px solid var(--accent-danger)` : `1.5px solid var(--border-strong)`,
+                  borderRadius: "var(--radius-sm)",
+                  fontSize: "var(--text-base)",
                   outline: "none",
-                  transition: "border-color 0.2s",
+                  transition: "border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease",
+                  background: "var(--surface-raised)",
+                  color: "var(--text-primary)",
                 }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "#667eea"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = error ? "#ef4444" : "#e5e7eb"; }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent-primary)";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px var(--accent-primary-soft)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = error ? "var(--accent-danger)" : "var(--border-strong)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
               />
             </div>
             {error && (
-              <p style={{ marginTop: "0.5rem", fontSize: "0.875rem", color: "#ef4444" }}>
+              <p style={{ marginTop: "0.4rem", fontSize: "var(--text-sm)", color: "var(--accent-danger)" }}>
                 {error}
               </p>
             )}
@@ -196,18 +212,35 @@ export default function Login() {
             disabled={loading}
             style={{
               width: "100%",
-              padding: "0.75rem",
-              background: loading ? "#9ca3af" : "#667eea",
+              padding: "0.7rem",
+              background: loading ? "var(--text-muted)" : "var(--accent-primary)",
               color: "white",
               border: "none",
-              borderRadius: "0.5rem",
-              fontSize: "1rem",
-              fontWeight: "bold",
+              borderRadius: "var(--radius-sm)",
+              fontSize: "var(--text-base)",
+              fontWeight: 600,
               cursor: loading ? "not-allowed" : "pointer",
-              transition: "background 0.2s",
+              transition: "background var(--duration-fast) ease, transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease",
+              boxShadow: "var(--shadow-sm)",
             }}
-            onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = "#5568d3"; }}
-            onMouseLeave={(e) => { if (!loading) e.currentTarget.style.background = "#667eea"; }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.background = "var(--accent-primary-hover)";
+                e.currentTarget.style.boxShadow = "var(--shadow-md)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.background = "var(--accent-primary)";
+                e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+              }
+            }}
+            onMouseDown={(e) => {
+              if (!loading) e.currentTarget.style.transform = "scale(0.985)";
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
@@ -215,24 +248,25 @@ export default function Login() {
 
         <div
           style={{
-            marginTop: "2rem",
-            padding: "1rem",
-            background: "#f3f4f6",
-            borderRadius: "0.5rem",
-            fontSize: "0.875rem",
-            color: "#6b7280",
+            marginTop: "1.75rem",
+            padding: "0.875rem 1rem",
+            background: "var(--surface-sunken)",
+            borderRadius: "var(--radius-sm)",
+            fontSize: "var(--text-sm)",
+            color: "var(--text-tertiary)",
+            border: "1px solid var(--border-subtle)",
           }}
         >
-          <div style={{ fontWeight: "bold", marginBottom: "0.5rem", color: "#374151" }}>
+          <div style={{ fontWeight: 600, marginBottom: "0.35rem", color: "var(--text-secondary)" }}>
             {isClientLogin ? "Client Login" : "Admin Login"}:
           </div>
           {isClientLogin ? (
-            <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "#9ca3af" }}>
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)", lineHeight: 1.6 }}>
               • Sign in with your client email and password<br />
               • View your product audit reports
             </div>
           ) : (
-            <div style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "#9ca3af" }}>
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)", lineHeight: 1.6 }}>
               • Sign in with your admin email and password<br />
               • Full access to create and edit reports
             </div>

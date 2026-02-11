@@ -42,8 +42,14 @@ export default function EvidenceSlide({
   }, [slideIndex, isPrintMode, prefersReducedMotion]);
 
   const urgency = calculateUrgency(data.finding);
-  const urgencyColor =
-    urgency >= 3.0 ? "#ef4444" : urgency >= 1.5 ? "#f59e0b" : "#3b82f6";
+  const urgencyLevel =
+    urgency >= 3.0 ? "danger" : urgency >= 1.5 ? "warning" : "info";
+
+  const urgencyStyles: Record<string, { bg: string; color: string }> = {
+    danger: { bg: "var(--accent-danger-soft)", color: "var(--accent-danger-text)" },
+    warning: { bg: "var(--accent-warning-soft)", color: "var(--accent-warning-text)" },
+    info: { bg: "var(--accent-info-soft)", color: "var(--accent-info-text)" },
+  };
 
   const getImpactWarning = (impact: number): string => {
     if (impact >= 5)
@@ -57,7 +63,6 @@ export default function EvidenceSlide({
 
   const ignoredImpact = data.finding.ifIgnored?.trim() || getImpactWarning(data.finding.impact);
 
-  // Split recommendation into high-level directions
   const recSteps = getRecommendedDirection(data.finding)
     .split(/\.\s+/)
     .map((s) => s.replace(/\.$/, "").trim())
@@ -71,168 +76,180 @@ export default function EvidenceSlide({
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        padding: "4rem",
-        background: "#f9fafb",
+        padding: "3.5rem 4rem",
+        background: "var(--surface-ground)",
         gap: "1.5rem",
       }}
     >
-      <div className="evidence-finding">
-        {/* Layer 1 — Story: badges + title + first sentence */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-            marginBottom: "0.75rem",
-            flexWrap: "wrap",
-          }}
-        >
-          <span
-            style={{
-              background: urgencyColor,
-              color: "white",
-              padding: "0.35rem 0.75rem",
-              borderRadius: "0.5rem",
-              fontSize: "0.75rem",
-              fontWeight: "bold",
-            }}
-          >
-            Urgency: {urgency.toFixed(1)}
-          </span>
-          <span
-            style={{
-              background: "#e5e7eb",
-              padding: "0.35rem 0.75rem",
-              borderRadius: "0.5rem",
-              fontSize: "0.75rem",
-            }}
-          >
-            {formatCategoryName(data.finding.category)}
-          </span>
-        </div>
-
-        <h2
-          style={{
-            fontSize: "2.25rem",
-            fontWeight: "bold",
-            marginBottom: "0.5rem",
-            color: "#1f2937",
-          }}
-        >
-          {data.finding.title}
-        </h2>
-
-        <p
-          style={{
-            fontSize: "1.05rem",
-            lineHeight: 1.6,
-            color: "#4b5563",
-            marginBottom: "0.75rem",
-          }}
-        >
-          {getLeadSentence(getFindingWhatsHappening(data.finding))}
-        </p>
-
-        {/* Layer 2 — Explain: full detail behind toggle */}
-        <DetailPanel label="Why this matters">
-          <DetailBlock title="Full context">
-            {getFindingWhatsHappening(data.finding)}
-          </DetailBlock>
-          <DetailBlock title="If unaddressed">
-            <span style={{ color: "#991b1b" }}>
-              {ignoredImpact}
-            </span>
-          </DetailBlock>
-          <DetailBlock title="Impact · Effort">
-            <span>
-              Impact {data.finding.impact}/5 · Effort {data.finding.effort}/5 · Confidence{" "}
-              {data.finding.confidence}/5
-            </span>
-          </DetailBlock>
-          <DetailBlock title="Recommended direction">
-            {recSteps.length > 1 ? (
-              <ol style={{ margin: 0, paddingLeft: "1.1rem" }}>
-                {recSteps.map((step, i) => (
-                  <li key={i} style={{ marginBottom: i < recSteps.length - 1 ? "0.3rem" : 0 }}>
-                    {step}
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <span>{getRecommendedDirection(data.finding)}</span>
-            )}
-          </DetailBlock>
-        </DetailPanel>
-      </div>
-
-      {/* Layer 3 — Proof: clickable thumbnails → lightbox */}
-      {data.finding.evidence.length > 0 && (
-        <div className="evidence-media">
-          <h3
-            style={{
-              fontSize: "1.1rem",
-              fontWeight: "bold",
-              marginBottom: "0.5rem",
-              color: "#1f2937",
-            }}
-          >
-            Evidence
-            <span style={{ fontSize: "0.8rem", fontWeight: "normal", color: "#9ca3af", marginLeft: "0.5rem" }}>
-              click to enlarge
-            </span>
-          </h3>
+      <div style={{ maxWidth: "var(--canvas-max-width)", margin: "0 auto", width: "100%" }}>
+        <div className="evidence-finding">
+          {/* Badges — informational, not interactive */}
           <div
             style={{
               display: "flex",
-              gap: "1rem",
+              alignItems: "center",
+              gap: "0.5rem",
+              marginBottom: "0.75rem",
               flexWrap: "wrap",
             }}
           >
-            {data.finding.evidence.map((ev, index) => (
-              <div
-                key={index}
-                className="evidence-thumb"
-                onClick={() => setLightboxEvidence(ev)}
-                style={{
-                  width: "180px",
-                  height: "120px",
-                  borderRadius: "0.5rem",
-                  overflow: "hidden",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  position: "relative",
-                }}
-              >
-                {ev.type === "image" ? (
-                  <img
-                    src={ev.url}
-                    alt={ev.caption || "Evidence"}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://via.placeholder.com/180x120?text=Preview";
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      background: "#e5e7eb",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "0.8rem",
-                      color: "#6b7280",
-                    }}
-                  >
-                    ▶ Video
-                  </div>
-                )}
-              </div>
-            ))}
+            <span
+              style={{
+                background: urgencyStyles[urgencyLevel].bg,
+                color: urgencyStyles[urgencyLevel].color,
+                padding: "0.3rem 0.7rem",
+                borderRadius: "var(--radius-full)",
+                fontSize: "var(--text-xs)",
+                fontWeight: 600,
+                letterSpacing: "var(--tracking-wide)",
+              }}
+            >
+              Urgency {urgency.toFixed(1)}
+            </span>
+            <span
+              style={{
+                background: "var(--surface-sunken)",
+                color: "var(--text-tertiary)",
+                padding: "0.3rem 0.7rem",
+                borderRadius: "var(--radius-full)",
+                fontSize: "var(--text-xs)",
+                fontWeight: 500,
+              }}
+            >
+              {formatCategoryName(data.finding.category)}
+            </span>
           </div>
+
+          <h2
+            style={{
+              fontSize: "var(--text-3xl)",
+              fontWeight: 700,
+              marginBottom: "0.5rem",
+              color: "var(--text-primary)",
+              letterSpacing: "var(--tracking-tight)",
+              lineHeight: "var(--leading-tight)",
+            }}
+          >
+            {data.finding.title}
+          </h2>
+
+          <p
+            style={{
+              fontSize: "var(--text-md)",
+              lineHeight: "var(--leading-relaxed)",
+              color: "var(--text-secondary)",
+              marginBottom: "0.75rem",
+              maxWidth: "720px",
+            }}
+          >
+            {getLeadSentence(getFindingWhatsHappening(data.finding))}
+          </p>
+
+          {/* Explain panel */}
+          <DetailPanel label="Why this matters">
+            <DetailBlock title="Full context">
+              {getFindingWhatsHappening(data.finding)}
+            </DetailBlock>
+            <DetailBlock title="If unaddressed">
+              <span style={{ color: "var(--accent-danger-text)" }}>
+                {ignoredImpact}
+              </span>
+            </DetailBlock>
+            <DetailBlock title="Impact · Effort">
+              <span>
+                Impact {data.finding.impact}/5 · Effort {data.finding.effort}/5 · Confidence{" "}
+                {data.finding.confidence}/5
+              </span>
+            </DetailBlock>
+            <DetailBlock title="Recommended direction">
+              {recSteps.length > 1 ? (
+                <ol style={{ margin: 0, paddingLeft: "1.1rem" }}>
+                  {recSteps.map((step, i) => (
+                    <li key={i} style={{ marginBottom: i < recSteps.length - 1 ? "0.3rem" : 0 }}>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <span>{getRecommendedDirection(data.finding)}</span>
+              )}
+            </DetailBlock>
+          </DetailPanel>
         </div>
-      )}
+
+        {/* Evidence thumbnails */}
+        {data.finding.evidence.length > 0 && (
+          <div className="evidence-media" style={{ marginTop: "1rem" }}>
+            <h3
+              style={{
+                fontSize: "var(--text-md)",
+                fontWeight: 600,
+                marginBottom: "0.625rem",
+                color: "var(--text-primary)",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              Evidence
+              <span style={{ fontSize: "var(--text-xs)", fontWeight: 400, color: "var(--text-muted)" }}>
+                click to enlarge
+              </span>
+            </h3>
+            <div
+              style={{
+                display: "flex",
+                gap: "0.75rem",
+                flexWrap: "wrap",
+              }}
+            >
+              {data.finding.evidence.map((ev, index) => (
+                <div
+                  key={index}
+                  className="evidence-thumb"
+                  onClick={() => setLightboxEvidence(ev)}
+                  style={{
+                    width: "180px",
+                    height: "120px",
+                    borderRadius: "var(--radius-sm)",
+                    overflow: "hidden",
+                    boxShadow: "var(--shadow-sm)",
+                    position: "relative",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  {ev.type === "image" ? (
+                    <img
+                      src={ev.url}
+                      alt={ev.caption || "Evidence"}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://via.placeholder.com/180x120?text=Preview";
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        background: "var(--surface-sunken)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "var(--text-sm)",
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      ▶ Video
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       <EvidenceLightbox
         evidence={lightboxEvidence}

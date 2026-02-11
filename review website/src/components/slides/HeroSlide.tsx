@@ -59,9 +59,9 @@ export default function HeroSlide({ data, slideIndex }: HeroSlideProps) {
   }, [slideIndex, isPrintMode, prefersReducedMotion]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "#10b981";
-    if (score >= 6) return "#f59e0b";
-    return "#ef4444";
+    if (score >= 8) return "#5ec7a0";
+    if (score >= 6) return "#e0b45c";
+    return "#e07070";
   };
 
   return (
@@ -74,58 +74,64 @@ export default function HeroSlide({ data, slideIndex }: HeroSlideProps) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "4rem",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        padding: "4rem 3rem",
+        background: "linear-gradient(160deg, #2d3250 0%, #3b2f5c 40%, #4a3568 100%)",
         color: "white",
         textAlign: "center",
       }}
     >
-      <h1
-        className="hero-title"
-        style={{
-          fontSize: "3.5rem",
-          fontWeight: "bold",
-          marginBottom: "1rem",
-          lineHeight: 1.2,
-        }}
-      >
-        {data.productName}
-      </h1>
-
       <p
         style={{
-          fontSize: "1rem",
-          opacity: 0.7,
-          marginBottom: "1.5rem",
+          fontSize: "var(--text-sm)",
+          opacity: 0.55,
+          marginBottom: "0.75rem",
           textTransform: "uppercase",
-          letterSpacing: "0.15em",
+          letterSpacing: "0.18em",
+          fontWeight: 500,
         }}
         className="hero-title"
       >
         Product Audit Report
       </p>
 
+      <h1
+        className="hero-title"
+        style={{
+          fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
+          fontWeight: 700,
+          marginBottom: "1.25rem",
+          lineHeight: 1.15,
+          letterSpacing: "-0.02em",
+          maxWidth: "800px",
+        }}
+      >
+        {data.productName}
+      </h1>
+
       <div
         className="hero-score"
         style={{
-          fontSize: "5rem",
-          fontWeight: "bold",
+          fontSize: "clamp(3.5rem, 8vw, 5rem)",
+          fontWeight: 700,
           marginBottom: "1.5rem",
           color: getScoreColor(data.overallScore),
-          textShadow: "0 4px 20px rgba(0,0,0,0.3)",
+          lineHeight: 1,
+          letterSpacing: "-0.03em",
         }}
       >
-        {data.overallScore}/10
+        {data.overallScore}
+        <span style={{ fontSize: "0.4em", opacity: 0.5, fontWeight: 500, marginLeft: "0.1em" }}>/10</span>
       </div>
 
       <p
         className="hero-summary"
         style={{
-          fontSize: "1.25rem",
-          maxWidth: "750px",
+          fontSize: "var(--text-lg)",
+          maxWidth: "680px",
           marginBottom: "2rem",
-          lineHeight: 1.6,
-          opacity: 0.95,
+          lineHeight: "var(--leading-relaxed)",
+          opacity: 0.88,
+          fontWeight: 400,
         }}
       >
         {data.summary}
@@ -136,7 +142,7 @@ export default function HeroSlide({ data, slideIndex }: HeroSlideProps) {
         <div
           style={{
             display: "flex",
-            gap: "1rem",
+            gap: "0.75rem",
             flexWrap: "wrap",
             justifyContent: "center",
             marginBottom: "1.5rem",
@@ -149,14 +155,15 @@ export default function HeroSlide({ data, slideIndex }: HeroSlideProps) {
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                background: "rgba(16, 185, 129, 0.25)",
-                border: "1px solid rgba(16, 185, 129, 0.5)",
-                padding: "0.6rem 1.25rem",
-                borderRadius: "2rem",
-                fontSize: "0.95rem",
+                background: "rgba(94, 199, 160, 0.15)",
+                border: "1px solid rgba(94, 199, 160, 0.3)",
+                padding: "0.55rem 1.15rem",
+                borderRadius: "var(--radius-full)",
+                fontSize: "var(--text-sm)",
+                fontWeight: 500,
               }}
             >
-              <TrendingUp size={16} />
+              <TrendingUp size={15} style={{ opacity: 0.8 }} />
               {data.topStrength}
             </div>
           )}
@@ -167,14 +174,15 @@ export default function HeroSlide({ data, slideIndex }: HeroSlideProps) {
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                background: "rgba(239, 68, 68, 0.2)",
-                border: "1px solid rgba(239, 68, 68, 0.4)",
-                padding: "0.6rem 1.25rem",
-                borderRadius: "2rem",
-                fontSize: "0.95rem",
+                background: "rgba(224, 112, 112, 0.15)",
+                border: "1px solid rgba(224, 112, 112, 0.3)",
+                padding: "0.55rem 1.15rem",
+                borderRadius: "var(--radius-full)",
+                fontSize: "var(--text-sm)",
+                fontWeight: 500,
               }}
             >
-              <TrendingDown size={16} />
+              <TrendingDown size={15} style={{ opacity: 0.8 }} />
               {data.topWeakness}
             </div>
           )}
@@ -185,7 +193,7 @@ export default function HeroSlide({ data, slideIndex }: HeroSlideProps) {
       <div
         style={{
           display: "flex",
-          gap: "1rem",
+          gap: "0.625rem",
           flexWrap: "wrap",
           justifyContent: "center",
           marginBottom: "1.5rem",
@@ -196,12 +204,14 @@ export default function HeroSlide({ data, slideIndex }: HeroSlideProps) {
             key={index}
             className="hero-highlight"
             style={{
-              background: "rgba(255, 255, 255, 0.15)",
-              backdropFilter: "blur(10px)",
-              padding: "0.75rem 1.5rem",
-              borderRadius: "2rem",
-              fontSize: "0.95rem",
-              border: "1px solid rgba(255, 255, 255, 0.25)",
+              background: "rgba(255, 255, 255, 0.08)",
+              backdropFilter: "blur(12px)",
+              padding: "0.6rem 1.25rem",
+              borderRadius: "var(--radius-full)",
+              fontSize: "var(--text-sm)",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
+              fontWeight: 450,
+              letterSpacing: "0.01em",
             }}
           >
             {highlight}
@@ -218,11 +228,12 @@ export default function HeroSlide({ data, slideIndex }: HeroSlideProps) {
             alignItems: "center",
             gap: "0.5rem",
             marginTop: "0.5rem",
-            fontSize: "0.95rem",
-            opacity: 0.85,
+            fontSize: "var(--text-sm)",
+            opacity: 0.65,
+            fontWeight: 450,
           }}
         >
-          <AlertTriangle size={16} />
+          <AlertTriangle size={15} />
           Up next: {data.urgentCount} urgent finding{data.urgentCount > 1 ? "s" : ""} requiring
           immediate attention
         </div>

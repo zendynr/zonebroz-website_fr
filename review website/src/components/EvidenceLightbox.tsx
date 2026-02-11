@@ -13,7 +13,6 @@ interface EvidenceLightboxProps {
  * Never chains into more prose. Click backdrop or X to close.
  */
 export default function EvidenceLightbox({ evidence, onClose }: EvidenceLightboxProps) {
-  // Close on Escape key
   useEffect(() => {
     if (!evidence) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -33,7 +32,8 @@ export default function EvidenceLightbox({ evidence, onClose }: EvidenceLightbox
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: "rgba(0, 0, 0, 0.88)",
+        background: "rgba(0, 0, 0, 0.85)",
+        backdropFilter: "blur(4px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -46,10 +46,10 @@ export default function EvidenceLightbox({ evidence, onClose }: EvidenceLightbox
         onClick={onClose}
         style={{
           position: "absolute",
-          top: "1.5rem",
-          right: "1.5rem",
-          background: "rgba(255,255,255,0.15)",
-          border: "none",
+          top: "1.25rem",
+          right: "1.25rem",
+          background: "rgba(255,255,255,0.1)",
+          border: "1px solid rgba(255,255,255,0.15)",
           borderRadius: "50%",
           width: "2.5rem",
           height: "2.5rem",
@@ -58,10 +58,17 @@ export default function EvidenceLightbox({ evidence, onClose }: EvidenceLightbox
           justifyContent: "center",
           cursor: "pointer",
           color: "white",
+          transition: "background var(--duration-fast) ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(255,255,255,0.2)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(255,255,255,0.1)";
         }}
         aria-label="Close lightbox"
       >
-        <X size={20} />
+        <X size={18} />
       </button>
 
       <div
@@ -82,7 +89,7 @@ export default function EvidenceLightbox({ evidence, onClose }: EvidenceLightbox
             style={{
               maxWidth: "100%",
               maxHeight: "78vh",
-              borderRadius: "0.5rem",
+              borderRadius: "var(--radius-md)",
               objectFit: "contain",
             }}
             onError={(e) => {
@@ -98,18 +105,19 @@ export default function EvidenceLightbox({ evidence, onClose }: EvidenceLightbox
             style={{
               maxWidth: "100%",
               maxHeight: "78vh",
-              borderRadius: "0.5rem",
+              borderRadius: "var(--radius-md)",
             }}
           />
         )}
         {evidence.caption && (
           <p
             style={{
-              color: "rgba(255,255,255,0.75)",
+              color: "rgba(255,255,255,0.65)",
               textAlign: "center",
               marginTop: "0.75rem",
-              fontSize: "0.9rem",
+              fontSize: "var(--text-sm)",
               maxWidth: "600px",
+              lineHeight: "var(--leading-normal)",
             }}
           >
             {evidence.caption}

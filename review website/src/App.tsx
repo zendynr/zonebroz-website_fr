@@ -29,8 +29,10 @@ function AppContent() {
         alignItems: "center", 
         justifyContent: "center", 
         minHeight: "100vh",
-        fontSize: "1.125rem",
-        color: "#6b7280"
+        fontSize: "var(--text-md)",
+        color: "var(--text-muted)",
+        background: "var(--surface-ground)",
+        fontFamily: "var(--font-sans)",
       }}>
         Loading...
       </div>
@@ -40,7 +42,7 @@ function AppContent() {
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
       {/* Main Content */}
-      <div style={{ marginTop: isPrintMode ? "0" : "4rem" }}>
+      <div style={{ marginTop: isPrintMode ? "0" : "3.5rem" }}>
         <Routes>
           {/* Admin Login Route */}
           <Route path="/admin/login" element={<Login />} />
@@ -123,7 +125,7 @@ function AdminLayout({
   return (
     <>
       <AdminHeader />
-      <div style={{ marginTop: isPrintMode ? "0" : "4rem" }}>
+      <div style={{ marginTop: isPrintMode ? "0" : "3.5rem" }}>
         <Routes>
           <Route
             path="clients"
@@ -197,7 +199,7 @@ function ClientLayout() {
   return (
     <>
       <ClientHeader />
-      <div style={{ marginTop: isPrintMode ? "0" : "4rem" }}>
+      <div style={{ marginTop: isPrintMode ? "0" : "3.5rem" }}>
         <Routes>
           <Route
             path="report/:reportId"
@@ -258,12 +260,14 @@ function ClientReportViewer() {
           onClick={() => navigate("/client/report")}
           style={{
             marginTop: "1rem",
-            padding: "0.75rem 1.5rem",
-            background: "#10b981",
+            padding: "0.6rem 1.25rem",
+            background: "var(--accent-success)",
             color: "white",
             border: "none",
-            borderRadius: "0.5rem",
+            borderRadius: "var(--radius-sm)",
             cursor: "pointer",
+            fontSize: "var(--text-sm)",
+            fontWeight: 600,
           }}
         >
           Back to My Reports
@@ -274,18 +278,20 @@ function ClientReportViewer() {
 
   if (!hasAccess) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>
         <p>You don't have access to this report.</p>
         <button
           onClick={() => navigate("/client/report")}
           style={{
             marginTop: "1rem",
-            padding: "0.75rem 1.5rem",
-            background: "#10b981",
+            padding: "0.6rem 1.25rem",
+            background: "var(--accent-success)",
             color: "white",
             border: "none",
-            borderRadius: "0.5rem",
+            borderRadius: "var(--radius-sm)",
             cursor: "pointer",
+            fontSize: "var(--text-sm)",
+            fontWeight: 600,
           }}
         >
           Back to My Reports
@@ -313,18 +319,20 @@ function AdminReportEditor({ onSave }: { onSave: (report: Report) => void }) {
 
   if (!report) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div style={{ padding: "2rem", textAlign: "center", color: "var(--text-secondary)" }}>
         <p>Report not found.</p>
         <button
           onClick={() => navigate("/admin/reports")}
           style={{
             marginTop: "1rem",
-            padding: "0.75rem 1.5rem",
-            background: "#3b82f6",
+            padding: "0.6rem 1.25rem",
+            background: "var(--accent-primary)",
             color: "white",
             border: "none",
-            borderRadius: "0.5rem",
+            borderRadius: "var(--radius-sm)",
             cursor: "pointer",
+            fontSize: "var(--text-sm)",
+            fontWeight: 600,
           }}
         >
           Back to Reports
@@ -338,9 +346,9 @@ function AdminReportEditor({ onSave }: { onSave: (report: Report) => void }) {
       {/* Back button */}
       <div
         style={{
-          padding: "1rem 2rem",
-          background: "white",
-          borderBottom: "1px solid #e5e7eb",
+          padding: "0.75rem 2rem",
+          background: "var(--surface-raised)",
+          borderBottom: "1px solid var(--border-default)",
         }}
       >
         <button
@@ -348,17 +356,27 @@ function AdminReportEditor({ onSave }: { onSave: (report: Report) => void }) {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.5rem 1rem",
-            background: "#f3f4f6",
-            border: "none",
-            borderRadius: "0.5rem",
+            gap: "0.4rem",
+            padding: "0.45rem 0.875rem",
+            background: "var(--surface-sunken)",
+            border: "1px solid var(--border-default)",
+            borderRadius: "var(--radius-sm)",
             cursor: "pointer",
-            fontSize: "0.875rem",
-            color: "#1f2937",
+            fontSize: "var(--text-sm)",
+            color: "var(--text-secondary)",
+            fontWeight: 500,
+            transition: "all var(--duration-fast) ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "var(--surface-ground)";
+            e.currentTarget.style.borderColor = "var(--border-strong)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "var(--surface-sunken)";
+            e.currentTarget.style.borderColor = "var(--border-default)";
           }}
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
           Back to Reports List
         </button>
       </div>

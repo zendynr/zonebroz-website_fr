@@ -22,14 +22,21 @@ export default function DetailPanel({ label = "Details", children }: DetailPanel
         style={{
           background: "none",
           border: "none",
-          color: "#3b82f6",
-          fontSize: "0.85rem",
+          color: "var(--accent-primary)",
+          fontSize: "var(--text-sm)",
           cursor: "pointer",
-          padding: "0.25rem 0",
+          padding: "0.3rem 0",
           display: "inline-flex",
           alignItems: "center",
-          gap: "0.3rem",
+          gap: "0.35rem",
           fontWeight: 500,
+          transition: "color var(--duration-fast) ease",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = "var(--accent-primary-hover)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = "var(--accent-primary)";
         }}
       >
         {label}
@@ -37,7 +44,7 @@ export default function DetailPanel({ label = "Details", children }: DetailPanel
           size={14}
           style={{
             transform: isOpen ? "rotate(180deg)" : "none",
-            transition: "transform 0.2s ease",
+            transition: "transform 0.2s var(--ease-out)",
           }}
         />
       </button>
@@ -46,10 +53,10 @@ export default function DetailPanel({ label = "Details", children }: DetailPanel
         <div className="detail-panel-enter" style={{ marginTop: "0.5rem" }}>
           <div
             style={{
-              background: "#f8fafc",
-              borderRadius: "0.5rem",
-              border: "1px solid #e2e8f0",
-              padding: "1rem",
+              background: "var(--surface-ground)",
+              borderRadius: "var(--radius-md)",
+              border: "1px solid var(--border-default)",
+              padding: "1rem 1.125rem",
               display: "flex",
               flexDirection: "column",
               gap: "0.75rem",
@@ -77,17 +84,18 @@ export function DetailBlock({
     <div>
       <div
         style={{
-          fontSize: "0.7rem",
-          fontWeight: "bold",
+          fontSize: "var(--text-xs)",
+          fontWeight: 600,
           textTransform: "uppercase",
           letterSpacing: "0.06em",
-          color: "#6b7280",
-          marginBottom: "0.2rem",
+          color: "var(--text-muted)",
+          marginBottom: "0.25rem",
+          lineHeight: 1.4,
         }}
       >
         {title}
       </div>
-      <div style={{ fontSize: "0.9rem", lineHeight: 1.55, color: "#374151" }}>
+      <div style={{ fontSize: "var(--text-sm)", lineHeight: 1.6, color: "var(--text-secondary)" }}>
         {children}
       </div>
     </div>
