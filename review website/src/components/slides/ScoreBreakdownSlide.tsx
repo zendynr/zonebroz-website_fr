@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ScoreBreakdownSlideData } from "../../types";
 import { usePrint } from "../../context/PrintContext";
 import { gsap } from "gsap";
@@ -12,7 +12,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import DetailPanel, { DetailBlock } from "../DetailPanel";
+import AnalysisOverlay from "../AnalysisOverlay";
 
 interface ScoreBreakdownSlideProps {
   data: ScoreBreakdownSlideData;
@@ -25,6 +25,10 @@ export default function ScoreBreakdownSlide({
 }: ScoreBreakdownSlideProps) {
   const slideRef = useRef<HTMLDivElement>(null);
   const { isPrintMode, prefersReducedMotion } = usePrint();
+  const [selectedCategory, setSelectedCategory] = useState(
+    data.scores[0]?.category || ""
+  );
+  const [showFullAnalysis, setShowFullAnalysis] = useState(false);
 
   useEffect(() => {
     if (isPrintMode || prefersReducedMotion) return;
@@ -49,11 +53,21 @@ export default function ScoreBreakdownSlide({
     return () => ctx.revert();
   }, [slideIndex, isPrintMode, prefersReducedMotion]);
 
-  const chartData = data.scores.map((score) => ({
-    name: formatCategoryName(score.category),
-    score: score.score,
-    fullName: formatCategoryName(score.category),
-  }));
+  const chartData = useMemo(
+    () =>
+      data.scores.map((score) => ({
+        name: formatCategoryName(score.category),
+        score: score.score,
+        category: score.category,
+      })),
+    [data.scores]
+  );
+
+  useEffect(() => {
+    if (!data.scores.find((score) => score.category === selectedCategory)) {
+      setSelectedCategory(data.scores[0]?.category || "");
+    }
+  }, [data.scores, selectedCategory]);
 
   const getColor = (score: number) => {
     if (score >= 8) return "#10b981";
@@ -74,14 +88,18 @@ export default function ScoreBreakdownSlide({
     data.scores.reduce((sum, s) => sum + s.score, 0) / data.scores.length;
   const aboveAvg = data.scores.filter((s) => s.score >= avgScore).length;
 
-  // Scores that have supporting explanation details for the detail panel
-  const scoresWithDetails = data.scores.filter(
-    (s) =>
-      Boolean(s.scoreRationale?.trim()) ||
-      Boolean(s.strengths?.trim()) ||
-      Boolean(s.weaknesses?.trim()) ||
-      Boolean(s.notes?.trim())
+  const selectedScore = data.scores.find(
+    (score) => score.category === selectedCategory
   );
+  const selectedAnalysisSections =
+    selectedScore?.analysisSections
+      ?.filter((section) => section.content.trim())
+      .map((section) => ({
+        title: getScoreSectionLabel(section.type),
+        content: section.content.trim(),
+      })) || [];
+  const strengthsList = parseBulletLines(selectedScore?.strengths || "");
+  const weaknessesList = parseBulletLines(selectedScore?.weaknesses || "");
 
   return (
     <div
@@ -143,46 +161,116 @@ export default function ScoreBreakdownSlide({
               tick={{ fontSize: 13 }}
             />
             <Tooltip />
-            <Bar dataKey="score" radius={[0, 8, 8, 0]}>
+            <Bar
+              dataKey="score"
+              radius={[0, 8, 8, 0]}
+              onClick={(_, index) => {
+                const selected = chartData[index];
+                if (selected) setSelectedCategory(selected.category);
+              }}
+              style={{ cursor: "pointer" }}
+            >
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={getColor(entry.score)} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={getColor(entry.score)}
+                  stroke={selectedCategory === entry.category ? "#111827" : "none"}
+                  strokeWidth={selectedCategory === entry.category ? 2 : 0}
+                  fillOpacity={selectedCategory === entry.category ? 1 : 0.6}
+                />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Layer 2 — Explain: structured score details per category */}
-      {scoresWithDetails.length > 0 && (
-        <div className="score-annotation" style={{ marginTop: "1rem" }}>
-          <DetailPanel label="Score details">
-            {scoresWithDetails.map((s) => (
-              <DetailBlock key={s.category} title={`${formatCategoryName(s.category)} (${s.score}/10)`}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                  {s.strengths?.trim() && (
-                    <div>
-                      <strong>What's working well:</strong> {formatBulletText(s.strengths)}
-                    </div>
-                  )}
-                  {s.weaknesses?.trim() && (
-                    <div>
-                      <strong>What's not working well:</strong> {formatBulletText(s.weaknesses)}
-                    </div>
-                  )}
-                  {s.scoreRationale?.trim() && (
-                    <div>
-                      <strong>Why this score:</strong> {s.scoreRationale}
-                    </div>
-                  )}
-                  {!s.strengths?.trim() && !s.weaknesses?.trim() && !s.scoreRationale?.trim() && s.notes?.trim() && (
-                    <div>{s.notes}</div>
-                  )}
-                </div>
-              </DetailBlock>
-            ))}
-          </DetailPanel>
+      {selectedScore && (
+        <div
+          style={{
+            marginTop: "1rem",
+            background: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "0.65rem",
+            padding: "1rem 1.1rem",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "1rem",
+              marginBottom: "0.75rem",
+              alignItems: "center",
+            }}
+          >
+            <h3 style={{ margin: 0, fontSize: "1.05rem", color: "#1f2937" }}>
+              {formatCategoryName(selectedScore.category)} ({selectedScore.score}/10)
+            </h3>
+            <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+              Select a bar to compare categories
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.8rem" }}>
+            <div>
+              <div style={sectionTitleStyle}>What's working well</div>
+              {strengthsList.length > 0 ? (
+                <ul style={bulletListStyle}>
+                  {strengthsList.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={mutedTextStyle}>No strengths added.</p>
+              )}
+            </div>
+            <div>
+              <div style={sectionTitleStyle}>What's not working well</div>
+              {weaknessesList.length > 0 ? (
+                <ul style={bulletListStyle}>
+                  {weaknessesList.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={mutedTextStyle}>No weaknesses added.</p>
+              )}
+            </div>
+            <div>
+              <div style={sectionTitleStyle}>Why this score</div>
+              <p style={{ ...mutedTextStyle, color: "#374151" }}>
+                {selectedScore.scoreRationale?.trim() ||
+                  selectedScore.notes?.trim() ||
+                  "No rationale added."}
+              </p>
+            </div>
+          </div>
+          {selectedAnalysisSections.length > 0 && (
+            <>
+              <div style={{ borderTop: "1px solid #e5e7eb", margin: "0.85rem 0 0.65rem 0" }} />
+              <button
+                type="button"
+                onClick={() => setShowFullAnalysis(true)}
+                style={{
+                  border: "none",
+                  background: "none",
+                  color: "#6b7280",
+                  cursor: "pointer",
+                  fontSize: "0.88rem",
+                  padding: 0,
+                }}
+              >
+                View full analysis →
+              </button>
+            </>
+          )}
         </div>
       )}
+      <AnalysisOverlay
+        open={showFullAnalysis}
+        onClose={() => setShowFullAnalysis(false)}
+        title={`${selectedScore ? formatCategoryName(selectedScore.category) : "Score"} Full Analysis`}
+        sections={selectedAnalysisSections}
+      />
     </div>
   );
 }
@@ -194,10 +282,45 @@ function formatCategoryName(category: string): string {
     .trim();
 }
 
-function formatBulletText(value: string): string {
+function parseBulletLines(value: string): string[] {
   return value
     .split("\n")
     .map((line) => line.replace(/^[\s\-*]+/, "").trim())
-    .filter(Boolean)
-    .join("; ");
+    .filter(Boolean);
 }
+
+function getScoreSectionLabel(type: string): string {
+  const labels: Record<string, string> = {
+    contextSummary: "Context / Summary",
+    observedPatterns: "Observed Patterns",
+    evidenceExamples: "Evidence / Examples",
+    whyItMatters: "Why It Matters",
+    edgeCasesNuance: "Edge Cases / Nuance",
+    additionalNotes: "Additional Notes",
+  };
+  return labels[type] || "Additional Notes";
+}
+
+const sectionTitleStyle: React.CSSProperties = {
+  fontSize: "0.76rem",
+  textTransform: "uppercase",
+  letterSpacing: "0.04em",
+  color: "#6b7280",
+  fontWeight: 700,
+  marginBottom: "0.35rem",
+};
+
+const bulletListStyle: React.CSSProperties = {
+  margin: 0,
+  paddingLeft: "1.15rem",
+  color: "#374151",
+  fontSize: "0.92rem",
+  lineHeight: 1.5,
+};
+
+const mutedTextStyle: React.CSSProperties = {
+  margin: 0,
+  color: "#6b7280",
+  fontSize: "0.92rem",
+  lineHeight: 1.5,
+};

@@ -58,7 +58,7 @@ export default function EvidenceSlide({
   const ignoredImpact = data.finding.ifIgnored?.trim() || getImpactWarning(data.finding.impact);
 
   // Split recommendation into high-level directions
-  const recSteps = data.finding.recommendation
+  const recSteps = getRecommendedDirection(data.finding)
     .split(/\.\s+/)
     .map((s) => s.replace(/\.$/, "").trim())
     .filter((s) => s.length > 0);
@@ -130,13 +130,13 @@ export default function EvidenceSlide({
             marginBottom: "0.75rem",
           }}
         >
-          {getLeadSentence(data.finding.description)}
+          {getLeadSentence(getFindingWhatsHappening(data.finding))}
         </p>
 
         {/* Layer 2 — Explain: full detail behind toggle */}
         <DetailPanel label="Why this matters">
           <DetailBlock title="Full context">
-            {data.finding.description}
+            {getFindingWhatsHappening(data.finding)}
           </DetailBlock>
           <DetailBlock title="If unaddressed">
             <span style={{ color: "#991b1b" }}>
@@ -159,7 +159,7 @@ export default function EvidenceSlide({
                 ))}
               </ol>
             ) : (
-              <span>{data.finding.recommendation}</span>
+              <span>{getRecommendedDirection(data.finding)}</span>
             )}
           </DetailBlock>
         </DetailPanel>
@@ -254,4 +254,12 @@ function getLeadSentence(text: string): string {
   if (!cleaned) return "";
   const lead = cleaned.split(".")[0].trim();
   return lead.endsWith(".") ? lead : `${lead}.`;
+}
+
+function getFindingWhatsHappening(finding: EvidenceSlideData["finding"]): string {
+  return finding.whatsHappening || finding.description || "";
+}
+
+function getRecommendedDirection(finding: EvidenceSlideData["finding"]): string {
+  return finding.recommendedDirection || finding.recommendation || "";
 }

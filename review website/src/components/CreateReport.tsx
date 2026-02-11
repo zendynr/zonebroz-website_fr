@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Report, CategoryKey } from "../types";
+import { Report, CategoryKey, Client } from "../types";
 import { ArrowLeft, Save, Mail, User, Building2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useReports } from "../context/ReportsContext";
@@ -24,7 +24,7 @@ export default function CreateReport({ onSave }: CreateReportProps) {
   const [reviewDate, setReviewDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [existingClient, setExistingClient] = useState<ReturnType<typeof getClientByEmail>>(null);
+  const [existingClient, setExistingClient] = useState<Client | null>(null);
 
   // Check for existing client when email changes
   useEffect(() => {
@@ -111,6 +111,7 @@ export default function CreateReport({ onSave }: CreateReportProps) {
           strengths: "",
           weaknesses: "",
           scoreRationale: "",
+          analysisSections: [],
           notes: "",
         })),
         findings: [],

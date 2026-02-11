@@ -177,7 +177,7 @@ function generateInsightSlideData(
     relatedFinding: relatedFinding
       ? {
           title: relatedFinding.title,
-          description: relatedFinding.description,
+          description: getFindingWhatsHappening(relatedFinding),
           impact: relatedFinding.impact,
         }
       : undefined,
@@ -212,9 +212,9 @@ function generateDeepDiveSections(report: Report) {
     const uxF = journeyFindings.find((f) => f.category === "uxFlow");
     const mobF = journeyFindings.find((f) => f.category === "mobileResponsiveness");
 
-    if (perfF) parts.push(`Users face friction from the first visit: ${perfF.description.split(".")[0]}.`);
-    if (uxF) parts.push(`The friction compounds through conversion: ${uxF.description.split(".")[0]}.`);
-    if (mobF) parts.push(`On mobile, the experience is further compromised: ${mobF.description.split(".")[0]}.`);
+    if (perfF) parts.push(`Users face friction from the first visit: ${getFindingWhatsHappening(perfF).split(".")[0]}.`);
+    if (uxF) parts.push(`The friction compounds through conversion: ${getFindingWhatsHappening(uxF).split(".")[0]}.`);
+    if (mobF) parts.push(`On mobile, the experience is further compromised: ${getFindingWhatsHappening(mobF).split(".")[0]}.`);
 
     const scoreNote = [
       perfScore != null ? `Performance ${perfScore}/10` : null,
@@ -252,12 +252,12 @@ function generateDeepDiveSections(report: Report) {
 
     if (accF && mobF) {
       parts.push(
-        `Accessibility and mobile usability share a common root: interactive elements aren't designed for all users. ${accF.description.split(".")[0]}. Meanwhile, ${mobF.description.split(".")[0]}.`
+        `Accessibility and mobile usability share a common root: interactive elements aren't designed for all users. ${getFindingWhatsHappening(accF).split(".")[0]}. Meanwhile, ${getFindingWhatsHappening(mobF).split(".")[0]}.`
       );
     } else if (accF) {
-      parts.push(accF.description);
+      parts.push(getFindingWhatsHappening(accF));
     } else if (mobF) {
-      parts.push(mobF.description);
+      parts.push(getFindingWhatsHappening(mobF));
     }
 
     const avgEffort =
@@ -287,9 +287,9 @@ function generateDeepDiveSections(report: Report) {
 
     const parts: string[] = [];
     parts.push("Revenue impact flows through three stages:");
-    if (monF) parts.push(`confusion \u2014 ${monF.description.split(".")[0]}.`);
-    if (uxF) parts.push(`Friction \u2014 ${uxF.description.split(".")[0]}.`);
-    if (retF) parts.push(`Churn \u2014 ${retF.description.split(".")[0]}.`);
+    if (monF) parts.push(`confusion \u2014 ${getFindingWhatsHappening(monF).split(".")[0]}.`);
+    if (uxF) parts.push(`Friction \u2014 ${getFindingWhatsHappening(uxF).split(".")[0]}.`);
+    if (retF) parts.push(`Churn \u2014 ${getFindingWhatsHappening(retF).split(".")[0]}.`);
     parts.push(
       "Addressing these as a connected pipeline rather than isolated issues would yield the highest return on investment."
     );
@@ -477,4 +477,8 @@ function getScoreExplanation(score: CategoryScore): string {
   }
 
   return `Score: ${score.score}/10`;
+}
+
+function getFindingWhatsHappening(finding: Finding): string {
+  return finding.whatsHappening?.trim() || finding.description?.trim() || "";
 }

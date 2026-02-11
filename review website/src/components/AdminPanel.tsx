@@ -1,5 +1,14 @@
-import { useState } from "react";
-import { Report, CategoryKey, Finding, CategoryScore } from "../types";
+import { useState, type CSSProperties } from "react";
+import {
+  Report,
+  CategoryKey,
+  Finding,
+  CategoryScore,
+  ScoreAnalysisSection,
+  ScoreAnalysisSectionType,
+  FindingAnalysisSection,
+  FindingAnalysisSectionType,
+} from "../types";
 import { useUser } from "../context/UserContext";
 import { useReports } from "../context/ReportsContext";
 import ReportViewer from "./ReportViewer";
@@ -9,6 +18,30 @@ interface AdminPanelProps {
   initialReport?: Report;
   onSave?: (report: Report) => Promise<void>;
 }
+
+const SCORE_ANALYSIS_SECTION_OPTIONS: Array<{
+  value: ScoreAnalysisSectionType;
+  label: string;
+}> = [
+  { value: "contextSummary", label: "Context / Summary" },
+  { value: "observedPatterns", label: "Observed Patterns" },
+  { value: "evidenceExamples", label: "Evidence / Examples" },
+  { value: "whyItMatters", label: "Why It Matters" },
+  { value: "edgeCasesNuance", label: "Edge Cases / Nuance" },
+  { value: "additionalNotes", label: "Additional Notes" },
+];
+
+const FINDING_ANALYSIS_SECTION_OPTIONS: Array<{
+  value: FindingAnalysisSectionType;
+  label: string;
+}> = [
+  { value: "contextBackground", label: "Context / Background" },
+  { value: "whereThisAppears", label: "Where This Appears" },
+  { value: "whyItsSystemic", label: "Why It's Systemic" },
+  { value: "risksTradeoffs", label: "Risks & Tradeoffs" },
+  { value: "edgeCases", label: "Edge Cases" },
+  { value: "additionalNotes", label: "Additional Notes" },
+];
 
 export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
   const { currentUser } = useUser();
@@ -24,7 +57,7 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
   const [publishing, setPublishing] = useState(false);
 
   const missingWhatIsHappeningCount = report.findings.filter(
-    (finding) => !finding.description?.trim()
+    (finding) => !getFindingWhatsHappening(finding).trim()
   ).length;
 
   const validateFindings = (): boolean => {
@@ -552,6 +585,66 @@ function ScoresEditor({
     onChange(updated);
   };
 
+  const addScoreSection = (category: CategoryKey) => {
+    const score = scores.find((s) => s.category === category);
+    const existing = score?.analysisSections || [];
+    const nextOption =
+      SCORE_ANALYSIS_SECTION_OPTIONS.find(
+        (option) => !existing.some((section) => section.type === option.value)
+      ) || SCORE_ANALYSIS_SECTION_OPTIONS[0];
+    updateScore(category, {
+      analysisSections: [
+        ...existing,
+        {
+          id: `score-section-${Date.now()}`,
+          type: nextOption.value,
+          content: "",
+        },
+      ],
+    });
+  };
+
+  const updateScoreSection = (
+    category: CategoryKey,
+    sectionId: string,
+    updates: Partial<ScoreAnalysisSection>
+  ) => {
+    const score = scores.find((s) => s.category === category);
+    if (!score) return;
+    updateScore(category, {
+      analysisSections: (score.analysisSections || []).map((section) =>
+        section.id === sectionId ? { ...section, ...updates } : section
+      ),
+    });
+  };
+
+  const moveScoreSection = (
+    category: CategoryKey,
+    sectionId: string,
+    direction: "up" | "down"
+  ) => {
+    const score = scores.find((s) => s.category === category);
+    if (!score?.analysisSections?.length) return;
+    const sections = [...score.analysisSections];
+    const index = sections.findIndex((section) => section.id === sectionId);
+    if (index < 0) return;
+    const nextIndex = direction === "up" ? index - 1 : index + 1;
+    if (nextIndex < 0 || nextIndex >= sections.length) return;
+    const [item] = sections.splice(index, 1);
+    sections.splice(nextIndex, 0, item);
+    updateScore(category, { analysisSections: sections });
+  };
+
+  const removeScoreSection = (category: CategoryKey, sectionId: string) => {
+    const score = scores.find((s) => s.category === category);
+    if (!score) return;
+    updateScore(category, {
+      analysisSections: (score.analysisSections || []).filter(
+        (section) => section.id !== sectionId
+      ),
+    });
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       {scores.map((score) => (
@@ -700,6 +793,20 @@ function ScoresEditor({
               }}
             />
           </div>
+          <AnalysisSectionEditor
+            title="Optional full analysis sections"
+            description="Use only when deeper context helps. Add, remove, and reorder as needed."
+            sections={score.analysisSections || []}
+            options={SCORE_ANALYSIS_SECTION_OPTIONS}
+            onAdd={() => addScoreSection(score.category)}
+            onUpdate={(sectionId, updates) =>
+              updateScoreSection(score.category, sectionId, updates)
+            }
+            onMove={(sectionId, direction) =>
+              moveScoreSection(score.category, sectionId, direction)
+            }
+            onRemove={(sectionId) => removeScoreSection(score.category, sectionId)}
+          />
         </div>
       ))}
     </div>
@@ -718,12 +825,13 @@ function FindingsEditor({
       id: `finding-${Date.now()}`,
       category: "firstImpression",
       title: "New issue",
-      description: "",
+      whatsHappening: "",
       ifIgnored: "",
       impact: 3,
       effort: 3,
       confidence: 3,
-      recommendation: "",
+      recommendedDirection: "",
+      analysisSections: [],
       evidence: [],
     };
     onChange([...findings, newFinding]);
@@ -737,6 +845,60 @@ function FindingsEditor({
 
   const deleteFinding = (id: string) => {
     onChange(findings.filter((f) => f.id !== id));
+  };
+
+  const addFindingSection = (finding: Finding) => {
+    const existing = finding.analysisSections || [];
+    const nextOption =
+      FINDING_ANALYSIS_SECTION_OPTIONS.find(
+        (option) => !existing.some((section) => section.type === option.value)
+      ) || FINDING_ANALYSIS_SECTION_OPTIONS[0];
+    updateFinding(finding.id, {
+      analysisSections: [
+        ...existing,
+        {
+          id: `finding-section-${Date.now()}`,
+          type: nextOption.value,
+          content: "",
+        },
+      ],
+    });
+  };
+
+  const updateFindingSection = (
+    finding: Finding,
+    sectionId: string,
+    updates: Partial<FindingAnalysisSection>
+  ) => {
+    updateFinding(finding.id, {
+      analysisSections: (finding.analysisSections || []).map((section) =>
+        section.id === sectionId ? { ...section, ...updates } : section
+      ),
+    });
+  };
+
+  const moveFindingSection = (
+    finding: Finding,
+    sectionId: string,
+    direction: "up" | "down"
+  ) => {
+    if (!finding.analysisSections?.length) return;
+    const sections = [...finding.analysisSections];
+    const index = sections.findIndex((section) => section.id === sectionId);
+    if (index < 0) return;
+    const nextIndex = direction === "up" ? index - 1 : index + 1;
+    if (nextIndex < 0 || nextIndex >= sections.length) return;
+    const [item] = sections.splice(index, 1);
+    sections.splice(nextIndex, 0, item);
+    updateFinding(finding.id, { analysisSections: sections });
+  };
+
+  const removeFindingSection = (finding: Finding, sectionId: string) => {
+    updateFinding(finding.id, {
+      analysisSections: (finding.analysisSections || []).filter(
+        (section) => section.id !== sectionId
+      ),
+    });
   };
 
   return (
@@ -872,15 +1034,18 @@ function FindingsEditor({
             <label style={{ display: "block", marginBottom: "0.35rem", fontSize: "0.875rem", color: "#4b5563", fontWeight: "bold" }}>
               What's happening <span style={{ color: "#ef4444" }}>*</span>
             </label>
-            <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: !finding.description.trim() ? "#b91c1c" : "#6b7280" }}>
-              {!finding.description.trim()
+            <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.8rem", color: !getFindingWhatsHappening(finding).trim() ? "#b91c1c" : "#6b7280" }}>
+              {!getFindingWhatsHappening(finding).trim()
                 ? "Required: describe the issue before saving or publishing."
                 : "Describe the issue as it exists today. Be factual and observable."}
             </p>
             <textarea
-              value={finding.description}
+              value={getFindingWhatsHappening(finding)}
               onChange={(e) =>
-                updateFinding(finding.id, { description: e.target.value })
+                updateFinding(finding.id, {
+                  whatsHappening: e.target.value,
+                  description: e.target.value,
+                })
               }
               placeholder="Describe the issue as it exists today. Be factual and observable."
               style={{
@@ -888,7 +1053,7 @@ function FindingsEditor({
                 minHeight: "100px",
                 padding: "0.75rem",
                 marginBottom: "1rem",
-                border: !finding.description.trim()
+                border: !getFindingWhatsHappening(finding).trim()
                   ? "2px solid #ef4444"
                   : "1px solid #d1d5db",
                 borderRadius: "0.5rem",
@@ -996,9 +1161,12 @@ function FindingsEditor({
               High-level direction for addressing the issue (not implementation steps).
             </p>
             <textarea
-              value={finding.recommendation}
+              value={getFindingRecommendedDirection(finding)}
               onChange={(e) =>
-                updateFinding(finding.id, { recommendation: e.target.value })
+                updateFinding(finding.id, {
+                  recommendedDirection: e.target.value,
+                  recommendation: e.target.value,
+                })
               }
               placeholder="High-level direction for addressing the issue (not step-by-step instructions)."
               style={{
@@ -1009,6 +1177,20 @@ function FindingsEditor({
                 borderRadius: "0.5rem",
                 fontFamily: "inherit",
               }}
+            />
+            <AnalysisSectionEditor
+              title="Optional full analysis sections"
+              description="Use for deeper action context. Sections are hidden by default in client view."
+              sections={finding.analysisSections || []}
+              options={FINDING_ANALYSIS_SECTION_OPTIONS}
+              onAdd={() => addFindingSection(finding)}
+              onUpdate={(sectionId, updates) =>
+                updateFindingSection(finding, sectionId, updates)
+              }
+              onMove={(sectionId, direction) =>
+                moveFindingSection(finding, sectionId, direction)
+              }
+              onRemove={(sectionId) => removeFindingSection(finding, sectionId)}
             />
           </div>
         ))}
@@ -1022,6 +1204,159 @@ function formatCategoryName(category: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .trim();
+}
+
+function getFindingWhatsHappening(finding: Finding): string {
+  return finding.whatsHappening || finding.description || "";
+}
+
+function getFindingRecommendedDirection(finding: Finding): string {
+  return finding.recommendedDirection || finding.recommendation || "";
+}
+
+function AnalysisSectionEditor<TType extends string>({
+  title,
+  description,
+  sections,
+  options,
+  onAdd,
+  onUpdate,
+  onMove,
+  onRemove,
+}: {
+  title: string;
+  description: string;
+  sections: Array<{ id: string; type: TType; content: string }>;
+  options: Array<{ value: TType; label: string }>;
+  onAdd: () => void;
+  onUpdate: (
+    sectionId: string,
+    updates: Partial<{ id: string; type: TType; content: string }>
+  ) => void;
+  onMove: (sectionId: string, direction: "up" | "down") => void;
+  onRemove: (sectionId: string) => void;
+}) {
+  return (
+    <div style={{ marginTop: "1rem", borderTop: "1px solid #e5e7eb", paddingTop: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", alignItems: "center" }}>
+        <div>
+          <div style={{ fontSize: "0.9rem", fontWeight: "bold", color: "#374151" }}>{title}</div>
+          <p style={{ margin: "0.35rem 0 0 0", fontSize: "0.8rem", color: "#6b7280" }}>{description}</p>
+        </div>
+        <button
+          type="button"
+          onClick={onAdd}
+          style={{
+            padding: "0.5rem 0.8rem",
+            border: "1px solid #cbd5e1",
+            borderRadius: "0.4rem",
+            background: "#ffffff",
+            color: "#1f2937",
+            cursor: "pointer",
+            fontSize: "0.8rem",
+            fontWeight: 600,
+          }}
+        >
+          + Add section
+        </button>
+      </div>
+      {sections.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "0.75rem" }}>
+          {sections.map((section, index) => (
+            <div key={section.id} style={{ border: "1px solid #d1d5db", borderRadius: "0.5rem", padding: "0.75rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "0.5rem", alignItems: "start" }}>
+                <select
+                  value={section.type}
+                  onChange={(e) =>
+                    onUpdate(section.id, { type: e.target.value as TType })
+                  }
+                  style={{
+                    width: "100%",
+                    padding: "0.45rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "0.4rem",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <div style={{ display: "flex", gap: "0.25rem" }}>
+                  <button
+                    type="button"
+                    onClick={() => onMove(section.id, "up")}
+                    disabled={index === 0}
+                    style={smallActionButtonStyle(index === 0)}
+                  >
+                    Up
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onMove(section.id, "down")}
+                    disabled={index === sections.length - 1}
+                    style={smallActionButtonStyle(index === sections.length - 1)}
+                  >
+                    Down
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRemove(section.id)}
+                    style={smallDeleteButtonStyle}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <textarea
+                value={section.content}
+                onChange={(e) =>
+                  onUpdate(section.id, { content: e.target.value })
+                }
+                placeholder="Write optional deeper analysis for this section."
+                style={{
+                  width: "100%",
+                  minHeight: "85px",
+                  marginTop: "0.5rem",
+                  padding: "0.65rem",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "0.4rem",
+                  fontFamily: "inherit",
+                  fontSize: "0.9rem",
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const smallDeleteButtonStyle: CSSProperties = {
+  padding: "0.32rem 0.45rem",
+  borderRadius: "0.35rem",
+  border: "1px solid #fecaca",
+  background: "#fee2e2",
+  color: "#b91c1c",
+  cursor: "pointer",
+  fontSize: "0.72rem",
+  fontWeight: 600,
+};
+
+function smallActionButtonStyle(disabled: boolean): CSSProperties {
+  return {
+    padding: "0.32rem 0.45rem",
+    borderRadius: "0.35rem",
+    border: "1px solid #d1d5db",
+    background: "#f8fafc",
+    color: disabled ? "#9ca3af" : "#374151",
+    cursor: disabled ? "not-allowed" : "pointer",
+    fontSize: "0.72rem",
+    fontWeight: 600,
+  };
 }
 
 function createEmptyReport(): Report {
@@ -1042,6 +1377,7 @@ function createEmptyReport(): Report {
 
   return {
     id: `report-${Date.now()}`,
+    clientId: "",
     meta: {
       productName: "New Product",
       reviewDate: new Date().toISOString().split("T")[0],
@@ -1052,9 +1388,11 @@ function createEmptyReport(): Report {
       strengths: "",
       weaknesses: "",
       scoreRationale: "",
+      analysisSections: [],
       notes: "",
     })),
     findings: [],
     competitors: [],
+    status: "draft",
   };
 }

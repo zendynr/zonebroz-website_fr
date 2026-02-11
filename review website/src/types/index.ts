@@ -64,8 +64,23 @@ export interface CategoryScore {
   strengths?: string;
   weaknesses?: string;
   scoreRationale?: string;
+  analysisSections?: ScoreAnalysisSection[];
   // Legacy free-text field kept for backward compatibility.
   notes?: string;
+}
+
+export type ScoreAnalysisSectionType =
+  | "contextSummary"
+  | "observedPatterns"
+  | "evidenceExamples"
+  | "whyItMatters"
+  | "edgeCasesNuance"
+  | "additionalNotes";
+
+export interface ScoreAnalysisSection {
+  id: string;
+  type: ScoreAnalysisSectionType;
+  content: string;
 }
 
 // Findings System
@@ -73,13 +88,31 @@ export interface Finding {
   id: string;
   category: CategoryKey;
   title: string;
-  description: string;
+  whatsHappening: string;
   ifIgnored?: string;
   impact: number; // 1-5
   effort: number; // 1-5
   confidence: number; // 1-5
-  recommendation: string;
+  recommendedDirection: string;
+  analysisSections?: FindingAnalysisSection[];
   evidence: Evidence[];
+  // Legacy fields kept for backward compatibility.
+  description?: string;
+  recommendation?: string;
+}
+
+export type FindingAnalysisSectionType =
+  | "contextBackground"
+  | "whereThisAppears"
+  | "whyItsSystemic"
+  | "risksTradeoffs"
+  | "edgeCases"
+  | "additionalNotes";
+
+export interface FindingAnalysisSection {
+  id: string;
+  type: FindingAnalysisSectionType;
+  content: string;
 }
 
 export interface Evidence {
