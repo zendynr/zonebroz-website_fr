@@ -4,6 +4,7 @@ import {
   CategoryKey,
   Finding,
   CategoryScore,
+  AnalysisMedia,
   ScoreAnalysisSection,
   ScoreAnalysisSectionType,
   FindingAnalysisSection,
@@ -13,6 +14,10 @@ import { useUser } from "../context/UserContext";
 import { useReports } from "../context/ReportsContext";
 import ReportViewer from "./ReportViewer";
 import { Save, Eye, Edit2, Building2, Send, XCircle } from "lucide-react";
+import {
+  uploadAnalysisSectionMedia,
+  deleteAnalysisSectionMedia,
+} from "../lib/analysisMedia";
 
 interface AdminPanelProps {
   initialReport?: Report;
@@ -550,6 +555,7 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
         <div style={{ padding: "2rem" }}>
           {activeTab === "scores" && (
             <ScoresEditor
+              reportId={report.id}
               scores={report.categoryScores}
               onChange={(scores) =>
                 setReport({ ...report, categoryScores: scores })
@@ -558,6 +564,7 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
           )}
           {activeTab === "findings" && (
             <FindingsEditor
+              reportId={report.id}
               findings={report.findings}
               onChange={(findings) => setReport({ ...report, findings })}
             />
@@ -569,12 +576,16 @@ export default function AdminPanel({ initialReport, onSave }: AdminPanelProps) {
 }
 
 function ScoresEditor({
+  reportId,
   scores,
   onChange,
 }: {
+  reportId: string;
   scores: CategoryScore[];
   onChange: (scores: CategoryScore[]) => void;
 }) {
+  const [uploadingSectionId, setUploadingSectionId] = useState<string | null>(null);
+
   const updateScore = (
     category: CategoryKey,
     updates: Partial<Omit<CategoryScore, "category">>
@@ -641,6 +652,82 @@ function ScoresEditor({
     updateScore(category, {
       analysisSections: (score.analysisSections || []).filter(
         (section) => section.id !== sectionId
+      ),
+    });
+  };
+
+  const uploadScoreSectionMedia = async (
+    category: CategoryKey,
+    sectionId: string,
+    file: File
+  ) => {
+    setUploadingSectionId(sectionId);
+    try {
+      const uploaded = await uploadAnalysisSectionMedia({
+        reportId,
+        sectionId,
+        file,
+      });
+      const score = scores.find((s) => s.category === category);
+      const section = score?.analysisSections?.find((s) => s.id === sectionId);
+      const existingMedia = section?.media || [];
+      updateScoreSection(category, sectionId, {
+        media: [...existingMedia, uploaded],
+      });
+    } finally {
+      setUploadingSectionId(null);
+    }
+  };
+
+  const removeScoreSectionMedia = async (
+    category: CategoryKey,
+    sectionId: string,
+    mediaId: string
+  ) => {
+    const score = scores.find((s) => s.category === category);
+    const section = score?.analysisSections?.find((s) => s.id === sectionId);
+    if (!section) return;
+    const target = (section.media || []).find((item) => item.id === mediaId);
+    if (target) {
+      try {
+        await deleteAnalysisSectionMedia(target);
+      } catch (error) {
+        console.warn("Failed to delete media from storage:", error);
+      }
+    }
+    updateScoreSection(category, sectionId, {
+      media: (section.media || []).filter((item) => item.id !== mediaId),
+    });
+  };
+
+  const updateScoreSectionMediaCaption = (
+    category: CategoryKey,
+    sectionId: string,
+    mediaId: string,
+    caption: string
+  ) => {
+    const score = scores.find((s) => s.category === category);
+    const section = score?.analysisSections?.find((s) => s.id === sectionId);
+    if (!section) return;
+    updateScoreSection(category, sectionId, {
+      media: (section.media || []).map((item) =>
+        item.id === mediaId ? { ...item, caption } : item
+      ),
+    });
+  };
+
+  const updateScoreSectionMediaPlacement = (
+    category: CategoryKey,
+    sectionId: string,
+    mediaId: string,
+    placement: "left" | "right" | "full"
+  ) => {
+    const score = scores.find((s) => s.category === category);
+    const section = score?.analysisSections?.find((s) => s.id === sectionId);
+    if (!section) return;
+    updateScoreSection(category, sectionId, {
+      media: (section.media || []).map((item) =>
+        item.id === mediaId ? { ...item, placement } : item
       ),
     });
   };
@@ -806,6 +893,24 @@ function ScoresEditor({
               moveScoreSection(score.category, sectionId, direction)
             }
             onRemove={(sectionId) => removeScoreSection(score.category, sectionId)}
+            onUploadMedia={(sectionId, file) =>
+              uploadScoreSectionMedia(score.category, sectionId, file)
+            }
+            onRemoveMedia={(sectionId, mediaId) =>
+              removeScoreSectionMedia(score.category, sectionId, mediaId)
+            }
+            onUpdateMediaCaption={(sectionId, mediaId, caption) =>
+              updateScoreSectionMediaCaption(score.category, sectionId, mediaId, caption)
+            }
+            onUpdateMediaPlacement={(sectionId, mediaId, placement) =>
+              updateScoreSectionMediaPlacement(
+                score.category,
+                sectionId,
+                mediaId,
+                placement
+              )
+            }
+            isUploadingSectionId={uploadingSectionId}
           />
         </div>
       ))}
@@ -814,12 +919,16 @@ function ScoresEditor({
 }
 
 function FindingsEditor({
+  reportId,
   findings,
   onChange,
 }: {
+  reportId: string;
   findings: Finding[];
   onChange: (findings: Finding[]) => void;
 }) {
+  const [uploadingSectionId, setUploadingSectionId] = useState<string | null>(null);
+
   const addFinding = () => {
     const newFinding: Finding = {
       id: `finding-${Date.now()}`,
@@ -897,6 +1006,78 @@ function FindingsEditor({
     updateFinding(finding.id, {
       analysisSections: (finding.analysisSections || []).filter(
         (section) => section.id !== sectionId
+      ),
+    });
+  };
+
+  const uploadFindingSectionMedia = async (
+    finding: Finding,
+    sectionId: string,
+    file: File
+  ) => {
+    setUploadingSectionId(sectionId);
+    try {
+      const uploaded = await uploadAnalysisSectionMedia({
+        reportId,
+        sectionId,
+        file,
+      });
+      const section = finding.analysisSections?.find((s) => s.id === sectionId);
+      const existingMedia = section?.media || [];
+      updateFindingSection(finding, sectionId, {
+        media: [...existingMedia, uploaded],
+      });
+    } finally {
+      setUploadingSectionId(null);
+    }
+  };
+
+  const removeFindingSectionMedia = async (
+    finding: Finding,
+    sectionId: string,
+    mediaId: string
+  ) => {
+    const section = finding.analysisSections?.find((s) => s.id === sectionId);
+    if (!section) return;
+    const target = (section.media || []).find((item) => item.id === mediaId);
+    if (target) {
+      try {
+        await deleteAnalysisSectionMedia(target);
+      } catch (error) {
+        console.warn("Failed to delete media from storage:", error);
+      }
+    }
+    updateFindingSection(finding, sectionId, {
+      media: (section.media || []).filter((item) => item.id !== mediaId),
+    });
+  };
+
+  const updateFindingSectionMediaCaption = (
+    finding: Finding,
+    sectionId: string,
+    mediaId: string,
+    caption: string
+  ) => {
+    const section = finding.analysisSections?.find((s) => s.id === sectionId);
+    if (!section) return;
+    updateFindingSection(finding, sectionId, {
+      media: (section.media || []).map((item) =>
+        item.id === mediaId ? { ...item, caption } : item
+      ),
+    });
+  };
+
+  const updateFindingSectionMediaPlacement = (
+    finding: Finding,
+    sectionId: string,
+    mediaId: string,
+    placement: "left" | "right" | "full"
+  ) => {
+    const section = finding.analysisSections?.find((s) => s.id === sectionId);
+    if (!section) return;
+    updateFindingSection(finding, sectionId, {
+      media: (section.media || []).map((item) =>
+        item.id === mediaId ? { ...item, placement } : item
       ),
     });
   };
@@ -1191,6 +1372,24 @@ function FindingsEditor({
                 moveFindingSection(finding, sectionId, direction)
               }
               onRemove={(sectionId) => removeFindingSection(finding, sectionId)}
+              onUploadMedia={(sectionId, file) =>
+                uploadFindingSectionMedia(finding, sectionId, file)
+              }
+              onRemoveMedia={(sectionId, mediaId) =>
+                removeFindingSectionMedia(finding, sectionId, mediaId)
+              }
+              onUpdateMediaCaption={(sectionId, mediaId, caption) =>
+                updateFindingSectionMediaCaption(finding, sectionId, mediaId, caption)
+              }
+              onUpdateMediaPlacement={(sectionId, mediaId, placement) =>
+                updateFindingSectionMediaPlacement(
+                  finding,
+                  sectionId,
+                  mediaId,
+                  placement
+                )
+              }
+              isUploadingSectionId={uploadingSectionId}
             />
           </div>
         ))}
@@ -1223,18 +1422,41 @@ function AnalysisSectionEditor<TType extends string>({
   onUpdate,
   onMove,
   onRemove,
+  onUploadMedia,
+  onRemoveMedia,
+  onUpdateMediaCaption,
+  onUpdateMediaPlacement,
+  isUploadingSectionId,
 }: {
   title: string;
   description: string;
-  sections: Array<{ id: string; type: TType; content: string }>;
+  sections: Array<{
+    id: string;
+    type: TType;
+    content: string;
+    media?: AnalysisMedia[];
+  }>;
   options: Array<{ value: TType; label: string }>;
   onAdd: () => void;
   onUpdate: (
     sectionId: string,
-    updates: Partial<{ id: string; type: TType; content: string }>
+    updates: Partial<{ id: string; type: TType; content: string; media?: AnalysisMedia[] }>
   ) => void;
   onMove: (sectionId: string, direction: "up" | "down") => void;
   onRemove: (sectionId: string) => void;
+  onUploadMedia?: (sectionId: string, file: File) => Promise<void>;
+  onRemoveMedia?: (sectionId: string, mediaId: string) => Promise<void> | void;
+  onUpdateMediaCaption?: (
+    sectionId: string,
+    mediaId: string,
+    caption: string
+  ) => void;
+  onUpdateMediaPlacement?: (
+    sectionId: string,
+    mediaId: string,
+    placement: "left" | "right" | "full"
+  ) => void;
+  isUploadingSectionId?: string | null;
 }) {
   return (
     <div style={{ marginTop: "1rem", borderTop: "1px solid #e5e7eb", paddingTop: "1rem" }}>
@@ -1327,6 +1549,174 @@ function AnalysisSectionEditor<TType extends string>({
                   fontSize: "0.9rem",
                 }}
               />
+              <div style={{ marginTop: "0.65rem" }}>
+                <div style={{ fontSize: "0.78rem", color: "#4b5563", fontWeight: 600, marginBottom: "0.35rem" }}>
+                  Section media (images/videos)
+                </div>
+                <p style={{ margin: "0 0 0.5rem 0", fontSize: "0.75rem", color: "#6b7280" }}>
+                  Upload media under this category section. Media appears inline in Full Analysis.
+                </p>
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  disabled={!onUploadMedia || isUploadingSectionId === section.id}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file || !onUploadMedia) return;
+                    try {
+                      await onUploadMedia(section.id, file);
+                    } catch (error) {
+                      console.error("Media upload failed:", error);
+                      alert(
+                        error instanceof Error
+                          ? error.message
+                          : "Failed to upload media."
+                      );
+                    } finally {
+                      e.currentTarget.value = "";
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "0.45rem",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "0.4rem",
+                    fontSize: "0.82rem",
+                    background: "#fff",
+                  }}
+                />
+                {isUploadingSectionId === section.id && (
+                  <div style={{ marginTop: "0.4rem", fontSize: "0.75rem", color: "#2563eb" }}>
+                    Uploading media...
+                  </div>
+                )}
+                {(section.media || []).length > 0 && (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+                      gap: "0.65rem",
+                      marginTop: "0.65rem",
+                    }}
+                  >
+                    {(section.media || []).map((media) => (
+                      <div
+                        key={media.id}
+                        style={{
+                          border: "1px solid #d1d5db",
+                          borderRadius: "0.45rem",
+                          padding: "0.5rem",
+                          background: "#fff",
+                        }}
+                      >
+                        {media.type === "image" ? (
+                          <img
+                            src={media.url}
+                            alt={media.caption || "Section media"}
+                            style={{
+                              width: "100%",
+                              height: "110px",
+                              objectFit: "cover",
+                              borderRadius: "0.35rem",
+                              border: "1px solid #e5e7eb",
+                            }}
+                          />
+                        ) : (
+                          <video
+                            src={media.url}
+                            controls
+                            style={{
+                              width: "100%",
+                              height: "110px",
+                              objectFit: "cover",
+                              borderRadius: "0.35rem",
+                              border: "1px solid #e5e7eb",
+                            }}
+                          />
+                        )}
+                        <input
+                          type="text"
+                          value={media.caption || ""}
+                          placeholder="Optional caption"
+                          onChange={(e) =>
+                            onUpdateMediaCaption?.(section.id, media.id, e.target.value)
+                          }
+                          style={{
+                            width: "100%",
+                            marginTop: "0.45rem",
+                            padding: "0.38rem 0.45rem",
+                            border: "1px solid #d1d5db",
+                            borderRadius: "0.35rem",
+                            fontSize: "0.78rem",
+                          }}
+                        />
+                        <div
+                          style={{
+                            marginTop: "0.35rem",
+                            display: "grid",
+                            gridTemplateColumns: "repeat(3, 1fr)",
+                            gap: "0.3rem",
+                          }}
+                        >
+                          {(["left", "right", "full"] as const).map((placementOption) => (
+                            <button
+                              key={placementOption}
+                              type="button"
+                              onClick={() =>
+                                onUpdateMediaPlacement?.(
+                                  section.id,
+                                  media.id,
+                                  placementOption
+                                )
+                              }
+                              style={{
+                                padding: "0.28rem 0.3rem",
+                                borderRadius: "0.3rem",
+                                border:
+                                  (media.placement || "right") === placementOption
+                                    ? "1px solid #2563eb"
+                                    : "1px solid #d1d5db",
+                                background:
+                                  (media.placement || "right") === placementOption
+                                    ? "#dbeafe"
+                                    : "#f8fafc",
+                                color:
+                                  (media.placement || "right") === placementOption
+                                    ? "#1d4ed8"
+                                    : "#374151",
+                                fontSize: "0.7rem",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {placementOption}
+                            </button>
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => void onRemoveMedia?.(section.id, media.id)}
+                          style={{
+                            marginTop: "0.4rem",
+                            width: "100%",
+                            padding: "0.35rem 0.45rem",
+                            borderRadius: "0.35rem",
+                            border: "1px solid #fecaca",
+                            background: "#fee2e2",
+                            color: "#b91c1c",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Remove media
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>

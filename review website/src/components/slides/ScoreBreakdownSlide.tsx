@@ -13,6 +13,7 @@ import {
   Cell,
 } from "recharts";
 import AnalysisOverlay from "../AnalysisOverlay";
+import { ChevronRight, TrendingUp, TrendingDown, FileText } from "lucide-react";
 
 interface ScoreBreakdownSlideProps {
   data: ScoreBreakdownSlideData;
@@ -38,6 +39,13 @@ export default function ScoreBreakdownSlide({
         opacity: 0,
         y: 50,
         duration: 1,
+        ease: "power3.out",
+      });
+      gsap.from(".score-detail-panel", {
+        opacity: 0,
+        x: 30,
+        duration: 0.8,
+        delay: 0.3,
         ease: "power3.out",
       });
       gsap.from(".score-annotation", {
@@ -75,6 +83,13 @@ export default function ScoreBreakdownSlide({
     return "var(--accent-danger)";
   };
 
+  const getScoreLabel = (score: number) => {
+    if (score >= 8) return "Strong";
+    if (score >= 6) return "Moderate";
+    if (score >= 4) return "Needs Work";
+    return "Critical";
+  };
+
   const strengths = data.scores
     .filter((s) => s.score >= 7.5)
     .sort((a, b) => b.score - a.score)
@@ -97,6 +112,7 @@ export default function ScoreBreakdownSlide({
       .map((section) => ({
         title: getScoreSectionLabel(section.type),
         content: section.content.trim(),
+        media: section.media || [],
       })) || [];
   const strengthsList = parseBulletLines(selectedScore?.strengths || "");
   const weaknessesList = parseBulletLines(selectedScore?.weaknesses || "");
@@ -148,146 +164,256 @@ export default function ScoreBreakdownSlide({
             : `Multiple areas need attention \u2014 see the findings for prioritized remediation.`}
         </p>
 
-        {/* Chart */}
-        <div className="score-chart" style={{ flex: 1, minHeight: 0 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 10, right: 30, left: 150, bottom: 10 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
-              <XAxis type="number" domain={[0, 10]} tick={{ fill: "var(--text-muted)", fontSize: 12 }} />
-              <YAxis
-                dataKey="name"
-                type="category"
-                width={140}
-                tick={{ fontSize: 13, fill: "var(--text-secondary)" }}
-              />
-              <Tooltip
-                contentStyle={{
-                  background: "var(--surface-card)",
-                  border: "1px solid var(--border-default)",
-                  borderRadius: "var(--radius-sm)",
-                  boxShadow: "var(--shadow-md)",
-                  fontSize: "var(--text-sm)",
-                }}
-              />
-              <Bar
-                dataKey="score"
-                radius={[0, 6, 6, 0]}
-                onClick={(_, index) => {
-                  const selected = chartData[index];
-                  if (selected) setSelectedCategory(selected.category);
-                }}
-                style={{ cursor: "pointer" }}
+        {/* Two-column layout: Chart (left) + Detail Panel (right) */}
+        <div style={{ display: "flex", gap: "1.5rem", flex: 1, minHeight: 0 }}>
+          {/* Chart — left side */}
+          <div className="score-chart" style={{ flex: "1 1 58%", minHeight: 0, minWidth: 0 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={chartData}
+                layout="vertical"
+                margin={{ top: 10, right: 30, left: 150, bottom: 10 }}
               >
-                {chartData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={getColor(entry.score)}
-                    stroke={selectedCategory === entry.category ? "var(--text-primary)" : "none"}
-                    strokeWidth={selectedCategory === entry.category ? 2 : 0}
-                    fillOpacity={selectedCategory === entry.category ? 1 : 0.55}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
+                <XAxis type="number" domain={[0, 10]} tick={{ fill: "var(--text-muted)", fontSize: 12 }} />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  width={140}
+                  tick={{ fontSize: 13, fill: "var(--text-secondary)" }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--surface-card)",
+                    border: "1px solid var(--border-default)",
+                    borderRadius: "var(--radius-sm)",
+                    boxShadow: "var(--shadow-md)",
+                    fontSize: "var(--text-sm)",
+                  }}
+                />
+                <Bar
+                  dataKey="score"
+                  radius={[0, 6, 6, 0]}
+                  onClick={(_, index) => {
+                    const selected = chartData[index];
+                    if (selected) setSelectedCategory(selected.category);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={getColor(entry.score)}
+                      stroke={selectedCategory === entry.category ? "var(--text-primary)" : "none"}
+                      strokeWidth={selectedCategory === entry.category ? 2 : 0}
+                      fillOpacity={selectedCategory === entry.category ? 1 : 0.55}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-        {/* Selected category detail card */}
-        {selectedScore && (
-          <div
-            style={{
-              marginTop: "1rem",
-              background: "var(--surface-card)",
-              border: "1px solid var(--border-default)",
-              borderRadius: "var(--radius-md)",
-              padding: "1.125rem 1.25rem",
-              boxShadow: "var(--shadow-xs)",
-            }}
-          >
+          {/* Detail panel — right side */}
+          {selectedScore && (
             <div
+              className="score-detail-panel"
               style={{
+                flex: "0 0 38%",
+                background: "var(--surface-card)",
+                border: "1px solid var(--border-default)",
+                borderRadius: "var(--radius-lg)",
+                boxShadow: "var(--shadow-sm)",
                 display: "flex",
-                justifyContent: "space-between",
-                gap: "1rem",
-                marginBottom: "0.75rem",
-                alignItems: "center",
+                flexDirection: "column",
+                overflow: "hidden",
               }}
             >
-              <h3 style={{ margin: 0, fontSize: "var(--text-md)", color: "var(--text-primary)", fontWeight: 600 }}>
-                {formatCategoryName(selectedScore.category)}{" "}
-                <span style={{ fontWeight: 400, color: "var(--text-muted)" }}>({selectedScore.score}/10)</span>
-              </h3>
-              <span style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)" }}>
-                Select a bar to compare categories
-              </span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-              <div>
-                <div style={sectionTitleStyle}>What's working well</div>
-                {strengthsList.length > 0 ? (
-                  <ul style={bulletListStyle}>
-                    {strengthsList.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={mutedTextStyle}>No strengths added.</p>
+              {/* Score header with colored accent */}
+              <div
+                style={{
+                  padding: "1.25rem 1.5rem",
+                  borderBottom: "1px solid var(--border-subtle)",
+                  background: "var(--surface-sunken)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                  <h3 style={{ margin: 0, fontSize: "var(--text-lg)", color: "var(--text-primary)", fontWeight: 600, letterSpacing: "var(--tracking-tight)" }}>
+                    {formatCategoryName(selectedScore.category)}
+                  </h3>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "var(--text-xs)",
+                        fontWeight: 600,
+                        color: getColor(selectedScore.score).replace("var(", "").replace(")", ""),
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                      }}
+                    >
+                      {/* Use inline color */}
+                    </span>
+                  </div>
+                </div>
+                {/* Score display */}
+                <div style={{ display: "flex", alignItems: "baseline", gap: "0.625rem" }}>
+                  <span
+                    style={{
+                      fontSize: "2.5rem",
+                      fontWeight: 700,
+                      color: "var(--text-primary)",
+                      lineHeight: 1,
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {selectedScore.score}
+                  </span>
+                  <span style={{ fontSize: "var(--text-md)", color: "var(--text-muted)", fontWeight: 400 }}>/10</span>
+                  <span
+                    style={{
+                      marginLeft: "auto",
+                      fontSize: "var(--text-xs)",
+                      fontWeight: 600,
+                      padding: "0.2rem 0.6rem",
+                      borderRadius: "var(--radius-full)",
+                      background: selectedScore.score >= 8 ? "var(--accent-success-soft)" : selectedScore.score >= 6 ? "var(--accent-warning-soft)" : "var(--accent-danger-soft)",
+                      color: selectedScore.score >= 8 ? "var(--accent-success-text)" : selectedScore.score >= 6 ? "var(--accent-warning-text)" : "var(--accent-danger-text)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {getScoreLabel(selectedScore.score)}
+                  </span>
+                </div>
+                {/* Score bar */}
+                <div style={{ marginTop: "0.75rem", height: "4px", borderRadius: "2px", background: "var(--border-default)", overflow: "hidden" }}>
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${(selectedScore.score / 10) * 100}%`,
+                      borderRadius: "2px",
+                      background: getColor(selectedScore.score),
+                      transition: "width 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Scrollable details area */}
+              <div
+                style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  padding: "1.25rem 1.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1.125rem",
+                }}
+              >
+                {/* Strengths */}
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.5rem" }}>
+                    <TrendingUp size={14} color="var(--accent-success)" />
+                    <div style={panelSectionTitleStyle}>What's working well</div>
+                  </div>
+                  {strengthsList.length > 0 ? (
+                    <ul style={panelBulletListStyle}>
+                      {strengthsList.map((item) => (
+                        <li key={item} style={{ marginBottom: "0.25rem" }}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={panelMutedTextStyle}>No strengths added.</p>
+                  )}
+                </div>
+
+                {/* Weaknesses */}
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.5rem" }}>
+                    <TrendingDown size={14} color="var(--accent-danger)" />
+                    <div style={panelSectionTitleStyle}>What's not working well</div>
+                  </div>
+                  {weaknessesList.length > 0 ? (
+                    <ul style={panelBulletListStyle}>
+                      {weaknessesList.map((item) => (
+                        <li key={item} style={{ marginBottom: "0.25rem" }}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={panelMutedTextStyle}>No weaknesses added.</p>
+                  )}
+                </div>
+
+                {/* Rationale */}
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.5rem" }}>
+                    <FileText size={14} color="var(--text-muted)" />
+                    <div style={panelSectionTitleStyle}>Why this score</div>
+                  </div>
+                  <p style={{ ...panelMutedTextStyle, color: "var(--text-secondary)" }}>
+                    {selectedScore.scoreRationale?.trim() ||
+                      selectedScore.notes?.trim() ||
+                      "No rationale added."}
+                  </p>
+                </div>
+
+                {/* Analysis link */}
+                {selectedAnalysisSections.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowFullAnalysis(true)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.35rem",
+                      border: "1px solid var(--border-default)",
+                      background: "var(--surface-sunken)",
+                      color: "var(--accent-primary)",
+                      cursor: "pointer",
+                      fontSize: "var(--text-sm)",
+                      fontWeight: 500,
+                      padding: "0.5rem 0.875rem",
+                      borderRadius: "var(--radius-sm)",
+                      transition: "all var(--duration-fast) ease",
+                      marginTop: "auto",
+                      width: "100%",
+                      justifyContent: "center",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "var(--accent-primary-soft)";
+                      e.currentTarget.style.borderColor = "var(--accent-primary)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "var(--surface-sunken)";
+                      e.currentTarget.style.borderColor = "var(--border-default)";
+                    }}
+                  >
+                    View full analysis <ChevronRight size={14} />
+                  </button>
                 )}
               </div>
-              <div>
-                <div style={sectionTitleStyle}>What's not working well</div>
-                {weaknessesList.length > 0 ? (
-                  <ul style={bulletListStyle}>
-                    {weaknessesList.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={mutedTextStyle}>No weaknesses added.</p>
-                )}
-              </div>
-              <div>
-                <div style={sectionTitleStyle}>Why this score</div>
-                <p style={{ ...mutedTextStyle, color: "var(--text-secondary)" }}>
-                  {selectedScore.scoreRationale?.trim() ||
-                    selectedScore.notes?.trim() ||
-                    "No rationale added."}
-                </p>
+
+              {/* Hint footer */}
+              <div
+                style={{
+                  padding: "0.625rem 1.5rem",
+                  borderTop: "1px solid var(--border-subtle)",
+                  fontSize: "var(--text-xs)",
+                  color: "var(--text-muted)",
+                  textAlign: "center",
+                }}
+              >
+                Click a bar to explore a category
               </div>
             </div>
-            {selectedAnalysisSections.length > 0 && (
-              <>
-                <div style={{ borderTop: "1px solid var(--border-subtle)", margin: "0.875rem 0 0.625rem 0" }} />
-                <button
-                  type="button"
-                  onClick={() => setShowFullAnalysis(true)}
-                  style={{
-                    border: "none",
-                    background: "none",
-                    color: "var(--accent-primary)",
-                    cursor: "pointer",
-                    fontSize: "var(--text-sm)",
-                    fontWeight: 500,
-                    padding: 0,
-                    transition: "color var(--duration-fast) ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "var(--accent-primary-hover)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "var(--accent-primary)";
-                  }}
-                >
-                  View full analysis →
-                </button>
-              </>
-            )}
-          </div>
-        )}
+          )}
+        </div>
         <AnalysisOverlay
           open={showFullAnalysis}
           onClose={() => setShowFullAnalysis(false)}
@@ -325,27 +451,26 @@ function getScoreSectionLabel(type: string): string {
   return labels[type] || "Additional Notes";
 }
 
-const sectionTitleStyle: React.CSSProperties = {
+const panelSectionTitleStyle: React.CSSProperties = {
   fontSize: "var(--text-xs)",
   textTransform: "uppercase",
   letterSpacing: "0.06em",
   color: "var(--text-muted)",
   fontWeight: 600,
-  marginBottom: "0.4rem",
   lineHeight: 1.4,
 };
 
-const bulletListStyle: React.CSSProperties = {
+const panelBulletListStyle: React.CSSProperties = {
   margin: 0,
   paddingLeft: "1.1rem",
   color: "var(--text-secondary)",
   fontSize: "var(--text-sm)",
-  lineHeight: 1.55,
+  lineHeight: 1.6,
 };
 
-const mutedTextStyle: React.CSSProperties = {
+const panelMutedTextStyle: React.CSSProperties = {
   margin: 0,
   color: "var(--text-muted)",
   fontSize: "var(--text-sm)",
-  lineHeight: 1.55,
+  lineHeight: 1.6,
 };

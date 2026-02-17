@@ -3,7 +3,17 @@ import { UrgentFixesSlideData, Finding } from "../../types";
 import { usePrint } from "../../context/PrintContext";
 import { gsap } from "gsap";
 import { calculateUrgency } from "../../utils/priority";
-import { AlertTriangle, AlertCircle, Info } from "lucide-react";
+import {
+  AlertTriangle,
+  AlertCircle,
+  Info,
+  Zap,
+  ChevronRight,
+  Target,
+  ShieldAlert,
+  Compass,
+  BarChart3,
+} from "lucide-react";
 import AnalysisOverlay from "../AnalysisOverlay";
 
 interface UrgentFixesSlideProps {
@@ -29,9 +39,9 @@ export default function UrgentFixesSlide({
     const ctx = gsap.context(() => {
       gsap.from(".urgent-fix-item", {
         opacity: 0,
-        x: -50,
-        duration: 0.6,
-        stagger: 0.1,
+        y: 24,
+        duration: 0.5,
+        stagger: 0.08,
         ease: "power3.out",
       });
     }, slideRef);
@@ -56,6 +66,7 @@ export default function UrgentFixesSlide({
       .map((section) => ({
         title: getFindingSectionLabel(section.type),
         content: section.content.trim(),
+        media: section.media || [],
       }));
   }, [analysisTarget]);
 
@@ -124,7 +135,7 @@ export default function UrgentFixesSlide({
           , with a combined impact score of {totalCombinedImpact}.
         </p>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "2.25rem" }}>
           {/* ── Fix Now (urgent) ── */}
           {data.findings.length > 0 && (
             <FindingsGroup
@@ -199,13 +210,13 @@ function FindingsGroup({
   onOpenAnalysis: (f: Finding) => void;
 }) {
   return (
-    <div>
+    <div style={{ width: "100%", display: "block" }}>
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: "0.5rem",
-          marginBottom: "0.75rem",
+          marginBottom: "0.875rem",
         }}
       >
         {icon}
@@ -224,132 +235,283 @@ function FindingsGroup({
         </h3>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
-        {findings.map((finding) => {
-          const urgency = calculateUrgency(finding);
-          return (
-            <div
-              key={finding.id}
-              className="urgent-fix-item"
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem", minHeight: "0", width: "100%", position: "relative" }}>
+        {findings.length > 0 ? (
+          findings.map((finding) => {
+            const urgency = calculateUrgency(finding);
+            return (
+              <FindingCard
+                key={finding.id}
+                finding={finding}
+                urgency={urgency}
+                accentColor={accentColor}
+                badgeBg={badgeBg}
+                badgeColor={badgeColor}
+                getIgnoredConsequence={getIgnoredConsequence}
+                onOpenAnalysis={onOpenAnalysis}
+              />
+            );
+          })
+        ) : (
+          <div style={{ padding: "1rem", color: "var(--text-muted)", fontSize: "var(--text-sm)" }}>
+            No findings in this category.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** A single redesigned finding card */
+function FindingCard({
+  finding,
+  urgency,
+  accentColor,
+  badgeBg,
+  badgeColor,
+  getIgnoredConsequence,
+  onOpenAnalysis,
+}: {
+  finding: Finding;
+  urgency: number;
+  accentColor: string;
+  badgeBg: string;
+  badgeColor: string;
+  getIgnoredConsequence: (f: Finding) => string;
+  onOpenAnalysis: (f: Finding) => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const impactColor = finding.impact >= 4 ? "var(--accent-danger)" : finding.impact >= 3 ? "var(--accent-warning)" : "var(--accent-success)";
+  const impactBg = finding.impact >= 4 ? "var(--accent-danger-soft)" : finding.impact >= 3 ? "var(--accent-warning-soft)" : "var(--accent-success-soft)";
+
+  return (
+    <div
+      className="urgent-fix-item"
+      style={{
+        background: "var(--surface-card)",
+        borderRadius: "var(--radius-lg)",
+        border: "1px solid var(--border-default)",
+        boxShadow: isHovered ? "var(--shadow-md)" : "var(--shadow-xs)",
+        transition: "all var(--duration-normal) var(--ease-out)",
+        transform: isHovered ? "translateY(-1px)" : "translateY(0)",
+        overflow: "visible",
+        minHeight: "200px",
+        width: "100%",
+        display: "block",
+        position: "relative",
+        visibility: "visible",
+        opacity: 1,
+        zIndex: 1,
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Colored top accent bar */}
+      <div style={{ height: "3px", background: accentColor, opacity: 0.8 }} />
+
+      <div style={{ padding: "1.25rem 1.5rem" }}>
+        {/* Top row: Category tag + Urgency */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+          <span
+            style={{
+              fontSize: "var(--text-xs)",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              color: badgeColor,
+              background: badgeBg,
+              padding: "0.2rem 0.6rem",
+              borderRadius: "var(--radius-full)",
+            }}
+          >
+            {formatCategoryName(finding.category)}
+          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <Zap size={13} color={badgeColor} />
+            <span
               style={{
-                background: "var(--surface-card)",
-                padding: "1.25rem 1.5rem",
-                borderRadius: "var(--radius-md)",
-                borderLeft: `3px solid ${accentColor}`,
-                boxShadow: "var(--shadow-sm)",
-                transition: "box-shadow var(--duration-normal) var(--ease-out)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "var(--shadow-md)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+                fontSize: "var(--text-xs)",
+                fontWeight: 700,
+                color: badgeColor,
+                letterSpacing: "var(--tracking-wide)",
               }}
             >
-              {/* Title + urgency badge */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "start",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <h3
-                  style={{
-                    fontSize: "var(--text-lg)",
-                    fontWeight: 600,
-                    color: "var(--text-primary)",
-                    flex: 1,
-                    lineHeight: "var(--leading-tight)",
-                    letterSpacing: "var(--tracking-tight)",
-                  }}
-                >
-                  {finding.title}
-                </h3>
-                {/* Urgency badge — informational, not interactive */}
-                <span
-                  style={{
-                    background: badgeBg,
-                    color: badgeColor,
-                    padding: "0.25rem 0.6rem",
-                    borderRadius: "var(--radius-full)",
-                    fontSize: "var(--text-xs)",
-                    fontWeight: 600,
-                    flexShrink: 0,
-                    marginLeft: "1rem",
-                    letterSpacing: "var(--tracking-wide)",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  Urgency {urgency.toFixed(1)}
-                </span>
-              </div>
+              {urgency.toFixed(1)}
+            </span>
+          </div>
+        </div>
 
-              <p
-                style={{
-                  fontSize: "var(--text-base)",
-                  lineHeight: "var(--leading-normal)",
-                  color: "var(--text-tertiary)",
-                  marginBottom: "0.875rem",
-                }}
-              >
-                {getLeadSentence(getFindingWhatsHappening(finding))}
-              </p>
+        {/* Title */}
+        <h4
+          style={{
+            fontSize: "var(--text-lg)",
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            lineHeight: "var(--leading-tight)",
+            letterSpacing: "var(--tracking-tight)",
+            marginBottom: "0.375rem",
+          }}
+        >
+          {finding.title}
+        </h4>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 1fr 1fr", gap: "0.875rem" }}>
-                <div>
-                  <div style={detailLabelStyle}>What's happening</div>
-                  <div style={detailBodyStyle}>{getFindingWhatsHappening(finding)}</div>
-                </div>
-                <div>
-                  <div style={detailLabelStyle}>If ignored</div>
-                  <div style={{ ...detailBodyStyle, color: "var(--accent-danger-text)" }}>{getIgnoredConsequence(finding)}</div>
-                </div>
-                <div>
-                  <div style={detailLabelStyle}>Recommended direction</div>
-                  <div style={detailBodyStyle}>{getRecommendedDirection(finding) || "Not provided."}</div>
-                </div>
-                <div>
-                  <div style={detailLabelStyle}>Impact / Effort / Confidence</div>
-                  <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap", marginTop: "0.15rem" }}>
-                    <span style={metricPillStyle}>I {finding.impact}/5</span>
-                    <span style={metricPillStyle}>E {finding.effort}/5</span>
-                    <span style={metricPillStyle}>C {finding.confidence}/5</span>
-                  </div>
-                </div>
-              </div>
+        {/* Lead sentence */}
+        <p
+          style={{
+            fontSize: "var(--text-base)",
+            lineHeight: "var(--leading-normal)",
+            color: "var(--text-tertiary)",
+            marginBottom: "1rem",
+          }}
+        >
+          {getLeadSentence(getFindingWhatsHappening(finding))}
+        </p>
 
-              {finding.analysisSections?.some((section) => section.content.trim()) && (
-                <>
-                  <div style={{ borderTop: "1px solid var(--border-subtle)", margin: "0.875rem 0 0.625rem 0" }} />
-                  <button
-                    type="button"
-                    onClick={() => onOpenAnalysis(finding)}
-                    style={{
-                      border: "none",
-                      background: "none",
-                      color: "var(--accent-primary)",
-                      cursor: "pointer",
-                      fontSize: "var(--text-sm)",
-                      fontWeight: 500,
-                      padding: 0,
-                      transition: "color var(--duration-fast) ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = "var(--accent-primary-hover)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = "var(--accent-primary)";
-                    }}
-                  >
-                    View full analysis →
-                  </button>
-                </>
-              )}
+        {/* Details grid — 2 columns */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1rem",
+            padding: "1rem",
+            background: "var(--surface-sunken)",
+            borderRadius: "var(--radius-md)",
+            marginBottom: "1rem",
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        >
+          {/* What's happening */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginBottom: "0.35rem" }}>
+              <Target size={12} color="var(--text-muted)" />
+              <div style={cardLabelStyle}>What's happening</div>
             </div>
-          );
-        })}
+            <div style={cardBodyStyle}>{getFindingWhatsHappening(finding)}</div>
+          </div>
+
+          {/* If ignored */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginBottom: "0.35rem" }}>
+              <ShieldAlert size={12} color="var(--accent-danger)" />
+              <div style={{ ...cardLabelStyle, color: "var(--accent-danger-text)" }}>If ignored</div>
+            </div>
+            <div style={{ ...cardBodyStyle, color: "var(--text-secondary)" }}>{getIgnoredConsequence(finding)}</div>
+          </div>
+
+          {/* Recommended direction */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginBottom: "0.35rem" }}>
+              <Compass size={12} color="var(--text-muted)" />
+              <div style={cardLabelStyle}>Recommended direction</div>
+            </div>
+            <div style={cardBodyStyle}>{getRecommendedDirection(finding) || "Not provided."}</div>
+          </div>
+
+          {/* Metrics */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginBottom: "0.5rem" }}>
+              <BarChart3 size={12} color="var(--text-muted)" />
+              <div style={cardLabelStyle}>Metrics</div>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <MetricBadge label="Impact" value={finding.impact} max={5} color={impactColor} bg={impactBg} />
+              <MetricBadge
+                label="Effort"
+                value={finding.effort}
+                max={5}
+                color="var(--accent-primary)"
+                bg="var(--accent-primary-soft)"
+              />
+              <MetricBadge
+                label="Confidence"
+                value={finding.confidence}
+                max={5}
+                color="var(--accent-success)"
+                bg="var(--accent-success-soft)"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer: View analysis */}
+        {finding.analysisSections?.some((section) => section.content.trim()) && (
+          <button
+            type="button"
+            onClick={() => onOpenAnalysis(finding)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.3rem",
+              border: "none",
+              background: "none",
+              color: "var(--accent-primary)",
+              cursor: "pointer",
+              fontSize: "var(--text-sm)",
+              fontWeight: 500,
+              padding: 0,
+              transition: "all var(--duration-fast) ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--accent-primary-hover)";
+              e.currentTarget.style.gap = "0.5rem";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--accent-primary)";
+              e.currentTarget.style.gap = "0.3rem";
+            }}
+          >
+            View full analysis <ChevronRight size={14} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** A small metric badge with bar indicator */
+function MetricBadge({
+  label,
+  value,
+  max,
+  color,
+  bg,
+}: {
+  label: string;
+  value: number;
+  max: number;
+  color: string;
+  bg: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.25rem",
+        flex: "1 1 0",
+        minWidth: "70px",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: "0.65rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--text-muted)" }}>
+          {label}
+        </span>
+        <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, color }}>
+          {value}/{max}
+        </span>
+      </div>
+      <div style={{ height: "4px", borderRadius: "2px", background: "var(--border-default)", overflow: "hidden" }}>
+        <div
+          style={{
+            height: "100%",
+            width: `${(value / max) * 100}%`,
+            borderRadius: "2px",
+            background: color,
+            transition: "width 0.3s ease",
+          }}
+        />
       </div>
     </div>
   );
@@ -389,28 +551,17 @@ function getFindingSectionLabel(type: string): string {
   return labels[type] || "Additional Notes";
 }
 
-const detailLabelStyle: React.CSSProperties = {
+const cardLabelStyle: React.CSSProperties = {
   fontSize: "var(--text-xs)",
   textTransform: "uppercase",
   letterSpacing: "0.06em",
   color: "var(--text-muted)",
   fontWeight: 600,
-  marginBottom: "0.3rem",
   lineHeight: 1.4,
 };
 
-const detailBodyStyle: React.CSSProperties = {
+const cardBodyStyle: React.CSSProperties = {
   fontSize: "var(--text-sm)",
   color: "var(--text-secondary)",
-  lineHeight: 1.55,
-};
-
-const metricPillStyle: React.CSSProperties = {
-  background: "var(--surface-sunken)",
-  padding: "0.2rem 0.5rem",
-  borderRadius: "var(--radius-full)",
-  fontSize: "var(--text-xs)",
-  color: "var(--text-secondary)",
-  fontWeight: 500,
-  letterSpacing: "0.02em",
+  lineHeight: 1.6,
 };

@@ -81,6 +81,7 @@ export interface ScoreAnalysisSection {
   id: string;
   type: ScoreAnalysisSectionType;
   content: string;
+  media?: AnalysisMedia[];
 }
 
 // Findings System
@@ -113,12 +114,22 @@ export interface FindingAnalysisSection {
   id: string;
   type: FindingAnalysisSectionType;
   content: string;
+  media?: AnalysisMedia[];
 }
 
 export interface Evidence {
   type: "image" | "video";
   url: string;
   caption?: string;
+}
+
+export interface AnalysisMedia extends Evidence {
+  id: string;
+  placement?: "left" | "right" | "full";
+  storagePath?: string;
+  fileName?: string;
+  mimeType?: string;
+  createdAt?: string;
 }
 
 // Competitors
