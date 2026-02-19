@@ -2848,7 +2848,10 @@
             <span style="color: var(--muted);">•</span>
             <button data-modal="privacy" class="footer-btn">Privacy Policy</button>
         </div>
-        <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">© 2025 ZoneBrozStudios. All Rights Reserved.</p>
+        <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">© <span id="copyright-year"></span> ZoneBrozStudios. All Rights Reserved.</p>
+        <script>
+            document.getElementById('copyright-year').textContent = new Date().getFullYear();
+        </script>
     </footer>
 
     <!-- Terms & Conditions Modal -->
