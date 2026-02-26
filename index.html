@@ -27,6 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="onboarding.js"></script>
     <!-- DrawSVGPlugin (requires GreenSock Club membership) -->
     <script src="https://assets.codepen.io/16327/DrawSVGPlugin3.min.js"></script>
     <!-- MorphSVGPlugin (requires GreenSock Club membership) -->
@@ -2482,6 +2483,329 @@
             transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s ease;
         }
 
+        /* Onboarding wizard (contact modal) */
+        .onboarding-shell {
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+        }
+
+        .onboarding-subtext {
+            color: var(--muted);
+            font-size: 1.02rem;
+            max-width: 520px;
+        }
+
+        .onboarding-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+        }
+
+        .onboarding-progress {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            padding-bottom: 0.5rem;
+            background: linear-gradient(to bottom, rgba(3,3,3,0.96), rgba(3,3,3,0.9), transparent);
+        }
+
+        .onboarding-progress-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.4rem;
+        }
+
+        .onboarding-step-label {
+            font-size: 0.9rem;
+            color: var(--muted);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .onboarding-progress-bar {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.09);
+            overflow: hidden;
+        }
+
+        .onboarding-progress-bar-fill {
+            position: absolute;
+            inset: 0;
+            width: 16%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #ffffff, rgba(255,255,255,0.6));
+            box-shadow: 0 0 22px rgba(255,255,255,0.4);
+        }
+
+        .onboarding-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .onboarding-step {
+            display: none;
+        }
+
+        .onboarding-step-active {
+            display: block;
+        }
+
+        .onboarding-step-heading {
+            margin-bottom: 1rem;
+        }
+
+        .onboarding-step-heading h2 {
+            font-size: clamp(1.6rem, 3.2vw, 2rem);
+            margin-bottom: 0.4rem;
+        }
+
+        .onboarding-step-heading p {
+            color: var(--muted);
+            font-size: 0.98rem;
+        }
+
+        .onboarding-step-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .onboarding-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .onboarding-card {
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.09);
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.05), rgba(3,3,3,0.96));
+            padding: 1rem 1.1rem;
+            text-align: left;
+            cursor: pointer;
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            box-shadow:
+                0 12px 36px rgba(0,0,0,0.55),
+                inset 0 1px 1px rgba(255,255,255,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+            font-size: 0.98rem;
+        }
+
+        .onboarding-card-label {
+            font-weight: 600;
+        }
+
+        .onboarding-card-caption {
+            font-size: 0.86rem;
+            color: var(--muted);
+        }
+
+        .onboarding-card-selected {
+            border-color: rgba(255,255,255,0.5);
+            background: radial-gradient(circle at top, rgba(255,255,255,0.12), rgba(3,3,3,0.9));
+            box-shadow:
+                0 22px 60px rgba(0,0,0,0.7),
+                0 0 32px rgba(255,255,255,0.16);
+        }
+
+        .onboarding-tile-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.85rem;
+        }
+
+        .onboarding-tile-group-label {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .onboarding-field-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .onboarding-field-label {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .onboarding-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .onboarding-input,
+        .onboarding-textarea {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: var(--white);
+            padding: 0.95rem 1.1rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .onboarding-input:focus,
+        .onboarding-textarea:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.05);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.22),
+                0 16px 40px rgba(0,0,0,0.45);
+        }
+
+        .onboarding-textarea {
+            min-height: 160px;
+            resize: vertical;
+        }
+
+        .onboarding-helper-text {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 0.4rem;
+        }
+
+        .onboarding-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .onboarding-nav-button {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            color: var(--muted);
+            font-size: 0.95rem;
+            padding: 0.8rem 1.4rem;
+            cursor: pointer;
+            min-height: 44px;
+            transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+        }
+
+        .onboarding-nav-button[disabled] {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .onboarding-nav-button:not([disabled]):hover {
+            color: var(--white);
+            border-color: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.06);
+            transform: translateY(-1px);
+        }
+
+        .onboarding-cta-main {
+            border: none;
+            cursor: pointer;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #ffffff, rgba(255,255,255,0.85));
+            color: #000;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.95rem 2.75rem;
+            min-height: 48px;
+            min-width: 180px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 18px 50px rgba(0,0,0,0.65),
+                0 0 32px rgba(255,255,255,0.45);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .onboarding-cta-main[disabled] {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .onboarding-cta-main:not([disabled]):hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow:
+                0 24px 60px rgba(0,0,0,0.7),
+                0 0 40px rgba(255,255,255,0.55);
+        }
+
+        .onboarding-cta-main:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .onboarding-cta-loading {
+            position: relative;
+        }
+
+        .onboarding-cta-loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            border: 2px solid rgba(0,0,0,0.32);
+            border-top-color: rgba(0,0,0,0.9);
+            margin-left: 0.75rem;
+            animation: onboarding-spin 0.7s linear infinite;
+            display: inline-block;
+        }
+
+        .onboarding-social-proof {
+            flex: 1;
+            min-width: 200px;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        @keyframes onboarding-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .onboarding-body {
+                gap: 1.5rem;
+            }
+
+            .onboarding-card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .onboarding-field-group {
+                grid-template-columns: 1fr;
+            }
+
+            .onboarding-footer {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .onboarding-cta-main,
+            .onboarding-nav-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         @media (max-width: 640px) {
             .modal-overlay {
                 padding: 1rem 0.75rem;
@@ -3149,89 +3473,244 @@
                     <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
             </button>
-            <h1>Tell us where you're at</h1>
-            <form action="https://formspree.io/f/mvgrynvw" method="POST">
-                <div class="form-row">
+            <div class="onboarding-root" data-context="home-modal">
+                <div class="onboarding-shell">
                     <div>
-                        <label for="name">What is your name?</label>
-                        <input type="text" id="name" name="name" required>
+                        <h1 class="onboarding-headline">Let’s Build Something That Scales.</h1>
+                        <p class="onboarding-subtext">Tell us about your project. We’ll review it and respond with next steps.</p>
                     </div>
-                    <div>
-                        <label for="email">What is your email?</label>
-                        <input type="email" id="email" name="_replyto" required>
+                    <div class="onboarding-body">
+                        <div class="onboarding-progress">
+                            <div class="onboarding-progress-top">
+                                <span class="onboarding-step-label">Step 1 of 6</span>
+                            </div>
+                            <div class="onboarding-progress-bar">
+                                <div class="onboarding-progress-bar-fill"></div>
+                            </div>
+                        </div>
+                        <form class="onboarding-form" action="https://formspree.io/f/xvzblbbb" method="POST" novalidate>
+                            <input type="hidden" name="project_type" id="project_type_input">
+                            <input type="hidden" name="project_stage" id="project_stage_input">
+                            <input type="hidden" name="primary_goal" id="primary_goal_input">
+                            <input type="hidden" name="timeline" id="timeline_input">
+                            <input type="hidden" name="investment_level" id="investment_level_input">
+                            <input type="hidden" name="lead_score" id="lead_score_input">
+                            <input type="hidden" name="lead_flags" id="lead_flags_input">
+
+                            <section class="onboarding-step onboarding-step-active" data-step="1" aria-hidden="false">
+                                <div class="onboarding-step-heading">
+                                    <h2>What are we building together?</h2>
+                                    <p>Select the type of product you want to bring to life.</p>
+                                </div>
+                                <div class="onboarding-step-body">
+                                    <div class="onboarding-card-grid">
+                                        <button type="button" class="onboarding-card" data-field="projectType" data-value="AI Tool / SaaS Platform">
+                                            <span class="onboarding-card-label">AI Tool / SaaS Platform</span>
+                                            <span class="onboarding-card-caption">Product-led software with recurring users.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectType" data-value="Web Application">
+                                            <span class="onboarding-card-label">Web Application</span>
+                                            <span class="onboarding-card-caption">Custom web experience or platform.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectType" data-value="E-commerce Store">
+                                            <span class="onboarding-card-label">E-commerce Store</span>
+                                            <span class="onboarding-card-caption">Sell products with a tailored buying flow.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectType" data-value="Internal Business System">
+                                            <span class="onboarding-card-label">Internal Business System</span>
+                                            <span class="onboarding-card-caption">Dashboards, tooling, or internal automation.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectType" data-value="Mobile App">
+                                            <span class="onboarding-card-label">Mobile App</span>
+                                            <span class="onboarding-card-caption">Native or cross-platform mobile experience.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectType" data-value="Something Custom">
+                                            <span class="onboarding-card-label">Something Custom</span>
+                                            <span class="onboarding-card-caption">You don’t see it here, but you know it matters.</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="onboarding-step" data-step="2" aria-hidden="true">
+                                <div class="onboarding-step-heading">
+                                    <h2>Where are you in your journey?</h2>
+                                    <p>This helps us understand the level of complexity and support you need.</p>
+                                </div>
+                                <div class="onboarding-step-body">
+                                    <div class="onboarding-card-grid">
+                                        <button type="button" class="onboarding-card" data-field="projectStage" data-value="Just an idea">
+                                            <span class="onboarding-card-label">Just an idea</span>
+                                            <span class="onboarding-card-caption">You’re at the whiteboard stage and want clarity.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectStage" data-value="Have designs ready">
+                                            <span class="onboarding-card-label">Have designs ready</span>
+                                            <span class="onboarding-card-caption">You’ve invested in UX/UI and need it built right.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectStage" data-value="MVP built, need improvements">
+                                            <span class="onboarding-card-label">MVP built, need improvements</span>
+                                            <span class="onboarding-card-caption">You’ve shipped something and want to level it up.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectStage" data-value="Scaling existing product">
+                                            <span class="onboarding-card-label">Scaling existing product</span>
+                                            <span class="onboarding-card-caption">You’re growing and need robust, scalable systems.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="projectStage" data-value="Rebuilding from scratch">
+                                            <span class="onboarding-card-label">Rebuilding from scratch</span>
+                                            <span class="onboarding-card-caption">You know what’s not working and want a clean reset.</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="onboarding-step" data-step="3" aria-hidden="true">
+                                <div class="onboarding-step-heading">
+                                    <h2>What’s the main goal?</h2>
+                                    <p>Pick the outcome that matters most right now.</p>
+                                </div>
+                                <div class="onboarding-step-body">
+                                    <div class="onboarding-card-grid">
+                                        <button type="button" class="onboarding-card" data-field="primaryGoal" data-value="Generate revenue">
+                                            <span class="onboarding-card-label">Generate revenue</span>
+                                            <span class="onboarding-card-caption">Turn your product into a growth engine.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="primaryGoal" data-value="Automate operations">
+                                            <span class="onboarding-card-label">Automate operations</span>
+                                            <span class="onboarding-card-caption">Remove manual work and create leverage.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="primaryGoal" data-value="Improve user experience">
+                                            <span class="onboarding-card-label">Improve user experience</span>
+                                            <span class="onboarding-card-caption">Delight users and reduce friction.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="primaryGoal" data-value="Launch an MVP fast">
+                                            <span class="onboarding-card-label">Launch an MVP fast</span>
+                                            <span class="onboarding-card-caption">Get something real into the world quickly.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="primaryGoal" data-value="Integrate AI">
+                                            <span class="onboarding-card-label">Integrate AI</span>
+                                            <span class="onboarding-card-caption">Use AI where it genuinely moves the needle.</span>
+                                        </button>
+                                        <button type="button" class="onboarding-card" data-field="primaryGoal" data-value="Rebrand / Redesign">
+                                            <span class="onboarding-card-label">Rebrand / Redesign</span>
+                                            <span class="onboarding-card-caption">Align the product with where you’re really going.</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="onboarding-step" data-step="4" aria-hidden="true">
+                                <div class="onboarding-step-heading">
+                                    <h2>Timeline &amp; investment</h2>
+                                    <p>So we can recommend the right way to move forward.</p>
+                                </div>
+                                <div class="onboarding-step-body">
+                                    <div class="onboarding-tile-group">
+                                        <div class="onboarding-tile-group-label">When do you want to launch?</div>
+                                        <div class="onboarding-tile-row">
+                                            <button type="button" class="onboarding-card" data-field="timeline" data-value="ASAP (0–30 days)">
+                                                <span class="onboarding-card-label">ASAP (0–30 days)</span>
+                                            </button>
+                                            <button type="button" class="onboarding-card" data-field="timeline" data-value="1–3 months">
+                                                <span class="onboarding-card-label">1–3 months</span>
+                                            </button>
+                                            <button type="button" class="onboarding-card" data-field="timeline" data-value="3–6 months">
+                                                <span class="onboarding-card-label">3–6 months</span>
+                                            </button>
+                                            <button type="button" class="onboarding-card" data-field="timeline" data-value="No fixed deadline">
+                                                <span class="onboarding-card-label">No fixed deadline</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="onboarding-tile-group">
+                                        <div class="onboarding-tile-group-label">What level of investment are you prepared for?</div>
+                                        <div class="onboarding-tile-row">
+                                            <button type="button" class="onboarding-card" data-field="investmentLevel" data-value="Under R15k">
+                                                <span class="onboarding-card-label">Under R15k</span>
+                                            </button>
+                                            <button type="button" class="onboarding-card" data-field="investmentLevel" data-value="R15k–R40k">
+                                                <span class="onboarding-card-label">R15k–R40k</span>
+                                            </button>
+                                            <button type="button" class="onboarding-card" data-field="investmentLevel" data-value="R40k–R100k">
+                                                <span class="onboarding-card-label">R40k–R100k</span>
+                                            </button>
+                                            <button type="button" class="onboarding-card" data-field="investmentLevel" data-value="R100k+">
+                                                <span class="onboarding-card-label">R100k+</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="onboarding-step" data-step="5" aria-hidden="true">
+                                <div class="onboarding-step-heading">
+                                    <h2>The vision</h2>
+                                    <p>Describe the idea, who it’s for, and what success looks like.</p>
+                                </div>
+                                <div class="onboarding-step-body">
+                                    <div class="onboarding-field">
+                                        <label class="onboarding-field-label" for="home-vision">Tell us about the vision</label>
+                                        <textarea
+                                            id="home-vision"
+                                            name="message"
+                                            class="onboarding-textarea onboarding-vision-textarea"
+                                            placeholder="Describe your idea in detail. What problem does it solve? Who is it for? What does success look like?"
+                                            required
+                                        ></textarea>
+                                        <p class="onboarding-helper-text">The more context you give, the better we can advise you.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="onboarding-step" data-step="6" aria-hidden="true">
+                                <div class="onboarding-step-heading">
+                                    <h2>Where should we send next steps?</h2>
+                                    <p>We’ll review your answers and follow up with a considered response.</p>
+                                </div>
+                                <div class="onboarding-step-body">
+                                    <div class="onboarding-field-group">
+                                        <div class="onboarding-field">
+                                            <label class="onboarding-field-label" for="home-name">Name</label>
+                                            <input
+                                                id="home-name"
+                                                name="name"
+                                                type="text"
+                                                class="onboarding-input"
+                                                required
+                                            >
+                                        </div>
+                                        <div class="onboarding-field">
+                                            <label class="onboarding-field-label" for="home-email">Email</label>
+                                            <input
+                                                id="home-email"
+                                                name="_replyto"
+                                                type="email"
+                                                class="onboarding-input"
+                                                required
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="onboarding-field">
+                                        <label class="onboarding-field-label" for="home-company">Company (optional)</label>
+                                        <input
+                                            id="home-company"
+                                            name="company_name"
+                                            type="text"
+                                            class="onboarding-input"
+                                            placeholder="If applicable"
+                                        >
+                                    </div>
+                                </div>
+                            </section>
+
+                            <div class="onboarding-footer">
+                                <button type="button" class="onboarding-nav-button" data-role="back">Back</button>
+                                <button type="button" class="onboarding-nav-button" data-role="next">Next</button>
+                                <button type="submit" class="onboarding-cta-main" data-role="submit">Start My Project</button>
+                                <p class="onboarding-social-proof">Trusted by founders, startups &amp; scaling teams.</p>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <div>
-                    <label for="role">What is your role in the company?</label>
-                    <input type="text" id="role" name="role">
-                </div>
-
-                <div class="form-row">
-                    <div>
-                        <label for="company_name">Company Name</label>
-                        <input type="text" id="company_name" name="company_name">
-                    </div>
-                    <div>
-                        <label for="company_website">Company Website</label>
-                        <input type="url" id="company_website" name="company_website">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="select-wrapper">
-                        <label for="company_size">Company Size</label>
-                        <select id="company_size" name="company_size">
-                            <option value="">Select company size</option>
-                            <option>1-10 employees</option>
-                            <option>11-50 employees</option>
-                            <option>51-200 employees</option>
-                            <option>201-1000 employees</option>
-                            <option>1000+ employees</option>
-                        </select>
-                    </div>
-                    <div class="select-wrapper">
-                        <label for="revenue">Company's Annual Revenue</label>
-                        <select id="revenue" name="revenue">
-                            <option value="">Select revenue range</option>
-                            <option>Under $1M</option>
-                            <option>$1M - $10M</option>
-                            <option>$10M - $50M</option>
-                            <option>$50M+</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="select-wrapper">
-                        <label for="budget">Project budget</label>
-                        <select id="budget" name="budget">
-                            <option value="">Select budget range</option>
-                            <option>$5,000 - $10,000</option>
-                            <option>$10,000 - $25,000</option>
-                            <option>$25,000 - $50,000</option>
-                            <option>$50,000+</option>
-                        </select>
-                    </div>
-                    <div class="select-wrapper">
-                        <label for="services-interest">What services are you interested in?</label>
-                        <select id="services-interest" name="services_interest">
-                            <option value="">Select service</option>
-                            <option>UI/UX Design</option>
-                            <option>Web Development</option>
-                            <option>Brand Strategy</option>
-                            <option>Full Package</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" required></textarea>
-                </div>
-
-                <button type="submit">Send Inquiry</button>
-            </form>
         </div>
     </div>
 
