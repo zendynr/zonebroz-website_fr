@@ -459,24 +459,96 @@
     }
 
     function initFormSubmit() {
-      form.addEventListener("submit", function () {
+      let isSubmitting = false;
+
+      let statusEl = null;
+      const footer = form.querySelector(".onboarding-footer");
+      if (footer) {
+        statusEl = document.createElement("p");
+        statusEl.className = "onboarding-status";
+        footer.appendChild(statusEl);
+      }
+
+      function setStatus(type, message) {
+        if (!statusEl) return;
+        statusEl.textContent = message || "";
+        statusEl.dataset.statusType = type || "";
+      }
+
+      form.addEventListener("submit", function (event) {
         updateHiddenFields();
         applyLeadScore();
-        if (submitButton && safeGsap()) {
-          const gsapInst = safeGsap();
-          const originalText = submitButton.textContent;
+
+        if (!window.fetch) {
+          return;
+        }
+
+        event.preventDefault();
+        if (isSubmitting) return;
+        isSubmitting = true;
+
+        const gsapInst = safeGsap();
+        const originalText = submitButton ? submitButton.textContent : "";
+
+        if (submitButton) {
           submitButton.disabled = true;
           submitButton.classList.add("onboarding-cta-loading");
           submitButton.textContent = "Submitting...";
-          gsapInst.to(submitButton, {
-            scale: 0.98,
-            duration: 0.15,
-            ease: "power2.inOut"
-          });
-          setTimeout(function () {
-            submitButton.textContent = originalText;
-          }, 4000);
         }
+        setStatus("pending", "Submitting...");
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+          method: form.method || "POST",
+          body: formData,
+          headers: { Accept: "application/json" }
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error("Formspree error");
+            }
+            return response.json().catch(function () {
+              return {};
+            });
+          })
+          .then(function () {
+            if (submitButton) {
+              submitButton.classList.remove("onboarding-cta-loading");
+              submitButton.textContent = "Submitted";
+              submitButton.disabled = true;
+              if (gsapInst) {
+                gsapInst.to(submitButton, {
+                  scale: 1.02,
+                  duration: 0.2,
+                  ease: "power2.out"
+                });
+              }
+            }
+            setStatus(
+              "success",
+              "Submitted. We’ll review it and get back to you."
+            );
+          })
+          .catch(function () {
+            isSubmitting = false;
+            if (submitButton) {
+              submitButton.classList.remove("onboarding-cta-loading");
+              submitButton.disabled = false;
+              submitButton.textContent = originalText || "Start My Project";
+              if (gsapInst) {
+                gsapInst.to(submitButton, {
+                  scale: 1,
+                  duration: 0.2,
+                  ease: "power2.out"
+                });
+              }
+            }
+            setStatus(
+              "error",
+              "Something went wrong. Please try again in a moment."
+            );
+          });
       });
     }
 
